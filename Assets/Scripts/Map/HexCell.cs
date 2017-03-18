@@ -2,27 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
-
-
 public class HexCell
 {
-    
     #region MemberVariables
-    public Coords coords { get; protected set; }
+    public Coords Coords { get; protected set; }
 
     public Area ParentArea { get; protected set; }
-    
+
     public Base LocalBase { get; protected set; }
-    
-    
     #endregion
-
-
 }
-
-
-
 
 /// <summary>
 /// Coords are 2D coordinates.
@@ -38,14 +27,13 @@ public class Coords
         this.X = x;
         this.Y = y;
     }
-
 }
 
 /// <summary>
 /// This struct contains the neighbors of a HexCell
 /// </summary>
 /// 
-struct Neighbors
+public struct Neighbors
 {
     HexCell[] neighbors;
     HexCell center;
@@ -61,7 +49,7 @@ struct Neighbors
     /// </summary>
     /// <param name="direction">The direction of the neigbor as seen from the center cell</param>
     /// <returns>The corresponding neighbor</returns>
-    public HexCell getNeighbor(HexDirection direction)
+    public HexCell GetNeighbor(HexDirection direction)
     {
         //TODO: what if the center is an outskirt cell and there is no value in the array for this neighbor
         return neighbors[(int)direction];
@@ -71,7 +59,7 @@ struct Neighbors
     /// Get the center of this neighbor struct
     /// </summary>
     /// <returns>The center</returns>
-    public HexCell getCenter()
+    public HexCell GetCenter()
     {
         return center;
     }
@@ -82,7 +70,7 @@ struct Neighbors
     /// Without any directions given the whole neighbors array is returned.
     /// <param name="directions">The directions of the wanted neighbors </param>
     /// <returns>The neighbor cells wanted</returns>
-    public HexCell[] getNeighbors(List<HexDirection> directions = null)
+    public HexCell[] GetNeighbors(List<HexDirection> directions = null)
     {
         if (directions == null || directions.Count == 6)
             return neighbors;
@@ -94,18 +82,16 @@ struct Neighbors
 
         for (int i = 0; i < directions.Count; i++)
         {
-            wantedNeighbors[i] = getNeighbor(directions[i]);
+            wantedNeighbors[i] = GetNeighbor(directions[i]);
         }
         return wantedNeighbors;
     }
-
-
 }
 
 /// <summary>
 /// Used to identify the direction of a neighbor
 /// </summary>
-enum HexDirection
+public enum HexDirection
 {
     rightAbove,
     right,
