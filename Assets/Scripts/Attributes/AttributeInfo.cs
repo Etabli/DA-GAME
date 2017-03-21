@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Runtime.Serialization;
+using System;
 
 /// <summary>
 /// Represents information on a single AttributeType. Serializable via a DataContract.
@@ -38,6 +39,11 @@ public class AttributeInfo
     public Attribute GenerateAttribute(int tier)
     {
         return new Attribute(Type, ValueType, ValueInfo.GetValueForTier(tier));
+    }
+
+    public override string ToString()
+    {
+        return String.Format("{0}: {1}", Name, ValueInfo);
     }
 
     #region Static Functionality

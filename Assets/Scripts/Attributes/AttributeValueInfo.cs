@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Runtime.Serialization;
+using System;
 
 public delegate AttributeValue Progression(int tier, AttributeValue baseValue);
 
@@ -9,9 +10,14 @@ public delegate AttributeValue Progression(int tier, AttributeValue baseValue);
 /// Represents information on an Attribute's value or values. Serialiazable via a DataContract.
 /// </summary>
 [DataContract]
+[KnownType(typeof(AttributeValueSingle))]
+[KnownType(typeof(AttributeValueRange))]
+[KnownType(typeof(AttributeValueMultiple))]
 public class AttributeValueInfo
 {
+    [DataMember]
     protected AttributeValue baseValueMin;
+    [DataMember]
     protected AttributeValue baseValueMax;
 
     protected Progression progression;
@@ -35,7 +41,7 @@ public class AttributeValueInfo
     {
         if (progression != null)
         {
-            float frac = Random.Range(0, 100) / 100.0f;
+            float frac = UnityEngine.Random.Range(0, 100) / 100.0f;
             // Progress min and max values before combining them into a random value between them
             Debug.Log(string.Format("Generating Attribute of type {0} with base range {1} - {2}", baseValueMin.GetType(), baseValueMin, baseValueMax));
             Debug.Log(string.Format("Chosen fraction was {0}, and tier is {1}", frac, tier));
@@ -51,5 +57,10 @@ public class AttributeValueInfo
         }
         Debug.LogError("No progression function set!");
         return null;
+    }
+
+    public override string ToString()
+    {
+        return string.Format("{0} - {1}", baseValueMin, baseValueMax);
     }
 }

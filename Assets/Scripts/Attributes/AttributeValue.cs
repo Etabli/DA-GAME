@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using System.Runtime.Serialization;
 
 /// <summary>
 /// Value types for attributes. Used to decide on the proper AttributeValue child class upon deserialization.
@@ -18,6 +19,7 @@ public enum AttributeValueType
 /// <summary>
 /// Represents a general AttributeValue and the operations it should support.
 /// </summary>
+[DataContract]
 public abstract class AttributeValue
 {
     public abstract AttributeValue Invert();
@@ -66,8 +68,10 @@ public abstract class AttributeValue
 /// <summary>
 /// An AttributeValue that represents a single float.
 /// </summary>
+[DataContract]
 public class AttributeValueSingle : AttributeValue
 {
+    [DataMember]
     public float Value { get; protected set; }
 
     public AttributeValueSingle()
@@ -116,8 +120,10 @@ public class AttributeValueSingle : AttributeValue
 /// <summary>
 /// An AttributeValue that represents a Range.
 /// </summary>
+[DataContract]
 public class AttributeValueRange : AttributeValue
 {
+    [DataMember]
     public Range Value { get; protected set; }
 
     public AttributeValueRange()
@@ -178,8 +184,10 @@ public class AttributeValueRange : AttributeValue
 /// <summary>
 /// An AttributeValue that represents an array of floats.
 /// </summary>
+[DataContract]
 public class AttributeValueMultiple : AttributeValue
 {
+    [DataMember]
     public float[] Values { get; protected set; }
 
     public AttributeValueMultiple()

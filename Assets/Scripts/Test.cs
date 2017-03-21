@@ -26,11 +26,14 @@ public class Test : MonoBehaviour {
     {
 		if (Input.GetKeyDown(KeyCode.Space))
         {
-            AttributeValueRange r = new AttributeValueRange(new Range(5, 7));
-            print(-r);
+            AttributeInfo info = AttributeInfo.GetAttributeInfo(AttributeType.Health);
+            print(info);
 
-            Attribute attr = AttributeInfo.GetAttributeInfo(AttributeType.PhysDmgFlat).GenerateAttribute(2) as Attribute;
-            print(attr);
+            string infostring = AttributeInfoSerializer.SerializeAttributeInfo(info);
+            print(infostring);
+
+            AttributeInfo info2 = AttributeInfoSerializer.DeserializeAttributeInfo(infostring);
+            print(info2);
         }
 	}
 }
