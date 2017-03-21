@@ -21,9 +21,15 @@ public class AttributeInfo
     [DataMember]
     public readonly AttributeValueInfo ValueInfo;
 
+    public AttributeInfo(AttributeInfo src) : this(src.Type, src.ValueType, src.Name, src.ValueInfo, src.Description)
+    { }
+
     public AttributeInfo(AttributeType type, AttributeValueType valueType, string name, AttributeValueInfo valueInfo) : this(type, valueType, name, valueInfo, "")
     { }
 
+    /// <summary>
+    /// Creates a new AttributeInfo object and adds it to the AttributeInfoDictionary
+    /// </summary>
     public AttributeInfo(AttributeType type, AttributeValueType valueType, string name, AttributeValueInfo valueInfo, string description)
     {
         Type = type;
@@ -32,6 +38,7 @@ public class AttributeInfo
         Description = description;
         ValueInfo = valueInfo;
 
+        //Debug.Log(string.Format("Adding {0} to dictionary", type));
         AttributeInfoDictionary.Add(type, this);
     }
 

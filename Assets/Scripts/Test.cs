@@ -14,11 +14,15 @@ public class Test : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
     {
-        AttributeValueInfo attrVal = new AttributeValueInfo(new AttributeValueSingle(5.0f), new AttributeValueSingle(8.0f), ProgressFloat);
-        AttributeInfo attrInfo = new AttributeInfo(AttributeType.Health, AttributeValueType.SingleValue, "Base Health", attrVal, "Adds {0} Health");
+        //AttributeValueInfo attrVal = new AttributeValueInfo(new AttributeValueSingle(5.0f), new AttributeValueSingle(8.0f), ProgressFloat);
+        //AttributeInfo attrInfo = new AttributeInfo(AttributeType.Health, AttributeValueType.SingleValue, "Base Health", attrVal, "Adds {0} Health");
 
-        AttributeValueInfo physDmgFlatValInfo = new AttributeValueInfo(new AttributeValueRange(3, 4), new AttributeValueRange(5, 7), (tier, range) => range * tier);
-        AttributeInfo physDmgFlatInfo = new AttributeInfo(AttributeType.PhysDmgFlat, AttributeValueType.Range, "Flat Physical Damage", physDmgFlatValInfo);
+        AttributeInfoSerializer.LoadFromDisk(AttributeType.Health);
+
+        //AttributeValueInfo physDmgFlatValInfo = new AttributeValueInfo(new AttributeValueRange(3, 4), new AttributeValueRange(5, 7), (tier, range) => range * tier);
+        //AttributeInfo physDmgFlatInfo = new AttributeInfo(AttributeType.PhysDmgFlat, AttributeValueType.Range, "Flat Physical Damage", physDmgFlatValInfo);
+
+        AttributeInfoSerializer.LoadFromDisk(AttributeType.PhysDmgFlat);
     }
 	
 	// Update is called once per frame
@@ -29,14 +33,10 @@ public class Test : MonoBehaviour {
             AttributeInfo info = AttributeInfo.GetAttributeInfo(AttributeType.Health);
             print(info);
 
-            string infostring = AttributeInfoSerializer.SerializeAttributeInfo(info);
-            print(infostring);
-
-            AttributeInfo info2 = AttributeInfoSerializer.DeserializeAttributeInfo(infostring);
-            print(info2);
-
             Attribute attr = info.GenerateAttribute(7);
             print(attr);
+
+
         }
 	}
 }
