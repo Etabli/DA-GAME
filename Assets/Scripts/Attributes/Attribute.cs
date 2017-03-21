@@ -21,15 +21,19 @@ public class Attribute
     public AttributeValueType Class { get; protected set; }
     public AttributeValue Value { get; protected set; }
 
+    protected AttributeInfo info;
+
     public Attribute(AttributeType type, AttributeValueType attributeClass, AttributeValue value)
     {
         Type = type;
         Class = attributeClass;
         Value = value;
+
+        info = AttributeInfo.GetAttributeInfo(type);
     }
 
     public override string ToString()
     {
-        return string.Format("{0}({1}): {2}", Type, Class, Value);
+        return string.Format(info.Description, Value);
     }
 }

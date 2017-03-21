@@ -15,7 +15,7 @@ public class Test : MonoBehaviour {
 	void Start ()
     {
         AttributeValueInfo attrVal = new AttributeValueInfo(new AttributeValueSingle(5.0f), new AttributeValueSingle(8.0f), ProgressFloat);
-        AttributeInfo attrInfo = new AttributeInfo(AttributeType.Health, AttributeValueType.SingleValue, "Base Health", attrVal);
+        AttributeInfo attrInfo = new AttributeInfo(AttributeType.Health, AttributeValueType.SingleValue, "Base Health", attrVal, "Adds {0} Health");
 
         AttributeValueInfo physDmgFlatValInfo = new AttributeValueInfo(new AttributeValueRange(3, 4), new AttributeValueRange(5, 7), (tier, range) => range * tier);
         AttributeInfo physDmgFlatInfo = new AttributeInfo(AttributeType.PhysDmgFlat, AttributeValueType.Range, "Flat Physical Damage", physDmgFlatValInfo);
@@ -34,6 +34,9 @@ public class Test : MonoBehaviour {
 
             AttributeInfo info2 = AttributeInfoSerializer.DeserializeAttributeInfo(infostring);
             print(info2);
+
+            Attribute attr = info.GenerateAttribute(7);
+            print(attr);
         }
 	}
 }

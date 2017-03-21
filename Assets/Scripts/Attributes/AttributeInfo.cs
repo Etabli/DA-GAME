@@ -21,11 +21,15 @@ public class AttributeInfo
     [DataMember]
     public readonly AttributeValueInfo ValueInfo;
 
-    public AttributeInfo(AttributeType type, AttributeValueType attributeClass, string name, AttributeValueInfo valueInfo)
+    public AttributeInfo(AttributeType type, AttributeValueType valueType, string name, AttributeValueInfo valueInfo) : this(type, valueType, name, valueInfo, "")
+    { }
+
+    public AttributeInfo(AttributeType type, AttributeValueType valueType, string name, AttributeValueInfo valueInfo, string description)
     {
         Type = type;
-        ValueType = attributeClass;
+        ValueType = valueType;
         Name = name;
+        Description = description;
         ValueInfo = valueInfo;
 
         AttributeInfoDictionary.Add(type, this);
@@ -43,7 +47,7 @@ public class AttributeInfo
 
     public override string ToString()
     {
-        return String.Format("{0}: {1}", Name, ValueInfo);
+        return string.Format("{0}: " + string.Format(Description, ValueInfo) + " (Type {1}, ValueType {2})", Name, Type, ValueType);
     }
 
     #region Static Functionality
