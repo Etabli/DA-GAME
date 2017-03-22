@@ -22,6 +22,7 @@ public enum AttributeValueType
 [DataContract]
 public abstract class AttributeValue
 {
+    #region Operators
     public abstract AttributeValue Invert();
     public abstract AttributeValue Add(float val);
     public abstract AttributeValue Add(AttributeValue val);
@@ -30,6 +31,11 @@ public abstract class AttributeValue
     public static AttributeValue operator+(AttributeValue lhs, float rhs)
     {
         return lhs.Add(rhs);
+    }
+
+    public static AttributeValue operator +(float lhs, AttributeValue rhs)
+    {
+        return rhs + lhs;
     }
 
     public static AttributeValue operator+(AttributeValue lhs, AttributeValue rhs)
@@ -57,10 +63,16 @@ public abstract class AttributeValue
         return lhs.Multiply(rhs);
     }
 
+    public static AttributeValue operator*(float lhs, AttributeValue rhs)
+    {
+        return rhs.Multiply(lhs);
+    }
+
     protected void ThrowIncompatipleArgumentTypeException(AttributeValue val)
     {
         throw new ArgumentException(string.Format("Cannot add object of type {0} to object of type {1}", val.GetType(), this.GetType()), "val");
     }
+    #endregion
 }
 #endregion
 

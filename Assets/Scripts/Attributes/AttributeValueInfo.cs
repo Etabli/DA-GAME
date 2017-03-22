@@ -4,8 +4,6 @@ using UnityEngine;
 using System.Runtime.Serialization;
 using System;
 
-public delegate AttributeValue Progression(int tier, AttributeValue baseValue);
-
 /// <summary>
 /// Represents information on an Attribute's value or values. Serialiazable via a DataContract.
 /// </summary>
@@ -19,13 +17,13 @@ public class AttributeValueInfo
     protected AttributeValue baseValueMin;
     [DataMember]
     protected AttributeValue baseValueMax;
-
-    protected Progression progression;
+    [DataMember]
+    protected AttributeProgression progression;
 
     public AttributeValueInfo(AttributeValue baseValueMin, AttributeValue baseValueMax) : this(baseValueMin, baseValueMax, null)
     { }
 
-    public AttributeValueInfo(AttributeValue baseValueMin, AttributeValue baseValueMax, Progression progression)
+    public AttributeValueInfo(AttributeValue baseValueMin, AttributeValue baseValueMax, AttributeProgression progression)
     {
         this.baseValueMin = baseValueMin;
         this.baseValueMax = baseValueMax;
@@ -39,18 +37,27 @@ public class AttributeValueInfo
     /// <returns></returns>
     public AttributeValue GetValueForTier(int tier)
     {
-        if (progression != null)
+        if (!progression.HasProgressionFunction())
         {
-            float frac = UnityEngine.Random.Range(0, 100) / 100.0f;
-            // Progress min and max values before combining them into a random value between them
-
-            AttributeValue progressedMin = progression(tier, baseValueMin);
-            AttributeValue progressedMax = progression(tier, baseValueMax);
-
-            return progressedMin + (progressedMax - progressedMin) * frac;
+            if (!progression.AttachProgressionFunction())
+            {
+                Debug.LogError(string.Format("Invalid progression function set for AttributeValueInfo of type {0}", baseValueMin.GetType()));
+            }
         }
-        Debug.LogError("No progression function set!");
-        return null;
+        // At this point we are sure that the progression function is set, but not if parameters are valid
+
+        float frac = UnityEngine.Random.Range(0, 100) / 100.0f;
+        // Progress min and max values before combining them into a random value between them
+
+        AttributeValue progressedMin = progression.Apply(baseValueMin, tier);
+        if (progression == null)
+        {
+            // Parameters were invalid
+            return null;
+        }
+        AttributeValue progressedMax = progression.Apply(baseValueMax, tier);
+
+        return progressedMin + (progressedMax - progressedMin) * frac;
     }
 
     public override string ToString()

@@ -3,24 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Test : MonoBehaviour {
-
-    AttributeValue ProgressFloat(int tier, AttributeValue num)
-    {
-        return (AttributeValueSingle)num * tier;
-    }
-
-
-
+    
 	// Use this for initialization
 	void Start ()
     {
-        //AttributeValueInfo attrVal = new AttributeValueInfo(new AttributeValueSingle(5.0f), new AttributeValueSingle(8.0f), ProgressFloat);
+        //AttributeValueInfo attrVal = new AttributeValueInfo(new AttributeValueSingle(5.0f), new AttributeValueSingle(8.0f), new AttributeProgression("Linear", new float[] { 0, 1 }));
         //AttributeInfo attrInfo = new AttributeInfo(AttributeType.Health, AttributeValueType.SingleValue, "Base Health", attrVal, "Adds {0} Health");
+
+        //AttributeInfoSerializer.SaveToDisk(attrInfo);
 
         AttributeInfoSerializer.LoadFromDisk(AttributeType.Health);
 
-        //AttributeValueInfo physDmgFlatValInfo = new AttributeValueInfo(new AttributeValueRange(3, 4), new AttributeValueRange(5, 7), (tier, range) => range * tier);
+        //AttributeValueInfo physDmgFlatValInfo = new AttributeValueInfo(new AttributeValueRange(3, 4), new AttributeValueRange(5, 7), new AttributeProgression("Linear", new float[] { 0, 1 }));
         //AttributeInfo physDmgFlatInfo = new AttributeInfo(AttributeType.PhysDmgFlat, AttributeValueType.Range, "Flat Physical Damage", physDmgFlatValInfo);
+
+        //AttributeInfoSerializer.SaveToDisk(physDmgFlatInfo);
 
         AttributeInfoSerializer.LoadFromDisk(AttributeType.PhysDmgFlat);
     }
@@ -30,7 +27,7 @@ public class Test : MonoBehaviour {
     {
 		if (Input.GetKeyDown(KeyCode.Space))
         {
-            AttributeInfo info = AttributeInfo.GetAttributeInfo(AttributeType.Health);
+            AttributeInfo info = AttributeInfo.GetAttributeInfo(AttributeType.PhysDmgFlat);
             print(info);
 
             Attribute attr = info.GenerateAttribute(7);
