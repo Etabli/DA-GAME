@@ -1,13 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Runtime.Serialization;
 
 /// <summary>
 /// Represents a range of values that can be randomly sampled from
 /// </summary>
+[DataContract]
 public struct Range
 {
+    [DataMember]
     public float MinValue;
+    [DataMember]
     public float MaxValue;
 
     #region Constructors
@@ -62,13 +66,18 @@ public struct Range
     public static Range Combine(Range range1, Range range2)
     {
         float min = range1.MinValue + range2.MinValue;
-        float max = range2.MaxValue + range2.MaxValue;
+        float max = range1.MaxValue + range2.MaxValue;
         return new Range(min, max);
     }
 
     public static Range operator-(Range range)
     {
         return new Range(-range.MinValue, -range.MaxValue);
+    }
+
+    public static Range operator -(Range lhs, Range rhs)
+    {
+        return lhs + (-rhs);
     }
 
     public static Range operator+(Range lhs, Range rhs)
@@ -81,9 +90,14 @@ public struct Range
         return new Range(lhs.MinValue + rhs, lhs.MaxValue + rhs);
     }
 
-    public static Range operator-(Range lhs, Range rhs)
+    public static Range operator*(Range lhs, float rhs)
     {
-        return lhs + (-rhs);
+        return new Range(lhs.MinValue * rhs, lhs.MaxValue * rhs);
     }
     #endregion
+
+    public override string ToString()
+    {
+        return string.Format("{0} to {1}", MinValue, MaxValue);
+    }
 }

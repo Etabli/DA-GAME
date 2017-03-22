@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class HexCell
-{    
+{
     #region MemberVariables
     public Coords Coords { get; protected set; }
 
     public Area ParentArea { get; protected set; }
-    
-    public Base LocalBase { get; protected set; }   
+
+    public Base LocalBase { get; protected set; }
     #endregion
 }
 
