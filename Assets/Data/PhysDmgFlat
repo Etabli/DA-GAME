@@ -1,1 +1,21 @@
-<AttributeInfo xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.datacontract.org/2004/07/"><Description></Description><Name>Flat Physical Damage</Name><Type>PhysDmgFlat</Type><ValueInfo><baseValueMax i:type="AttributeValueRange"><Value><MaxValue>7</MaxValue><MinValue>5</MinValue></Value></baseValueMax><baseValueMin i:type="AttributeValueRange"><Value><MaxValue>4</MaxValue><MinValue>3</MinValue></Value></baseValueMin></ValueInfo><ValueType>Range</ValueType></AttributeInfo>
+<?xml version="1.0" encoding="utf-8"?>
+<AttributeInfo xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.datacontract.org/2004/07/">
+  <Description></Description>
+  <Name>Flat Physical Damage</Name>
+  <Type>PhysDmgFlat</Type>
+  <ValueInfo>
+    <baseValueMax i:type="AttributeValueRange">
+      <Value>
+        <MaxValue>3</MaxValue>
+        <MinValue>4</MinValue>
+      </Value>
+    </baseValueMax>
+    <baseValueMin i:type="AttributeValueRange">
+      <Value>
+        <MaxValue>5</MaxValue>
+        <MinValue>7</MinValue>
+      </Value>
+    </baseValueMin>
+  </ValueInfo>
+  <ValueType>Range</ValueType>
+</AttributeInfo>

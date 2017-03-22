@@ -1,13 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Runtime.Serialization;
 
 /// <summary>
 /// Represents a range of values that can be randomly sampled from
 /// </summary>
+[DataContract]
 public struct Range
 {
+    [DataMember]
     public float MinValue;
+    [DataMember]
     public float MaxValue;
 
     #region Constructors

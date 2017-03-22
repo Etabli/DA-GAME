@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Runtime.Serialization;
 using System.IO;
 using System.Text;
+using System.Xml;
 
 public class AttributeInfoSerializer
 {
@@ -11,7 +12,10 @@ public class AttributeInfoSerializer
     {
         MemoryStream stream = new MemoryStream();
         DataContractSerializer serializer = new DataContractSerializer(typeof(AttributeInfo));
-        serializer.WriteObject(stream, info);
+        XmlWriterSettings settings = new XmlWriterSettings() { Indent = true };
+
+        using (XmlWriter writer = XmlWriter.Create(stream, settings))
+            serializer.WriteObject(writer, info);
         stream.Position = 0;
         StreamReader reader = new StreamReader(stream);
         string data = reader.ReadToEnd();
