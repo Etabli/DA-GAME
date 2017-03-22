@@ -2,32 +2,187 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+/// <summary>
+/// Used to identify the direction of a neighbor
+/// </summary>
+public enum HexDirection
+{
+    rightAbove,
+    right,
+    rightBelow,
+    leftBelow,
+    left,
+    leftAbove
+}
+
+/// <summary>
+/// The index of every cornern of a HexCell
+/// Ordering:
+///     Right below Center point, 
+///     Directly below Center point, 
+///     Left below center point, 
+///     left above center point, 
+///     directly above center point, 
+///     right above center point
+/// </summary>
+public enum HexCorner
+{
+    rightBelowCenter,
+    belowCenter,
+    leftBelowCenter,
+    leftAboveCenter,
+    aboveCenter,
+    rightAboveCenter
+}
+
+
 public class HexCell
-{    
+{
+    //size of one cell
+   public  static readonly  float HEXCELL_SIZE = 20;
+ 
+
     #region MemberVariables
     public Coords Coords { get; protected set; }
 
     public Area ParentArea { get; protected set; }
     
-    public Base LocalBase { get; protected set; }   
+    public Base LocalBase { get; protected set; }
+
+
+
+    #endregion
+
+    #region ctor
+
+    public HexCell(Coords coords,Area  parentArea, Base localBase)
+    {
+        Coords = coords;
+        ParentArea = parentArea;
+        LocalBase = localBase;
+    }
+
+
+    public HexCell(int x, int y, Area parentArea, Base localBase)
+    : this(new Coords(x, y), parentArea, localBase)
+    {}
+
+    #endregion
+
+    #region HelperFunction
+    /// <summary>
+    /// The height of a single cell
+    /// </summary>
+    public float Height
+    { get { return HEXCELL_SIZE * 2; } }
+
+    /// <summary>
+    /// The vertical Distance between two HexCell center Points
+    /// </summary>
+    public float VerticalDistBetweenTwoHexCells
+    {
+        get
+        {
+            return this.Height * (3.0f / 4.0f);
+        }
+    }
+
+    /// <summary>
+    /// The width of a single Cell
+    /// </summary>
+    public float Width
+    {
+        get
+        {
+            return Mathf.Sqrt(3.0f) / 2.0f * this.Height;
+        }
+    }
+
+    /// <summary>
+    /// The horizontal distance between two HexCell CenterPoints
+    /// </summary>
+    public float HorizontalDistanceBetweenHexCells
+    {
+        get
+        {
+            return this.Width;
+        }
+    }
+
+
+    /// <summary>
+    /// Returns a given the world position of a given hex Cell
+    /// </summary>
+    /// <param name="corner">the corner wanted</param>
+    /// <returns>The world position of the corner</returns>
+    public Vector2 GetCorner(HexCorner corner)
+    {
+        // angle for corner in degree: 60° * corner + 30°
+        float angleRad = Mathf.PI / 180.0f * (60.0f * (float)corner + 30.0f);
+        Vector2 center = Map.HexCellToWorldPosition(this);
+        return new Vector2(center.x + HEXCELL_SIZE * Mathf.Cos(angleRad), center.y + HEXCELL_SIZE * Mathf.Sin(angleRad));
+    }
+
+    /// <summary>
+    /// Returns the world position coordinates of all corners
+    /// ordering in array consitent with HexCorner Enum values
+    /// </summary>
+    /// <returns>All the cornerns in world position coordinates</returns>
+    public Vector2[] GetAllCorners()
+    {
+        Vector2[] corners = new Vector2[6];
+        for (int i = 0; i < 6; i++)
+        {
+            corners[i] = GetCorner((HexCorner)i);
+        }
+        return corners;
+    }
+
+    #endregion
+
+    #region static hexCellFunctions
+
+
+    /// <summary>
+    /// Returns the coords of the nearest hex that contain these fractional coords
+    /// </summary>
+    /// <param name="fractionalCoords"></param>
+    /// <returns></returns>
+    public static Coords RoundToNearestHexCell(Vector2 fractionalCoords)
+    {
+        // for more reasons why rounding works this way visit:
+        //http://www.redblobgames.com/grids/hexagons/#rounding
+
+        //this is the cube coord representation
+        //makes the rounding easier
+        //cause x + y  + z = 0 has to be true always
+        float x = fractionalCoords.x;
+        float z = fractionalCoords.y;
+        float y = -x - z;
+
+        float roundedX = Mathf.Round(x);
+        float roundedY = Mathf.Round(y);
+        float roundedZ = Mathf.Round(z);
+
+        float xDiff = Mathf.Abs(roundedX - x);
+        float yDiff = Mathf.Abs(roundedY - y);
+        float zDiff = Mathf.Abs(roundedZ - z);
+
+        if (xDiff > yDiff && xDiff > zDiff)
+            roundedX = -roundedY - roundedZ;
+        else if (yDiff > zDiff)
+            roundedY = -roundedX - roundedZ;
+        else
+            roundedZ = -roundedX - roundedY;
+
+        return new Coords((int)roundedX, (int)roundedZ);
+    }
+
     #endregion
 }
 
-/// <summary>
-/// Coords are 2D coordinates.
-/// Currently used for an axial Coords representation of Hexagonal maps.
-/// </summary>
-public class Coords
-{
-    public int X { get; set; }
-    public int Y { get; set; }
 
-    public Coords(int x, int y)
-    {
-        this.X = x;
-        this.Y = y;
-    }
-}
 
 /// <summary>
 /// This struct contains the neighbors of a HexCell
@@ -45,13 +200,12 @@ public struct Neighbors
     }
     /// <summary>
     /// This function returns the neighbor given by, direction of the hexagonal cell center.
-    /// 
+    /// Returned HexCell may be null
     /// </summary>
     /// <param name="direction">The direction of the neigbor as seen from the center cell</param>
     /// <returns>The corresponding neighbor</returns>
     public HexCell GetNeighbor(HexDirection direction)
     {
-        //TODO: what if the center is an outskirt cell and there is no value in the array for this neighbor
         return neighbors[(int)direction];
     }
 
@@ -68,15 +222,13 @@ public struct Neighbors
     /// This functions returns more than one neighbor.
     /// The order of the directions of the neighbor cell in the returned array is equivalent to the order of directions in the given list
     /// Without any directions given the whole neighbors array is returned.
+    /// Returned Array may contain null
     /// <param name="directions">The directions of the wanted neighbors </param>
     /// <returns>The neighbor cells wanted</returns>
     public HexCell[] GetNeighbors(List<HexDirection> directions = null)
     {
         if (directions == null || directions.Count == 6)
             return neighbors;
-
-
-        //TODO: What if the neighbor array is not full
 
         HexCell[] wantedNeighbors = new HexCell[directions.Count];
 
@@ -88,15 +240,3 @@ public struct Neighbors
     }
 }
 
-/// <summary>
-/// Used to identify the direction of a neighbor
-/// </summary>
-public enum HexDirection
-{
-    rightAbove,
-    right,
-    rightBelow,
-    leftBelow,
-    left,
-    LeftAbove
-}
