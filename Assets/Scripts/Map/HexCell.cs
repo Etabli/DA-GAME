@@ -40,7 +40,7 @@ public enum HexCorner
 public class HexCell
 {
     //size of one cell
-   public  static readonly  float HEXCELL_SIZE = 20;
+    public static readonly float HEXCELL_SIZE = 20;
  
 
     #region MemberVariables

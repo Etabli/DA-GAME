@@ -135,9 +135,9 @@ public class Map
     /// <summary>
     /// Returns the HexCell that contains this world position
     /// </summary>
-    /// <param name="position"></param>
-    /// <returns></returns>
-    public HexCell WorldPositionToHexCell(Vector2 position)
+    /// <param name="position">The World position</param>
+    /// <returns>The HexCell in which the  world position is contained. Null if position is outside of map</returns>
+    public  HexCell WorldPositionToHexCell(Vector2 position)
     {
         //Debug.LogError("Map::WorldPositionToHexCell - WARNING NOT IMPLEMENTED RIGHT NOW");
         Vector2 hexCoordsFractional = new Vector2(position.x * (2.0f / 3.0f) / HexCell.HEXCELL_SIZE,
@@ -145,6 +145,16 @@ public class Map
 
         Coords hexCoords = HexCell.RoundToNearestHexCell(hexCoordsFractional);
 
+        if(hexCoords.X > Radius || hexCoords.X < -Radius)
+        {
+            Debug.Log("Map::WorldPositionToHexCell - Outside of map. WorldPosition:" + position.ToString() + " HexCoords: " + hexCoords.ToString() + " MapRadius:" + Radius);
+            return null;
+        }
+        if(hexCoords.Y > Radius || hexCoords.Y < -Radius)
+        {
+            Debug.Log("Map::WorldPositionToHexCell - Outside of map. WorldPosition:" + position.ToString() + " HexCoords: " + hexCoords.ToString() + " MapRadius:" + Radius);
+            return null;
+        }
         return this[hexCoords];
     }
 
@@ -154,7 +164,7 @@ public class Map
     /// </summary>
     /// <param name="cell">The cell in question</param>
     /// <returns>The WorldPosition of the center of the cell</returns>
-    public static Vector2 HexCellToWorldPosition(HexCell cell)
+    public  static Vector2 HexCellToWorldPosition(HexCell cell)
     {
         return new Vector2(HexCell.HEXCELL_SIZE * Mathf.Sqrt(3) * ((float)cell.Coords.X + (float)cell.Coords.Y / 2f),
                             HexCell.HEXCELL_SIZE * 3.0f / 2.0f * cell.Coords.Y);
