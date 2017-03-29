@@ -35,7 +35,7 @@ public static class Biome
 {
 
     public static Dictionary<BiomeType, List<EnemyType>> SpawnableEnemyTypeDictionary = new Dictionary<BiomeType, List<EnemyType>>();
-    public static Dictionary<BiomeType, List<ItemType>> SpwanableItemTypeDictionary = new Dictionary<BiomeType, List<ItemType>>();
+    public static Dictionary<BiomeType, List<ItemBaseType>> SpwanableItemTypeDictionary = new Dictionary<BiomeType, List<ItemBaseType>>();
     public static Dictionary<BiomeType, List<ResourceType>> SpwanableResourcesDictionary = new Dictionary<BiomeType, List<ResourceType>>();
 
     public static Dictionary<BiomeType, Tuple<int, int>> MinMaxTierDictionray = new Dictionary<BiomeType, Tuple<int, int>>();
@@ -61,7 +61,7 @@ public static class Biome
     /// </summary>
     /// <param name="biome">The BiomeType</param>
     /// <returns>The list of spawnable items</returns>
-    public static List<ItemType> GetSpwanableItems(BiomeType biome)
+    public static List<ItemBaseType> GetSpwanableItems(BiomeType biome)
     {
         if(SpwanableItemTypeDictionary.ContainsKey(biome))
         {

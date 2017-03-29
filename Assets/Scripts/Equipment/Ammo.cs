@@ -21,11 +21,5 @@ public class Ammo : Item
     public Ammo(AmmoType type)
     {
         Type = type;
-        GenerateBaseAttributes();
-    }
-
-    public override void GenerateBaseAttributes()
-    {
-
     }
 }

@@ -21,11 +21,5 @@ public class Weapon : Item
     public Weapon(WeaponType type)
     {
         Type = type;
-        GenerateBaseAttributes();
-    }
-
-    public override void GenerateBaseAttributes()
-    {
-
     }
 }

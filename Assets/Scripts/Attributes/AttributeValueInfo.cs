@@ -20,14 +20,14 @@ public class AttributeValueInfo
     [DataMember]
     protected AttributeProgression progression;
 
-    public AttributeValueInfo(AttributeValue baseValueMin, AttributeValue baseValueMax) : this(baseValueMin, baseValueMax, null)
+    public AttributeValueInfo(AttributeValue baseValueMin, AttributeValue baseValueMax) : this(baseValueMin, baseValueMax, new AttributeProgression("Linear", 0, 1))
     { }
 
     public AttributeValueInfo(AttributeValue baseValueMin, AttributeValue baseValueMax, AttributeProgression progression)
     {
         this.baseValueMin = baseValueMin;
         this.baseValueMax = baseValueMax;
-        this.progression = progression;
+        this.progression = progression;        
     }
 
     /// <summary>
@@ -37,25 +37,32 @@ public class AttributeValueInfo
     /// <returns></returns>
     public AttributeValue GetValueForTier(int tier)
     {
-        if (!progression.HasProgressionFunction())
+        return GetValueForTier(tier, progression);
+    }
+
+    public AttributeValue GetValueForTier(int tier, AttributeProgression prog)
+    {
+        if (!prog.HasProgressionFunction())
         {
-            if (!progression.AttachProgressionFunction())
+            if (!prog.HasProgressionFunction())
             {
-                Debug.LogError(string.Format("Invalid progression function set for AttributeValueInfo of type {0}", baseValueMin.GetType()));
+                Debug.LogError(string.Format("Invalid prog function set for AttributeValueInfo of type {0}", baseValueMin.GetType()));
             }
         }
-        // At this point we are sure that the progression function is set, but not if parameters are valid
+        // At this point we are sure that the prog function is set, but not if parameters are valid
 
         float frac = UnityEngine.Random.Range(0, 100) / 100.0f;
         // Progress min and max values before combining them into a random value between them
 
-        AttributeValue progressedMin = progression.Apply(baseValueMin, tier);
-        if (progression == null)
+        AttributeValue progressedMin = prog.Apply(baseValueMin, tier);
+        if (prog == null)
         {
             // Parameters were invalid
             return null;
         }
-        AttributeValue progressedMax = progression.Apply(baseValueMax, tier);
+        AttributeValue progressedMax = prog.Apply(baseValueMax, tier);
+
+        Debug.Log(string.Format("Progressed minimum: {0}, Progressed maximum: {1}, frac: {2}", progressedMin, progressedMax, frac));
 
         return progressedMin + (progressedMax - progressedMin) * frac;
     }

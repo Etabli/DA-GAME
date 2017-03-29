@@ -19,11 +19,5 @@ public class Armor : Item
     public Armor(ArmorType type)
     {
         Type = type;
-        GenerateBaseAttributes();
-    }
-
-    public override void GenerateBaseAttributes()
-    {
-
     }
 }

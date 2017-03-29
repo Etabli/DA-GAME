@@ -2,5 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Slot
-{ }
+public enum Slot
+{
+    Weapon,
+    Body,
+    Crotch,
+    Ammo
+}

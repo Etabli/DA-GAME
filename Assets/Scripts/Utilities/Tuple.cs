@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Runtime.Serialization;
 
 /// <summary>
 /// Represents a functional tuple that can be used to store
@@ -9,9 +10,12 @@ using UnityEngine;
 /// </summary>
 /// <typeparam name="T1">The type of the first element</typeparam>
 /// <typeparam name="T2">The type of the second element</typeparam>
+[DataContract]
 public sealed class Tuple<T1, T2>
 {
+    [DataMember]
     private readonly T1 item1;
+    [DataMember]
     private readonly T2 item2;
 
     /// <summary>

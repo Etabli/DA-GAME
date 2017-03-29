@@ -7,19 +7,13 @@ public class Test : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
     {
-        //AttributeValueInfo attrVal = new AttributeValueInfo(new AttributeValueSingle(5.0f), new AttributeValueSingle(8.0f), new AttributeProgression("Linear", new float[] { 0, 1 }));
-        //AttributeInfo attrInfo = new AttributeInfo(AttributeType.Health, AttributeValueType.SingleValue, "Base Health", attrVal, "Adds {0} Health");
-
-        //AttributeInfoSerializer.SaveToDisk(attrInfo);
-
         AttributeInfoSerializer.LoadFromDisk(AttributeType.Health);
-
-        //AttributeValueInfo physDmgFlatValInfo = new AttributeValueInfo(new AttributeValueRange(3, 4), new AttributeValueRange(5, 7), new AttributeProgression("Linear", new float[] { 0, 1 }));
-        //AttributeInfo physDmgFlatInfo = new AttributeInfo(AttributeType.PhysDmgFlat, AttributeValueType.Range, "Flat Physical Damage", physDmgFlatValInfo);
-
-        //AttributeInfoSerializer.SaveToDisk(physDmgFlatInfo);
-
         AttributeInfoSerializer.LoadFromDisk(AttributeType.PhysDmgFlat);
+
+        //AttributeValueInfo fireRateValInfo = new AttributeValueInfo(new AttributeValueSingle(0.05f), new AttributeValueSingle(0.1f), new AttributeProgression("Linear", 0, 1));
+        //AttributeInfo fireRateInfo = new AttributeInfo(AttributeType.FireRate, AttributeValueType.SingleValue, "Fire Rate", fireRateValInfo, "Increases fire rate by {0}");
+        //AttributeInfoSerializer.SaveToDisk(fireRateInfo);
+        AttributeInfoSerializer.LoadFromDisk(AttributeType.FireRate);
     }
 	
 	// Update is called once per frame
@@ -27,13 +21,13 @@ public class Test : MonoBehaviour {
     {
 		if (Input.GetKeyDown(KeyCode.Space))
         {
-            AttributeInfo info = AttributeInfo.GetAttributeInfo(AttributeType.PhysDmgFlat);
-            print(info);
-
-            Attribute attr = info.GenerateAttribute(7);
-            print(attr);
-
-
+            //AttributePool pool1 = new AttributePool(AttributeType.FireRate, AttributeType.PhysDmgFlat);
+            //AttributePool pool2 = new AttributePool(AttributeType.Health);
+            //AttributePool.RegisterPoolForSlot(Slot.Weapon, pool1);
+            //AttributePool.RegisterPoolForSlot(Slot.Crotch, pool2);
+            //AttributePool.SavePoolsToDisk();
+            AttributePool.LoadPoolsFromDisk();
+            print(AttributePool.GetPool(Slot.Weapon));
         }
 	}
 }

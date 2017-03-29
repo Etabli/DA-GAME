@@ -52,6 +52,11 @@ public class AttributeInfo
         return new Attribute(Type, ValueType, ValueInfo.GetValueForTier(tier));
     }
 
+    public Attribute GenerateAttribute(int tier, AttributeProgression progression)
+    {
+        return new Attribute(Type, ValueType, ValueInfo.GetValueForTier(tier, progression));
+    }
+
     public override string ToString()
     {
         return string.Format("{0}: " + string.Format(Description, ValueInfo) + " (Type {1}, ValueType {2})", Name, Type, ValueType);
