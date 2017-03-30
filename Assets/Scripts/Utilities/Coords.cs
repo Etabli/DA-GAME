@@ -55,6 +55,7 @@ public class Coords
         return new Coords(lhs.X * scale, lhs.Y * scale);
     }
 
+
     #endregion
 
     #region Negihborhood
@@ -142,7 +143,7 @@ public class Coords
     /// <returns>The Manhatten distance as integer</returns>
     public static int Distance(Coords a, Coords b)
     {
-        return (Mathf.Abs(a.X - b.X) + Mathf.Abs(a.X + a.Y - b.X - b.Y) + Mathf.Abs(a.Y - b.Y)) / 2;
+        return ((Mathf.Abs(a.X - b.X) + Mathf.Abs((-a.X -a.Y) - (-b.X -b.Y))+ Mathf.Abs(a.Y - b.Y)) / 2);
     }
 
     #endregion

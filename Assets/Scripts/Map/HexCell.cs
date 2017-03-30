@@ -41,30 +41,31 @@ public class HexCell
 {
 
     //size of one cell
-    public static readonly float HEXCELL_SIZE = 20;
+    public static readonly float HEXCELL_SIZE = 3;
  
 
     #region MemberVariables
     public Coords Coords { get; protected set; }
 
-    public Area ParentArea { get; protected set; }
+    Area _ParentArea;
+    public Area ParentArea { get{ return _ParentArea; }
+                            set { _ParentArea = value; WorldController.Instance.UpdateCellTexture(this);  } }
 
-    public Base LocalBase { get; protected set; }
-
+    public Base LocalBase { get; set; }
     #endregion
 
     #region ctor
 
-    public HexCell(Coords coords,Area  parentArea, Base localBase)
+    public HexCell(Coords coords, Area parentArea = null)
     {
         Coords = coords;
         ParentArea = parentArea;
-        LocalBase = localBase;
+        WorldController.Instance.OnHexCellCreated(this);
     }
 
 
-    public HexCell(int x, int y, Area parentArea, Base localBase)
-    : this(new Coords(x, y), parentArea, localBase)
+    public HexCell(int x, int y, Area parentArea = null)
+    : this(new Coords(x, y),parentArea)
     {}
 
     #endregion
@@ -179,6 +180,7 @@ public class HexCell
     }
 
     #endregion
+
 }
 
 
@@ -236,6 +238,21 @@ public struct Neighbors
             wantedNeighbors[i] = GetNeighbor(directions[i]);
         }
         return wantedNeighbors;
+    }
+
+    public List<HexCell> GetExistingNeighbors()
+    {
+        List<HexCell> existingNeighbors = new List<HexCell>();
+
+        for (int i = 0; i < 6; i++)
+        {
+            if(neighbors[i] != null)
+            {
+                existingNeighbors.Add(neighbors[i]);
+            }
+        }
+
+        return existingNeighbors;
     }
 }
 

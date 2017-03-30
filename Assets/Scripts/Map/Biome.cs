@@ -10,6 +10,8 @@ public enum BiomeType
 {
     Grass,
     Swamp,
+    House,
+    Ice,
     DickGrease
 }
 
@@ -163,6 +165,28 @@ public static class Biome
 
     #endregion
 
+
+    static BiomeType prevVictor = BiomeType.DickGrease;
+
+    public static BiomeType GetRandomBiomeType()
+    {
+        Lottery<BiomeType> lottery = new Lottery<BiomeType>();
+
+        lottery.Enter(BiomeType.DickGrease, 20);
+        lottery.Enter(BiomeType.Grass, 20);
+        lottery.Enter(BiomeType.House, 20);
+        lottery.Enter(BiomeType.Ice, 20);
+        lottery.Enter(BiomeType.Swamp, 20);
+
+        BiomeType winner = prevVictor;
+
+        while (winner == prevVictor)
+        {
+            winner = lottery.GetWinner();
+        }
+        prevVictor = winner;
+        return winner;
+    }
 
     #region GenerateBiomeLandscape
     

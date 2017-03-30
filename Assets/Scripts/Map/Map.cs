@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 
 public class Map
@@ -10,7 +11,7 @@ public class Map
     public int Radius { get; protected set; }
 
     HexCell[,] WorldMap;
-
+    
     int WorldMapLength;
 
     #endregion
@@ -25,39 +26,8 @@ public class Map
 
         WorldMap = new HexCell[WorldMapLength, WorldMapLength];
 
-        HexCell center = new HexCell(0, 0, null, null);
-
-        //set center in world map
-        this[center.Coords] = center;
-
-        Queue<HexCell> outerRing = new Queue<HexCell>();
-        outerRing.Enqueue(center);
-
-        //for testing
-        //there are no bases and areas assigned yet
-        for (int i = 0; i < radius; i++)
-        {
-            //Debug.Log("Hi why am i in here");
-            Queue<HexCell> oldOuterRing = new Queue<HexCell>(outerRing);
-            outerRing.Clear();
-            while (oldOuterRing.Count > 0)
-            {
-                HexCell currCenter = oldOuterRing.Dequeue();
-
-                Coords[] neighborCoords = Coords.GetAllNeighborCoords(currCenter.Coords);
-
-                for (int j = 0; j < 6; j++)
-                {
-                    //Debug.Log("X:" + neighborCoords[j].X + " Y: " + neighborCoords[j].Y);
-                    if(this[neighborCoords[j]] == null)
-                    {
-                        HexCell neighbor = new HexCell(neighborCoords[j], null, null);
-                        this[neighborCoords[j]] = neighbor;
-                        outerRing.Enqueue(neighbor);
-                    }
-                }
-            }
-        }
+        Generate();
+        Debug.Log("Finished generating");
     }
 
     #endregion
@@ -66,9 +36,130 @@ public class Map
     /// Generates the map, and areas as well as the texture for the center cell and maybe it sourounding
     /// cells
     /// </summary>
-    public void Generate()
+    void Generate()
     {
-        Debug.LogError("Map::Generate - WARNING: NOT IMPLEMENTED");
+        System.Random rng = new System.Random();
+        Debug.Log("Map::Generate - WARNING: NOT Finsihed IMPLEMENTING");
+        HexCell center = new HexCell(0, 0,new Area(0,rng.Next(1,4),BiomeType.Ice));
+        center.ParentArea.AddToCellList(center);
+
+        //generate start area
+
+        //set center in world map
+        this[center.Coords] = center;
+
+        for (int i = 1; i <= Radius; i++)
+        {
+            Coords coord = new Coords(-i, 0);
+
+            //walk a long a ring with radius i
+            for (int j = 0; j < 6; j++)
+            {
+                for (int k = 0; k < i; k++)
+                {
+                    this[coord] = new HexCell(coord);
+                    HandleAreaForCell(this[coord]);
+                    coord = Coords.GetNeighborCoords(coord, (HexDirection)j);
+                }
+            }
+
+        }
+
+    }
+
+    void HandleAreaForCell(HexCell cell)
+    {
+        List<HexCell> existingNeighbors = GetNeighbors(cell).GetExistingNeighbors();
+
+        foreach (HexCell neighbor in existingNeighbors)
+        {
+            if(neighbor.ParentArea != null)
+            {
+                if(!neighbor.ParentArea.AreaIsFull())
+                {
+                    Lottery<int> lottery = new Lottery<int>();
+
+                    lottery.Enter(1, 55 + 10 * DistanceBetweenCells(cell,neighbor) + 2 * (neighbor.ParentArea.PossibleAreaSize - neighbor.ParentArea.Cells.Count));
+                    lottery.Enter(2, 35 + 5 * (1 - DistanceBetweenCells(cell,neighbor)) - 2 * (neighbor.ParentArea.PossibleAreaSize - neighbor.ParentArea.Cells.Count));
+
+                    if (lottery.GetWinner() == 1)
+                    {
+                        cell.ParentArea = neighbor.ParentArea;
+                        cell.ParentArea.AddToCellList(cell);
+                    }
+                }
+            }
+        }
+        
+        if(cell.ParentArea == null)
+        {
+            Lottery<int> lottery = new Lottery<int>();
+
+            lottery.Enter(1, 30);
+            lottery.Enter(2, 50);
+            lottery.Enter(3, 42);
+            lottery.Enter(4, 17);
+
+
+            cell.ParentArea = new Area(DistanceBetweenCells(cell, this[0, 0]), lottery.GetWinner() , Biome.GetRandomBiomeType());
+            cell.ParentArea.AddToCellList(cell);
+        }
+    }
+
+
+
+    List<HexCell> GetNeighborsWithoutArea(HexCell cell)
+    {
+        List<HexCell> neighors = new List<HexCell>();
+
+        Neighbors neigh = GetNeighbors(cell);
+
+        foreach(HexCell c in neigh.GetNeighbors())
+        {
+            if(c != null && c.ParentArea == null)
+            {
+                neighors.Add(c);
+            }
+        }
+        return neighors;
+    }
+
+    /// <summary>
+    /// Returns a ring of hexcell with a certain distance from the center
+    /// </summary>
+    /// <param name="radius">The radius of the ring</param>
+    /// <returns>List of the HexCells in the ring</returns>
+    public List<HexCell> GetRing(int radius)
+    {
+
+        List<HexCell> ring = new List<HexCell>();
+
+        if(radius == 0)
+        {
+            ring.Add(this[0,0]);
+            return ring;
+        }
+
+
+        HexCell cube = this[-radius, 0];
+
+        for (int i = 0; i < 6; i++)
+        {
+            for (int j = 0; j < radius; j++)
+            {
+                ring.Add(cube);
+                cube = this[Coords.GetNeighborCoords(cube.Coords, (HexDirection)i)];
+            }
+        }
+        return ring;
+    }
+
+
+
+    public int GetTotalNumberOfHexCellsInMap()
+    {
+        // (2*radius +1) ^ 2 - (radius * (radius +1)) 
+        return 1 + (3 * (Radius * (Radius + 1)));
     }
 
 
@@ -100,7 +191,6 @@ public class Map
     }
 
 
-
     /// <summary>
     /// Returns the manahten distance between two cells
     /// </summary>
@@ -124,13 +214,25 @@ public class Map
 
         for (int i = 0; i < 6; i++)
         {
-            neighbors[i] = this[neighborCoords[i]];
+            if (CheckCoordsInRange(neighborCoords[i]))
+            {
+               neighbors[i] = this[neighborCoords[i]];
+            }
         }
 
         return new Neighbors(center, neighbors);
 
     }
 
+    /// <summary>
+    /// Check if coord is outside of the map or not
+    /// </summary>
+    /// <param name="coord">the coords to check</param>
+    /// <returns>Flase when outside of map, true when inside</returns>
+    public bool CheckCoordsInRange(Coords coord)
+    {
+        return Coords.Distance(coord, new Coords(0, 0)) <= Radius;
+    }
 
     /// <summary>
     /// Returns the HexCell that contains this world position
@@ -140,22 +242,19 @@ public class Map
     public  HexCell WorldPositionToHexCell(Vector2 position)
     {
         //Debug.LogError("Map::WorldPositionToHexCell - WARNING NOT IMPLEMENTED RIGHT NOW");
-        Vector2 hexCoordsFractional = new Vector2(position.x * (2.0f / 3.0f) / HexCell.HEXCELL_SIZE,
-                                                  ((-position.x) / 3.0f + Mathf.Sqrt(3.0f) / 3.0f * position.y) / HexCell.HEXCELL_SIZE);
+
+        //float x = (position.x * Mathf.Sqrt(3) / 3 - position.y / 3) / HexCell.HEXCELL_SIZE;
+        //float y = position.y * 2.0f / 3.0f / HexCell.HEXCELL_SIZE;
+
+        Vector2 hexCoordsFractional = 
+                new Vector2((position.x * Mathf.Sqrt(3) / 3 - position.y / 3) / HexCell.HEXCELL_SIZE,
+                             position.y * 2.0f / 3.0f / HexCell.HEXCELL_SIZE);
 
         Coords hexCoords = HexCell.RoundToNearestHexCell(hexCoordsFractional);
 
-        if(hexCoords.X > Radius || hexCoords.X < -Radius)
-        {
-            Debug.Log("Map::WorldPositionToHexCell - Outside of map. WorldPosition:" + position.ToString() + " HexCoords: " + hexCoords.ToString() + " MapRadius:" + Radius);
-            return null;
-        }
-        if(hexCoords.Y > Radius || hexCoords.Y < -Radius)
-        {
-            Debug.Log("Map::WorldPositionToHexCell - Outside of map. WorldPosition:" + position.ToString() + " HexCoords: " + hexCoords.ToString() + " MapRadius:" + Radius);
-            return null;
-        }
-        return this[hexCoords];
+        if (CheckCoordsInRange(hexCoords))
+            return this[hexCoords];
+        return null;
     }
 
 
@@ -167,7 +266,7 @@ public class Map
     public  static Vector2 HexCellToWorldPosition(HexCell cell)
     {
         return new Vector2(HexCell.HEXCELL_SIZE * Mathf.Sqrt(3) * ((float)cell.Coords.X + (float)cell.Coords.Y / 2f),
-                            HexCell.HEXCELL_SIZE * 3.0f / 2.0f * cell.Coords.Y);
+                            HexCell.HEXCELL_SIZE * (3.0f / 2.0f) * cell.Coords.Y);
     }
 
 
