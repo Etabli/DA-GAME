@@ -4,7 +4,9 @@ using UnityEngine;
 
 public enum ItemType
 {
-
+    Hands,
+    NotHands,
+    Feet
 }
 
 /// <summary>

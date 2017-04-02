@@ -3,17 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-/// <summary>
-/// The possible bioms
-/// </summary>
-public enum BiomeType
-{
-    Grass,
-    Swamp,
-    House,
-    Ice,
-    DickGrease
-}
+
 
 /// <summary>
 /// EnemyType Enum
@@ -21,7 +11,10 @@ public enum BiomeType
 /// </summary>
 public enum EnemyType
 {
-    Marshmellow
+    Marshmellow,
+    Snickers,
+    Bat,
+    Nutts
 }
 
 
@@ -30,7 +23,10 @@ public enum EnemyType
 /// </summary>
 public enum ResourceType
 {
-    Asshair
+    Asshair,
+    Iron,
+    Blood,
+    Guts
 }
 
 public static class Biome

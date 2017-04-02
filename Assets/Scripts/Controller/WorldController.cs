@@ -19,10 +19,134 @@ public class WorldController : MonoBehaviour {
 
     public static WorldController Instance { get; protected set; }
 
-    Dictionary<HexCell, GameObject> hexCellToGameObjectDictionary;
-
+    Dictionary<HexCell, GameObject> HexCellToGameObjectDictionary;
+    Dictionary<BiomeType, Material> BiomeTypeToMaterialDictionary;
 
     #endregion
+
+
+
+
+    void OnEnable()
+    {
+        if (Instance != null)
+        {
+            Debug.LogError("There should never be two world controllers.");
+        }
+        Instance = this;
+	}
+
+
+    void Start()
+    {
+        HexCellToGameObjectDictionary = new Dictionary<HexCell, GameObject>();
+        LoadBiomeInfo();
+        hoveroverArea = null;
+        prevHoverOver = null;
+        map = new Map(20);
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+    }
+
+    //bool temp_once = false;
+    // Update is called once per frame
+    void Update()
+    {
+
+        //Vector2 mouse = Converter.V3ToV2(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+        ////Debug.Log(mouse);
+
+        //if (!temp_once)
+        //{
+        //    temp_once = true;
+        //    //temp_once = true;
+        //    //BiomeInfo info = new BiomeInfo(BiomeType.DickGrease,
+        //    //    new List<EnemyType>() { EnemyType.Bat, EnemyType.Marshmellow, EnemyType.Nutts, EnemyType.Snickers },
+        //    //    new List<ItemType>() { ItemType.Hands, ItemType.NotHands, ItemType.Feet },
+        //    //    new List<ResourceType>() { ResourceType.Asshair, ResourceType.Blood, ResourceType.Guts, ResourceType.Iron },
+        //    //    new Range(1.0f, 20.0f));
+        //    //Debug.Log(info.ToString());
+
+        //    //BiomeInfoSerializer.SaveBiomeInfoToDisk(info);
+
+
+        //    BiomeInfo info = BiomeInfoSerializer.LoadBiomeInfoFromDisk(BiomeType.DickGrease);
+
+
+        //    Debug.Log(info.ToString());
+
+        //}
+
+        //if (map != null)
+        //{
+        //    HexCell cell = map.WorldPositionToHexCell(mouse);
+        //    if (cell != null)
+        //    {
+        //        if (hoveroverArea != null)
+        //        {
+        //            foreach (HexCell c in hoveroverArea.Cells)
+        //            {
+        //                UpdateCellTexture(c);
+        //            }
+        //            prevHoverOver = hoveroverArea;
+        //            hoveroverArea = cell.ParentArea;
+        //            if (prevHoverOver != hoveroverArea)
+        //            {
+        //                Debug.Log("Area Capacity: " + hoveroverArea.Cells.Capacity +" Actual Size: "+hoveroverArea.Cells.Count+ " Area Tier: " + hoveroverArea.Tier);
+        //            }
+        //            foreach (HexCell c in hoveroverArea.Cells)
+        //            {
+        //                if (HexCellToGameObjectDictionary.ContainsKey(c))
+        //                {
+        //                    HexCellToGameObjectDictionary[c].GetComponent<MeshRenderer>().material.color = Color.blue;
+        //                }
+        //            }
+        //        }
+        //        else
+        //        {
+        //            hoveroverArea = cell.ParentArea;
+        //        }
+        //    }
+
+        //}
+        //else
+        //{
+        //    // Debug.Log("MAP IS NULL WHAT IS GOING ON");
+        //}
+
+
+    }
+
+    /// <summary>
+    /// Loads everything about the biomes from  material to info
+    /// </summary>
+    void LoadBiomeInfo()
+    {
+        BiomeInfoSerializer.LoadAllBiomeInfosFromDisk();
+        LoadBiomeMaterials();
+    }
+
+    /// <summary>
+    /// Loads the biome materials
+    /// </summary>
+    void LoadBiomeMaterials()
+    {
+        BiomeTypeToMaterialDictionary = new Dictionary<BiomeType, Material>();
+
+        Material[] materials = Resources.LoadAll<Material>("Materials/BiomeMaterials/");
+
+        foreach (Material mat in materials)
+        {
+            BiomeType type = (BiomeType)Enum.Parse(typeof(BiomeType), mat.name);
+            Debug.Log("WorldController::LoadBiomeMaterials - Creating entry for " + type);
+            if(!BiomeTypeToMaterialDictionary.ContainsKey(type))
+            {
+                BiomeTypeToMaterialDictionary.Add(type, mat);
+            }
+        }
+    }
 
 
     public void OnHexCellCreated(HexCell cell)
@@ -40,136 +164,54 @@ public class WorldController : MonoBehaviour {
         MeshFilter meshFilter = hexGO.AddComponent<MeshFilter>();
         meshFilter.mesh = HexCellMeshGenerator.GenerateHexCellMesh(cell);
         MeshRenderer renderer = hexGO.AddComponent<MeshRenderer>();
-        renderer.material = testMat;
+        renderer.material = default(Material);
 
 
-        if(hexCellToGameObjectDictionary.ContainsKey(cell))
+        if (HexCellToGameObjectDictionary.ContainsKey(cell))
         {
             Debug.LogError("WorldController::OnHexCellCreated - There already exists an entry for this hex cell in the <HexCell,GameObject> Dictionary");
             return;
         }
-        hexCellToGameObjectDictionary.Add(cell, hexGO);
+        HexCellToGameObjectDictionary.Add(cell, hexGO);
 
     }
 
-
-    void OnEnable()
+    /// <summary>
+    /// updates the material of a hexcell depending on biome type
+    /// </summary>
+    /// <param name="cell"></param>
+    public void UpdateCellTexture(HexCell cell)
     {
-        if (Instance != null)
+        if(HexCellToGameObjectDictionary.ContainsKey(cell))
         {
-            Debug.LogError("There should never be two world controllers.");
-        }
-        Instance = this;
-	}
-
-
-    void Start()
-    {
-        hexCellToGameObjectDictionary = new Dictionary<HexCell, GameObject>();
-        hoveroverArea = null;
-        prevHoverOver = null;
-        map = new Map(20);
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-    }
-    // Update is called once per frame
-    void Update()
-    {
-
-        Vector2 mouse = Converter.V3ToV2(Camera.main.ScreenToWorldPoint(Input.mousePosition));
-        ////Debug.Log(mouse);
-
-
-
-        if (map != null)
-        {
-            HexCell cell = map.WorldPositionToHexCell(mouse);
-            if (cell != null)
-            { 
-                if (hoveroverArea != null)
-                {
-                    foreach (HexCell c in hoveroverArea.Cells)
-                    {
-                        UpdateCellTexture(c);
-                    }
-                    prevHoverOver = hoveroverArea;
-                    hoveroverArea = cell.ParentArea;
-                    if (prevHoverOver != hoveroverArea)
-                    {
-                        Debug.Log("Area Size: " + hoveroverArea.PossibleAreaSize);
-                    }
-                    foreach (HexCell c in hoveroverArea.Cells)
-                    {
-                        if (hexCellToGameObjectDictionary.ContainsKey(c))
-                        {
-                            hexCellToGameObjectDictionary[c].GetComponent<MeshRenderer>().material.color = Color.blue;
-                        }
-                    }
-                }
-                else
-                {
-                    hoveroverArea = cell.ParentArea;
-                }
-            }
-
+           if(BiomeTypeToMaterialDictionary.ContainsKey(cell.ParentArea.BiomeType))
+           {
+                HexCellToGameObjectDictionary[cell].GetComponent<MeshRenderer>().material = BiomeTypeToMaterialDictionary[cell.ParentArea.BiomeType];
+           }
+           else
+           {
+                Debug.Log("WorldController::UpdateCellTexture - There is no material for this biome type " + cell.ParentArea.BiomeType);
+           }
         }
         else
         {
-           // Debug.Log("MAP IS NULL WHAT IS GOING ON");
-        }
-        //if (cell != null && hexCellToGameObjectDictionary.ContainsKey(cell))
-        //{
-        //    hexCellToGameObjectDictionary[cell].GetComponent<MeshRenderer>().material = markMaterial;
-        //}
-
-
-
-        //ColorRing(1, Color.red);
-        //ColorRing(2, Color.blue);
-        //ColorRing(3, Color.black);
-        //ColorRing(20, Color.cyan);
-
-    }
-
-
-    public void UpdateCellTexture(HexCell cell)
-    {
-        if(hexCellToGameObjectDictionary.ContainsKey(cell))
-        {
-            switch(cell.ParentArea.BiomeType)
-            {
-                case BiomeType.Ice:
-                    hexCellToGameObjectDictionary[cell].GetComponent<MeshRenderer>().material.color = Color.white;
-                    break;
-                case BiomeType.Grass:
-                    hexCellToGameObjectDictionary[cell].GetComponent<MeshRenderer>().material.color = Color.green;
-                    break;
-                case BiomeType.DickGrease:
-                    hexCellToGameObjectDictionary[cell].GetComponent<MeshRenderer>().material.color = Color.yellow;
-                    break;
-                case BiomeType.House:
-                    hexCellToGameObjectDictionary[cell].GetComponent<MeshRenderer>().material.color = Color.cyan;
-                    break;
-                case BiomeType.Swamp:
-                    hexCellToGameObjectDictionary[cell].GetComponent<MeshRenderer>().material.color = Color.red;
-                    break;
-                default:
-                    hexCellToGameObjectDictionary[cell].GetComponent<MeshRenderer>().material.color = Color.black;
-                    break;
-            }
+            Debug.Log("WorldController::UpdateCellTexture - This HexCell does not exist in the HexCell dictionary");
         }
     }
 
 
+    /// <summary>
+    /// Colors a ring of certain radius in the given color
+    /// </summary>
+    /// <param name="rad"></param>
+    /// <param name="color"></param>
     void ColorRing(int rad, Color color)
     {
         List<HexCell> ring = map.GetRing(rad);
 
         foreach (HexCell cell in ring)
         {
-            hexCellToGameObjectDictionary[cell].GetComponent<MeshRenderer>().material.color = color;
+            HexCellToGameObjectDictionary[cell].GetComponent<MeshRenderer>().material.color = color;
         }
     }
 

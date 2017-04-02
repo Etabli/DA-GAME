@@ -36,7 +36,6 @@ public enum HexCorner
     rightAboveCenter
 }
 
-
 public class HexCell
 {
 
@@ -56,16 +55,15 @@ public class HexCell
 
     #region ctor
 
-    public HexCell(Coords coords, Area parentArea = null)
+    public HexCell(Coords coords)
     {
         Coords = coords;
-        ParentArea = parentArea;
         WorldController.Instance.OnHexCellCreated(this);
     }
 
 
-    public HexCell(int x, int y, Area parentArea = null)
-    : this(new Coords(x, y),parentArea)
+    public HexCell(int x, int y)
+    : this(new Coords(x, y))
     {}
 
     #endregion

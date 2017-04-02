@@ -56,6 +56,16 @@ public struct Range
         MaxValue += range.MaxValue; 
     }
 
+    /// <summary>
+    /// checks if a value is inside the minimum and maximum range
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public bool IsInRange(float value)
+    {
+        return (value >= MinValue) && (value <= MaxValue);
+    }
+
     #region Operators
     /// <summary>
     /// Combines two Ranges and returns the result

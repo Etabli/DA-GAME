@@ -39,10 +39,11 @@ public class Map
     void Generate()
     {
         System.Random rng = new System.Random();
-        Debug.Log("Map::Generate - WARNING: NOT Finsihed IMPLEMENTING");
-        HexCell center = new HexCell(0, 0,new Area(0,rng.Next(1,4),BiomeType.Ice));
-        center.ParentArea.AddToCellList(center);
-
+        Debug.Log("Map::Generate - WARNING:  Finsihed IMPLEMENTING SUBJECT TO CHANGE");
+        Area centerArea = new Area(0, rng.Next(1, 4));
+        HexCell center = new HexCell(0, 0);
+        //center.ParentArea.AddToCellList(center);
+        centerArea.EstablishAreaCellRelationship(center);
         //generate start area
 
         //set center in world map
@@ -50,23 +51,34 @@ public class Map
 
         for (int i = 1; i <= Radius; i++)
         {
-            Coords coord = new Coords(-i, 0);
-
-            //walk a long a ring with radius i
-            for (int j = 0; j < 6; j++)
-            {
-                for (int k = 0; k < i; k++)
-                {
-                    this[coord] = new HexCell(coord);
-                    HandleAreaForCell(this[coord]);
-                    coord = Coords.GetNeighborCoords(coord, (HexDirection)j);
-                }
-            }
-
+            GenerateRing(i);
         }
-
     }
 
+    /// <summary>
+    /// Generates A ring of new HexCells in a certain distance, and places them in the map.
+    /// </summary>
+    /// <param name="distanceOfRingFromCenter">The distance of the ring from the center</param>
+    void GenerateRing(int distanceOfRingFromCenter)
+    {
+        Coords coord = new Coords(-distanceOfRingFromCenter, 0);
+
+        //walk a long a ring with radius i
+        for (int j = 0; j < 6; j++)
+        {
+            for (int k = 0; k < distanceOfRingFromCenter; k++)
+            {
+                this[coord] = new HexCell(coord);
+                HandleAreaForCell(this[coord]);
+                coord = Coords.GetNeighborCoords(coord, (HexDirection)j);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Handels the area assignment for a given cell
+    /// </summary>
+    /// <param name="cell">The Cell we want to find an area for</param>
     void HandleAreaForCell(HexCell cell)
     {
         List<HexCell> existingNeighbors = GetNeighbors(cell).GetExistingNeighbors();
@@ -79,13 +91,15 @@ public class Map
                 {
                     Lottery<int> lottery = new Lottery<int>();
 
-                    lottery.Enter(1, 55 + 10 * DistanceBetweenCells(cell,neighbor) + 2 * (neighbor.ParentArea.PossibleAreaSize - neighbor.ParentArea.Cells.Count));
-                    lottery.Enter(2, 35 + 5 * (1 - DistanceBetweenCells(cell,neighbor)) - 2 * (neighbor.ParentArea.PossibleAreaSize - neighbor.ParentArea.Cells.Count));
+                    lottery.Enter(1, 55 + 2 * (neighbor.ParentArea.Cells.Capacity - neighbor.ParentArea.Cells.Count));
+                    lottery.Enter(2, 35 - 2 * (neighbor.ParentArea.Cells.Capacity - neighbor.ParentArea.Cells.Count));
 
                     if (lottery.GetWinner() == 1)
                     {
-                        cell.ParentArea = neighbor.ParentArea;
-                        cell.ParentArea.AddToCellList(cell);
+                        neighbor.ParentArea.EstablishAreaCellRelationship(cell);
+                        //cell.ParentArea = neighbor.ParentArea;
+                        //cell.ParentArea.AddToCellList(cell);
+                        break;
                     }
                 }
             }
@@ -101,12 +115,10 @@ public class Map
             lottery.Enter(4, 17);
 
 
-            cell.ParentArea = new Area(DistanceBetweenCells(cell, this[0, 0]), lottery.GetWinner() , Biome.GetRandomBiomeType());
-            cell.ParentArea.AddToCellList(cell);
+            new Area(DistanceBetweenCells(cell, this[0, 0]), lottery.GetWinner()).EstablishAreaCellRelationship(cell);
+            //cell.ParentArea.AddToCellList(cell);
         }
     }
-
-
 
     List<HexCell> GetNeighborsWithoutArea(HexCell cell)
     {
@@ -140,7 +152,6 @@ public class Map
             return ring;
         }
 
-
         HexCell cube = this[-radius, 0];
 
         for (int i = 0; i < 6; i++)
@@ -154,14 +165,11 @@ public class Map
         return ring;
     }
 
-
-
     public int GetTotalNumberOfHexCellsInMap()
     {
         // (2*radius +1) ^ 2 - (radius * (radius +1)) 
         return 1 + (3 * (Radius * (Radius + 1)));
     }
-
 
     public HexCell this[Coords coord]
     {
@@ -176,7 +184,6 @@ public class Map
 
     }
 
-
     public HexCell this[int x, int y]
     {
         get
@@ -187,9 +194,7 @@ public class Map
         {
             WorldMap[y + Radius, x + Radius + Mathf.Min(0, y)] = value;
         }
-
     }
-
 
     /// <summary>
     /// Returns the manahten distance between two cells
@@ -221,7 +226,6 @@ public class Map
         }
 
         return new Neighbors(center, neighbors);
-
     }
 
     /// <summary>
