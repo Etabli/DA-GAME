@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Runtime.Serialization;
 using System;
+using System.Linq;
 
 /// <summary>
 /// Represents information on a single AttributeType. Serializable via a DataContract.
@@ -72,6 +73,13 @@ public class AttributeInfo
     /// <returns></returns>
     public static AttributeInfo GetAttributeInfo(AttributeType type)
     {
+        // If the requested type is random, select a random attribute
+        if (type == AttributeType.Random)
+        {
+            System.Random rng = new System.Random();
+            return AttributeInfoDictionary.ElementAt(rng.Next() % AttributeInfoDictionary.Count).Value;
+        }
+
         if (AttributeInfoDictionary.ContainsKey(type))
         {
             return AttributeInfoDictionary[type];

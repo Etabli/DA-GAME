@@ -34,8 +34,9 @@ public abstract class ItemBase
     [DataMember]
     public readonly AttributeType[] GuaranteedAttributes;
 
-    public ItemBase(ItemClass itemClass, AttributeType[] baseAttributes, AttributeType[] guaranteedAttributes)
+    public ItemBase(ItemBaseType baseType, ItemClass itemClass, AttributeType[] baseAttributes, AttributeType[] guaranteedAttributes)
     {
+        BaseType = baseType;
         Class = itemClass;
         BaseAttributes = baseAttributes.Clone() as AttributeType[];
         GuaranteedAttributes = guaranteedAttributes.Clone() as AttributeType[];
@@ -56,6 +57,57 @@ public abstract class ItemBase
     {
         item.Attributes.Clear();
         item.BaseAttributes.Clear();
+
+        foreach (AttributeType attributeType in BaseAttributes)
+        {
+            item.BaseAttributes.Add(attributeType, AttributeInfo.GetAttributeInfo(attributeType).GenerateAttribute(item.Tier));
+        }
+
+        // Create new lottery to decide tier roll of each attribute
+        // TODO: make nicer
+        Lottery<int> tierLottery = new Lottery<int>();
+        tierLottery.Enter(item.Tier, 10);
+        if (item.Tier > 1)
+            tierLottery.Enter(item.Tier - 1, 5);
+        if (item.Tier > 2)
+            tierLottery.Enter(item.Tier - 2, 2);
+        if (item.Tier > 3)
+            tierLottery.Enter(item.Tier - 3, 1);
+
+        int quality = item.Quality;
+        Debug.Log(string.Format("quality = {0}", quality));
+
+        foreach (AttributeType attributeType in GuaranteedAttributes)
+        {
+            GenerateAttributeForItem(tierLottery, ref quality, item, attributeType);
+        }
+
+        while (quality > 0)
+        {
+            Debug.Log("Generating random attribute");
+            GenerateAttributeForItem(tierLottery, ref quality, item, AttributeType.Random);
+        }
+    }
+
+    protected void GenerateAttributeForItem(Lottery<int> tierLottery, ref int quality, Item item, AttributeType attributeType)
+    {
+        // Get perliminary tier of new attribute
+        int tier = tierLottery.GetWinner();
+        // Check if we have high enough quality left to allow this tier of attribute
+        if (tier > quality)
+            tier = quality;
+        quality -= tier;
+
+        Attribute attribute;
+        int i = 0;
+        do
+        {
+            attribute = AttributeInfo.GetAttributeInfo(attributeType).GenerateAttribute(tier);
+            Debug.Log(attribute.Type);
+
+        } while (item.Attributes.ContainsKey(attribute.Type) && i < 10);
+
+        item.Attributes.Add(attribute.Type, attribute);
     }
 }
 
@@ -65,7 +117,7 @@ public class WeaponBase : ItemBase
     [DataMember]
     public readonly AmmoClass[] AllowedAmmoTypes;
 
-    public WeaponBase(ItemClass itemClass, AttributeType[] baseAttributes, AttributeType[] guaranteedAttributes, AmmoClass[] allowedAmmoTypes) : base(itemClass, baseAttributes, guaranteedAttributes)
+    public WeaponBase(ItemBaseType baseType, AttributeType[] baseAttributes, AttributeType[] guaranteedAttributes, AmmoClass[] allowedAmmoTypes) : base(baseType, ItemClass.Weapon, baseAttributes, guaranteedAttributes)
     {
         AllowedAmmoTypes = allowedAmmoTypes.Clone() as AmmoClass[];
     }
@@ -84,7 +136,7 @@ public class ArmorBase : ItemBase
     [DataMember]
     public readonly Slot[] Slots;
 
-    public ArmorBase(ItemClass itemClass, AttributeType[] baseAttributes, AttributeType[] guaranteedAttributes, Slot[] slots) : base(itemClass, baseAttributes, guaranteedAttributes)
+    public ArmorBase(ItemBaseType baseType, AttributeType[] baseAttributes, AttributeType[] guaranteedAttributes, Slot[] slots) : base(baseType, ItemClass.Armor, baseAttributes, guaranteedAttributes)
     {
         Slots = slots.Clone() as Slot[];
     }
@@ -102,7 +154,7 @@ public class AmmoBase : ItemBase
     [DataMember]
     public readonly AmmoClass AmmoClass;
 
-    public AmmoBase(ItemClass itemClass, AttributeType[] baseAttributes, AttributeType[] guaranteedAttributes, AmmoClass ammoClass) : base(itemClass, baseAttributes, guaranteedAttributes)
+    public AmmoBase(ItemBaseType baseType, AttributeType[] baseAttributes, AttributeType[] guaranteedAttributes, AmmoClass ammoClass) : base(baseType, ItemClass.Ammo, baseAttributes, guaranteedAttributes)
     {
         AmmoClass = ammoClass;
     }

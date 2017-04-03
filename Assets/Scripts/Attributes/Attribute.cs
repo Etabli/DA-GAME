@@ -9,7 +9,8 @@ public enum AttributeType
 {
     Health,
     PhysDmgFlat,
-    FireRate
+    FireRate,
+    Random
 }
 
 /// <summary>

@@ -44,9 +44,9 @@ public class AttributeValueInfo
     {
         if (!prog.HasProgressionFunction())
         {
-            if (!prog.HasProgressionFunction())
+            if (!prog.AttachProgressionFunction())
             {
-                Debug.LogError(string.Format("Invalid prog function set for AttributeValueInfo of type {0}", baseValueMin.GetType()));
+                Debug.LogError(string.Format("Invalid progression function set for AttributeValueInfo of type {0}", baseValueMin.GetType()));
             }
         }
         // At this point we are sure that the prog function is set, but not if parameters are valid

@@ -30,5 +30,26 @@ public abstract class Item
         Quality = quality;
         BaseType = baseType;
         this.itemBase = itemBase;
+
+        Attributes = new Dictionary<AttributeType, Attribute>();
+        BaseAttributes = new Dictionary<AttributeType, Attribute>();
+    }
+
+    public override string ToString()
+    {
+        string result = string.Format("{0} (t{1}, q{2}): \n", Name, Tier, Quality);
+        foreach(Attribute a in BaseAttributes.Values)
+        {
+            result += a + "\n";
+        }
+        result += "-------------------------------------------\n";
+        
+        foreach(Attribute a in Attributes.Values)
+        {
+            result += a + "\n";
+        }
+        result.TrimEnd('\n');
+        
+        return result;
     }
 }

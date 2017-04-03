@@ -9,10 +9,6 @@ public class Test : MonoBehaviour {
     {
         AttributeInfoSerializer.LoadFromDisk(AttributeType.Health);
         AttributeInfoSerializer.LoadFromDisk(AttributeType.PhysDmgFlat);
-
-        //AttributeValueInfo fireRateValInfo = new AttributeValueInfo(new AttributeValueSingle(0.05f), new AttributeValueSingle(0.1f), new AttributeProgression("Linear", 0, 1));
-        //AttributeInfo fireRateInfo = new AttributeInfo(AttributeType.FireRate, AttributeValueType.SingleValue, "Fire Rate", fireRateValInfo, "Increases fire rate by {0}");
-        //AttributeInfoSerializer.SaveToDisk(fireRateInfo);
         AttributeInfoSerializer.LoadFromDisk(AttributeType.FireRate);
 
         AttributePool.LoadPoolsFromDisk();
@@ -23,7 +19,10 @@ public class Test : MonoBehaviour {
     {
 		if (Input.GetKeyDown(KeyCode.Space))
         {
-            print(AttributePool.GetPool(Slot.Weapon));
+            WeaponBase wBase = new WeaponBase(ItemBaseType.Pistol ,new AttributeType[] { AttributeType.PhysDmgFlat }, new AttributeType[] { AttributeType.FireRate }, new AmmoClass[] { AmmoClass.Bullet, AmmoClass.Battery });
+            Weapon w = wBase.GenerateItem(1, 1) as Weapon;
+            print("Generated weapon!");
+            print(w);
         }
 	}
 }
