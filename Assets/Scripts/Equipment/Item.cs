@@ -22,4 +22,13 @@ public abstract class Item
     public Dictionary<AttributeType, Attribute> BaseAttributes = new Dictionary<AttributeType, Attribute>();
 
     protected ItemBase itemBase;
+
+    public Item(string name, int tier, int quality, ItemBaseType baseType, ItemBase itemBase)
+    {
+        Name = name;
+        Tier = tier;
+        Quality = quality;
+        BaseType = baseType;
+        this.itemBase = itemBase;
+    }
 }

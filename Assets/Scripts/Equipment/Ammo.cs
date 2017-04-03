@@ -8,6 +8,17 @@ using UnityEngine;
 public class Ammo : Item
 {
     static readonly int STACK_SIZE = 99;
-    
+
+    public AmmoClass AmmoClass
+    {
+        get
+        {
+            return ((AmmoBase)itemBase).AmmoClass;
+        }
+    }
     public int Count { get; protected set; }
+
+    public Ammo(string name, int tier, int quality, ItemBaseType baseType, ItemBase itemBase) : base(name, tier, quality, baseType, itemBase)
+    {
+    }
 }

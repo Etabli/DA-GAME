@@ -7,5 +7,7 @@ using UnityEngine;
 /// </summary>
 public class Armor : Item
 {
-    public Slot[] OccupiedSlots { get; protected set; }
+    public Armor(string name, int tier, int quality, ItemBaseType baseType, ItemBase itemBase) : base(name, tier, quality, baseType, itemBase)
+    {
+    }
 }
