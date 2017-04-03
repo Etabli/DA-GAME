@@ -4,9 +4,21 @@ using UnityEngine;
 using System.Runtime.Serialization;
 using System;
 
+/// <summary>
+/// An item base type
+/// </summary>
 public enum ItemBaseType
 {
+    //###------------------------------WEAPONS------------------------------###
+    Pistol,
+    Wand,
 
+    //###-------------------------------ARMOR-------------------------------###
+    Breastplate,
+    Cockring,
+
+    //###-------------------------------AMMO--------------------------------###
+    PhysicalAmmo
 }
 
 [DataContract]

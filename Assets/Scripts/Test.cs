@@ -14,6 +14,8 @@ public class Test : MonoBehaviour {
         //AttributeInfo fireRateInfo = new AttributeInfo(AttributeType.FireRate, AttributeValueType.SingleValue, "Fire Rate", fireRateValInfo, "Increases fire rate by {0}");
         //AttributeInfoSerializer.SaveToDisk(fireRateInfo);
         AttributeInfoSerializer.LoadFromDisk(AttributeType.FireRate);
+
+        AttributePool.LoadPoolsFromDisk();
     }
 	
 	// Update is called once per frame
@@ -21,12 +23,6 @@ public class Test : MonoBehaviour {
     {
 		if (Input.GetKeyDown(KeyCode.Space))
         {
-            //AttributePool pool1 = new AttributePool(AttributeType.FireRate, AttributeType.PhysDmgFlat);
-            //AttributePool pool2 = new AttributePool(AttributeType.Health);
-            //AttributePool.RegisterPoolForSlot(Slot.Weapon, pool1);
-            //AttributePool.RegisterPoolForSlot(Slot.Crotch, pool2);
-            //AttributePool.SavePoolsToDisk();
-            AttributePool.LoadPoolsFromDisk();
             print(AttributePool.GetPool(Slot.Weapon));
         }
 	}

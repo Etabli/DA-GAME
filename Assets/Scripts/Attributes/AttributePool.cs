@@ -22,6 +22,7 @@ public class AttributePool
 
     public void CombineInto(AttributePool pool)
     {
+        // TODO: Maybe change so that odds stay even. Currently attributes in both pools have a higher chance to be drawn
         lottery.CombineInto(pool.lottery);
     }
     
