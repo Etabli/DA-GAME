@@ -171,12 +171,14 @@ public class WorldController : MonoBehaviour {
         hexGO.name = "HexCell : " + cell.Coords.ToString();
         hexGO.transform.position = Map.HexCellToWorldPosition(cell);
         hexGO.transform.SetParent(transform, true);
+        hexGO.layer = LayerMask.NameToLayer("Map");
+        //set layer
+
 
         MeshFilter meshFilter = hexGO.AddComponent<MeshFilter>();
         meshFilter.mesh = HexCellMeshGenerator.GenerateHexCellMesh(cell);
         MeshRenderer renderer = hexGO.AddComponent<MeshRenderer>();
         renderer.material = default(Material);
-
 
         if (HexCellToGameObjectDictionary.ContainsKey(cell))
         {
