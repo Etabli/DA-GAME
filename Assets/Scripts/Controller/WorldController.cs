@@ -1,13 +1,23 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System;
+using System.Linq;
 using UnityEngine;
-using UnityEditor;
 
 
 public class WorldController : MonoBehaviour {
 
     #region Member Variables
+
+ 
+    [Range(1,5)]
+    public int EnemyVariatyPerBiome;
+
+    [Range(1, 20)]
+    public int ItemVariatyPerBiome;
+
+    [Range(1, 5)]
+    public  int ResourceVariatyPerBiome;
 
     public Map map;// = new Map(20);
 
@@ -43,7 +53,7 @@ public class WorldController : MonoBehaviour {
         LoadBiomeInfo();
         hoveroverArea = null;
         prevHoverOver = null;
-        map = new Map(20);
+        map = new Map(5);
         if (Instance == null)
         {
             Instance = this;
@@ -55,7 +65,7 @@ public class WorldController : MonoBehaviour {
     void Update()
     {
 
-        //Vector2 mouse = Converter.V3ToV2(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+        Vector2 mouse = Converter.V3ToV2(Camera.main.ScreenToWorldPoint(Input.mousePosition));
         ////Debug.Log(mouse);
 
         //if (!temp_once)
@@ -79,44 +89,45 @@ public class WorldController : MonoBehaviour {
 
         //}
 
-        //if (map != null)
-        //{
-        //    HexCell cell = map.WorldPositionToHexCell(mouse);
-        //    if (cell != null)
-        //    {
-        //        if (hoveroverArea != null)
-        //        {
-        //            foreach (HexCell c in hoveroverArea.Cells)
-        //            {
-        //                UpdateCellTexture(c);
-        //            }
-        //            prevHoverOver = hoveroverArea;
-        //            hoveroverArea = cell.ParentArea;
-        //            if (prevHoverOver != hoveroverArea)
-        //            {
-        //                Debug.Log("Area Capacity: " + hoveroverArea.Cells.Capacity +" Actual Size: "+hoveroverArea.Cells.Count+ " Area Tier: " + hoveroverArea.Tier);
-        //            }
-        //            foreach (HexCell c in hoveroverArea.Cells)
-        //            {
-        //                if (HexCellToGameObjectDictionary.ContainsKey(c))
-        //                {
-        //                    HexCellToGameObjectDictionary[c].GetComponent<MeshRenderer>().material.color = Color.blue;
-        //                }
-        //            }
-        //        }
-        //        else
-        //        {
-        //            hoveroverArea = cell.ParentArea;
-        //        }
-        //    }
+        if (map != null)
+        {
+            HexCell cell = map.WorldPositionToHexCell(mouse);
+            if (cell != null)
+            {
+                if (hoveroverArea != null)
+                {
+                    foreach (HexCell c in hoveroverArea.Cells)
+                    {
+                        UpdateCellTexture(c);
+                    }
+                    prevHoverOver = hoveroverArea;
+                    hoveroverArea = cell.ParentArea;
+                    if (prevHoverOver != hoveroverArea)
+                    {
+                        Debug.Log("Area Capacity: " + hoveroverArea.Cells.Capacity + " Actual Size: " + hoveroverArea.Cells.Count + "\nBiome: " + hoveroverArea.AreaBiome.ToString());
+                    }
+                    foreach (HexCell c in hoveroverArea.Cells)
+                    {
+                        if (HexCellToGameObjectDictionary.ContainsKey(c))
+                        {
+                            HexCellToGameObjectDictionary[c].GetComponent<MeshRenderer>().material.color = Color.blue;
+                        }
+                    }
+                }
+                else
+                {
+                    hoveroverArea = cell.ParentArea;
+                }
+            }
 
-        //}
-        //else
-        //{
-        //    // Debug.Log("MAP IS NULL WHAT IS GOING ON");
-        //}
+            //}
+            //else
+            //{
+            //    // Debug.Log("MAP IS NULL WHAT IS GOING ON");
+            //}
 
 
+        }
     }
 
     /// <summary>
@@ -184,13 +195,13 @@ public class WorldController : MonoBehaviour {
     {
         if(HexCellToGameObjectDictionary.ContainsKey(cell))
         {
-           if(BiomeTypeToMaterialDictionary.ContainsKey(cell.ParentArea.BiomeType))
+           if(BiomeTypeToMaterialDictionary.ContainsKey(cell.ParentArea.AreaBiome.Type))
            {
-                HexCellToGameObjectDictionary[cell].GetComponent<MeshRenderer>().material = BiomeTypeToMaterialDictionary[cell.ParentArea.BiomeType];
+                HexCellToGameObjectDictionary[cell].GetComponent<MeshRenderer>().material = BiomeTypeToMaterialDictionary[cell.ParentArea.AreaBiome.Type];
            }
            else
            {
-                Debug.Log("WorldController::UpdateCellTexture - There is no material for this biome type " + cell.ParentArea.BiomeType);
+                Debug.Log("WorldController::UpdateCellTexture - There is no material for this biome type " + cell.ParentArea.AreaBiome.Type);
            }
         }
         else
@@ -263,4 +274,3 @@ public class WorldController : MonoBehaviour {
 
 
 }
-

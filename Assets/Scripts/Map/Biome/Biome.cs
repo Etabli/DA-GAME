@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 
 
@@ -29,168 +30,197 @@ public enum ResourceType
     Guts
 }
 
-public static class Biome
+
+/// <summary>
+/// Contains all information about a Biome depending on Tier
+/// The Resources and Items and Enemies that are in here are the one spawnable in this biome
+/// Not all possible spawnable are listed here, because it is restriced by it's tier as well as not every bioem will probably spawn all possible enemies
+/// for a biome of this tier
+/// </summary>
+public class Biome
 {
 
-    public static Dictionary<BiomeType, List<EnemyType>> SpawnableEnemyTypeDictionary = new Dictionary<BiomeType, List<EnemyType>>();
-    public static Dictionary<BiomeType, List<ItemType>> SpwanableItemTypeDictionary = new Dictionary<BiomeType, List<ItemType>>();
-    public static Dictionary<BiomeType, List<ResourceType>> SpwanableResourcesDictionary = new Dictionary<BiomeType, List<ResourceType>>();
-
-    public static Dictionary<BiomeType, Tuple<int, int>> MinMaxTierDictionray = new Dictionary<BiomeType, Tuple<int, int>>();
-
-    #region Spawnables
-    /// <summary>
-    /// This function returns the List of spwanable EnemyTypes for a given biome type
-    /// </summary>
-    /// <param name="biome">The BiomeType</param>
-    /// <returns>The list of possible spwanable enemy types</returns>
-    public static List<EnemyType> GetSpawnableEnemies(BiomeType biome)
-    {
-        if(SpawnableEnemyTypeDictionary.ContainsKey(biome))
-        {
-            return SpawnableEnemyTypeDictionary[biome];
-        }
-        Debug.Log("Biome:: GetSpawnableEnemies - There is no entry for this BiomeType");
-        return null;
-    }
-
-    /// <summary>
-    /// Returnes the list of spawnable Items for a given biome type
-    /// </summary>
-    /// <param name="biome">The BiomeType</param>
-    /// <returns>The list of spawnable items</returns>
-    public static List<ItemType> GetSpwanableItems(BiomeType biome)
-    {
-        if(SpwanableItemTypeDictionary.ContainsKey(biome))
-        {
-            return SpwanableItemTypeDictionary[biome];
-        }
-        Debug.Log("Biome:: GetSpwanableItems - There is no entry for this BiomeType");
-        return null;
-    }
-
-
-    /// <summary>
-    /// Returns the possible spawnable resources for a given biome type
-    /// </summary>
-    /// <param name="biome">The BiomeType</param>
-    /// <returns>The list of spawnable items </returns>
-    public static List<ResourceType> GetSpwanableResources(BiomeType biome)
-    {
-        if(SpwanableResourcesDictionary.ContainsKey(biome))
-        {
-            return SpwanableResourcesDictionary[biome];
-        }
-        Debug.Log("Biome:: GetSpwanableResources - There is no entry for this BiomeType");
-        return null;
-    }
+    #region Member Variables
+    public BiomeType Type { get; protected set; }
+    public int Tier { get; protected set; }
+    public List<EnemyType> SpawnableEnemies { get; protected set; }
+    public List<ResourceType> SpawnableResource { get; protected set; }
+    public List<ItemType> SpawnableItems { get; protected set; }
     #endregion
 
 
-    #region Tier
-    /// <summary>
-    /// Returns the min and max tier, in which a biome is spawnable
-    /// The first entry is the min tier, the second the max tier
-    /// </summary>
-    /// <param name="biome">The BiomeType</param>
-    /// <returns>A tuple with the min and max tier.</returns>
-    public static Tuple<int,int> GetMinMaxTier(BiomeType biome)
+    #region ctor
+
+
+    public Biome(BiomeType type, int tier, List<EnemyType> EnemiesSpawnable, List<ResourceType> ResourcesSpawnable, List<ItemType> ItemsSpawnable)
     {
-        if(MinMaxTierDictionray.ContainsKey(biome))
-        {
-            return MinMaxTierDictionray[biome];
-        }
-        Debug.Log("Biome:: GetMinMaxTier - There is no entry for this BiomeType");
-        return null;
-    }
-    /// <summary>
-    /// Returns the minimum tier,in which a bioem is spawnable 
-    /// </summary>
-    /// <param name="biome">The BiomeType</param>
-    /// <returns>The minimum tier, -1 when there is no entry for this BiomeType</returns>
-    public static int GetMinTier(BiomeType biome)
-    {
-        if(MinMaxTierDictionray.ContainsKey(biome))
-        {
-            return MinMaxTierDictionray[biome].Item1;
-        }
-        Debug.Log("Biome:: GetMinTier - There is no entry for this BiomeType");
-        return -1;
+        Type = type;
+        Tier = tier;
+        SpawnableEnemies = EnemiesSpawnable;
+        SpawnableResource = ResourcesSpawnable;
+        SpawnableItems = ItemsSpawnable;
     }
 
-    /// <summary>
-    /// Returns the maximum  tier, in which a biome is spawnable
-    /// </summary>
-    /// <param name="biome">The BiomeType</param>
-    /// <returns>The maximum  tier, -1 when there is no entry for this BiomeType</returns>
-    public static int GetMaxTier(BiomeType biome)
+    public Biome(BiomeInfo info, int tier)
     {
-        if(MinMaxTierDictionray.ContainsKey(biome))
-        {
-            return MinMaxTierDictionray[biome].Item2;
-        }
-        Debug.Log("Biome:: GetMaxTier - There is no entry for this BiomeType");
-        return -1;
-    }
-    #endregion
+        Type = info.Type;
+        Tier = tier;
 
+        SpawnableEnemies = new List<EnemyType>();
+        SpawnableResource = new List<ResourceType>();
+        SpawnableItems = new List<ItemType>();
 
-    #region Loading and Saving
-    /// <summary>
-    /// Loads the information for every biome on start up, most likely form a file
-    /// Liekely DataOrganization:
-    /// BiomeType: Enemies
-    ///            Items
-    ///            Resources
-    ///            MinMaxTier
-    ///  BiomeType:
-    ///             .....
-    /// </summary>
-    public static void LoadBiomeInfromation()
-    {
-        Debug.LogError("Biome::LoadInformationForBiomes -  Not Implemented");
-        //TODO: Load the biome data
-    }
-
-
-    public static void SaveBiomeInformation()
-    {
-        Debug.LogError("Biome::SaveBiomeInformation -  Not Implemented");
-        //TODO: Load the biome data
+        FillSpawnableEnemies(info.PossibleEnemiesToSpawn);
+        FillSpawnableResources(info.PossibleResourceToSpawn);
+        FillSpawnableItems(info.PossibleItemsToSpawn);
+        //Debug.Log(this.ToString());
     }
 
     #endregion
 
+    #region Fill Biome Lists
 
-    static BiomeType prevVictor = BiomeType.DickGrease;
-
-    public static BiomeType GetRandomBiomeType()
+    /// <summary>
+    /// Fills the biome spanwable enmeis with random type out of the possible Types for this tier
+    /// amount controlled by worldcontroller enemy variaty
+    /// </summary>
+    /// <param name="possEnemyType"></param>
+    void FillSpawnableEnemies(List<EnemyType> possEnemyType)
     {
-        Lottery<BiomeType> lottery = new Lottery<BiomeType>();
+        Debug.LogWarning("Biome::FillSpwanableEnemies - Currently uses enemies of all types wihtoug checking for tier");
+        List<EnemyType> enemiesForThisTier = new List<EnemyType>();
+        //= EnemyInfo.GetEnemiesForTier(Tier, possEnemyTpye);  
 
-        lottery.Enter(BiomeType.DickGrease, 20);
-        lottery.Enter(BiomeType.Grass, 20);
-        lottery.Enter(BiomeType.House, 20);
-        lottery.Enter(BiomeType.Ice, 20);
-        lottery.Enter(BiomeType.Swamp, 20);
+        System.Random rng = new System.Random((int)System.DateTime.Now.Ticks);
 
-        BiomeType winner = prevVictor;
 
-        while (winner == prevVictor)
+        //TODO: USE enmeies for this tier not poss enemies
+        if(WorldController.Instance.EnemyVariatyPerBiome >= possEnemyType.Count)
         {
-            winner = lottery.GetWinner();
+            SpawnableEnemies = possEnemyType;
+            return;
         }
-        prevVictor = winner;
-        return winner;
+
+        while(SpawnableEnemies.Count < WorldController.Instance.EnemyVariatyPerBiome)
+        {
+            //TODO: Use enmeiesFor this tier not poss enemis.
+            EnemyType type = possEnemyType[rng.Next(possEnemyType.Count)];
+            if (!SpawnableEnemies.Contains(type))
+                SpawnableEnemies.Add(type);
+
+        }
     }
 
-    #region GenerateBiomeLandscape
-    
-    //TODO: Figure out how to generate landscape 
-    //      Create Function that calls landscape generation function based on biometype
-    //      Fidddles with params or create different functions per biome
+    /// <summary>
+    /// Fills the spawnable 
+    /// </summary>
+    /// <param name="possResourceType"></param>
+    void FillSpawnableResources(List<ResourceType> possResourceType)
+    {
+        Debug.LogWarning("Biome::FillSpwanableResources - Currently uses resources of all types wihtoug checking for tier");
+
+        //List<ResourceType> ResourceForThisTier = new List<ResourceType>();
+        //= ResourceInfo.GetResourcesForTier(Tier, possEnemyTpye);  
+
+        System.Random rng = new System.Random((int)System.DateTime.Now.Ticks);
+
+
+        //TODO: USE enmeies for this tier not poss enemies
+        if (WorldController.Instance.ResourceVariatyPerBiome >= possResourceType.Count)
+        {
+            SpawnableResource = possResourceType;
+            return;
+        }
+
+        while (SpawnableResource.Count < WorldController.Instance.ResourceVariatyPerBiome)
+        {
+            //TODO: Use enmeiesFor this tier not poss enemis.
+            ResourceType type = possResourceType[rng.Next(possResourceType.Count)];
+            if (!SpawnableResource.Contains(type))
+                SpawnableResource.Add(type);
+
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="possItemType"></param>
+    void FillSpawnableItems(List<ItemType> possItemType)
+    {
+        Debug.LogWarning("Biome::FillSpwanableItems - Currently uses items of all types wihtoug checking for tier");
+
+        //List<ResourceType> ResourceForThisTier = new List<ResourceType>();
+        //= ResourceInfo.GetResourcesForTier(Tier, possEnemyTpye);  
+
+        System.Random rng = new System.Random((int)System.DateTime.Now.Ticks);
+
+        //TODO: USE enmeies for this tier not poss enemies
+        if (WorldController.Instance.ItemVariatyPerBiome >= possItemType.Count)
+        {
+            SpawnableItems = possItemType;
+            return;
+        }
+
+        while (SpawnableResource.Count < WorldController.Instance.ItemVariatyPerBiome)
+        {
+            //TODO: Use enmeiesFor this tier not poss enemis.
+            ItemType type = possItemType[rng.Next(possItemType.Count)];
+            if (!SpawnableItems.Contains(type))
+                SpawnableItems.Add(type);
+        }
+    }
+
 
     #endregion
 
 
+    #region Random Type to Spwan
+
+    /// <summary>
+    /// Returns a random enemy type that is spawnable in this biome
+    /// </summary>
+    /// <returns></returns>
+    public EnemyType GetRandomEnemyTypeToSpawn()
+    {
+        System.Random rng = new System.Random((int)System.DateTime.Now.Ticks);
+        return SpawnableEnemies[rng.Next(SpawnableEnemies.Count)];
+    }
+
+    /// <summary>
+    /// returns a random resource type that is spawnable in this biome
+    /// </summary>
+    /// <returns></returns>
+    public ResourceType GetRandomResourceTypeToSpawn()
+    {
+        System.Random rng = new System.Random((int)System.DateTime.Now.Ticks);
+        return SpawnableResource[rng.Next(SpawnableResource.Count)];
+
+    }
+
+    /// <summary>
+    /// returns a random itemType that is spawnable in this biome
+    /// </summary>
+    /// <returns></returns>
+    public ItemType GetRandomItemToSpawn()
+    {
+        System.Random rng = new System.Random((int)System.DateTime.Now.Ticks);
+        return SpawnableItems[rng.Next(SpawnableItems.Count)];
+
+    }
+    #endregion
+
+    #region override
+
+    public override string ToString()
+    {
+        return string.Format("Type: {0}\nTier: {1}\nSpwanable Enemies: {2}\nSpawnable Resources{3}\n Spawnable Items{4}",
+            Type,
+            Tier,
+            string.Join(", ", SpawnableEnemies.Select(e => e.ToString()).ToArray<string>()),
+            string.Join(", ", SpawnableResource.Select(e => e.ToString()).ToArray<string>()),
+            string.Join(", ", SpawnableItems.Select(e=>e.ToString()).ToArray<string>()));
+    }
+
+    #endregion
 }

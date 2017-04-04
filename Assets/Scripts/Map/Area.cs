@@ -5,18 +5,18 @@ using UnityEngine;
 public class Area
 {
     #region Member Varaiables
-    public BiomeType BiomeType { get; protected set; }
+    public Biome AreaBiome { get; protected set; }
+
     public List<HexCell> Cells { get; protected set; }
-    public int Tier { get; protected set; }
     #endregion
 
     #region ctors
 
     public Area(int tier,int size)
     {
-        this.Tier = tier;
+
         this.Cells = new List<HexCell>(size);
-        GetBiomeForArea();
+        GetBiomeForArea(tier);
     }
 
     #endregion
@@ -65,16 +65,17 @@ public class Area
     /// Gets a random BiomeType for this area, depending on tier.
     /// Only biomes that exist in the biome info dictioanry are possible to be chosen
     /// </summary>
-    void GetBiomeForArea()
+    void GetBiomeForArea(int tier)
     {
         Lottery<BiomeType> biomeLottery  = new Lottery<BiomeType>();
 
-        foreach(BiomeType type in BiomeInfo.GetPossibleBiomesForTier(Tier))
+        foreach(BiomeType type in BiomeInfo.GetPossibleBiomesForTier(tier))
         {
             biomeLottery.Enter(type, 20);
         }
 
-        BiomeType = biomeLottery.GetWinner();
+        AreaBiome = new Biome(BiomeInfo.GetBiomeInfo(biomeLottery.GetWinner()),tier);
+
     }
 
 
