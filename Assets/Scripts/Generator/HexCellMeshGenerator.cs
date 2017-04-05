@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public static  class HexCellMeshGenerator {
 
@@ -21,10 +22,16 @@ public static  class HexCellMeshGenerator {
         hexMesh.vertices = Converter.V2ArrayToV3Array(corners);
         hexMesh.triangles = HexTriangles();
 
-        hexMesh.uv = corners;
+        hexMesh.uv =  corners;
         return hexMesh;
     }
 
+
+    /// <summary>
+    /// returns an int array with the triangels uesed
+    /// ordering: counter clockwise
+    /// </summary>
+    /// <returns></returns>
     static int[] HexTriangles()
     {
         // CLOCKWISE winding order
@@ -32,6 +39,8 @@ public static  class HexCellMeshGenerator {
         //                   1, 2, 3,
         //                   0, 3, 4,
         //                   0, 4, 5 };
+
+        //counter clockwise
         return new int[]{ 0, 3, 1,
                           1, 3, 2,
                           0, 4, 3,
