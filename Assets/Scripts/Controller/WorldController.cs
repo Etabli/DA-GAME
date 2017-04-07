@@ -66,29 +66,6 @@ public class WorldController : MonoBehaviour {
     {
 
         Vector2 mouse = Converter.V3ToV2(Camera.main.ScreenToWorldPoint(Input.mousePosition));
-        ////Debug.Log(mouse);
-
-        //if (!temp_once)
-        //{
-        //    temp_once = true;
-        //    //temp_once = true;
-        //    //BiomeInfo info = new BiomeInfo(BiomeType.DickGrease,
-        //    //    new List<EnemyType>() { EnemyType.Bat, EnemyType.Marshmellow, EnemyType.Nutts, EnemyType.Snickers },
-        //    //    new List<ItemType>() { ItemType.Hands, ItemType.NotHands, ItemType.Feet },
-        //    //    new List<ResourceType>() { ResourceType.Asshair, ResourceType.Blood, ResourceType.Guts, ResourceType.Iron },
-        //    //    new Range(1.0f, 20.0f));
-        //    //Debug.Log(info.ToString());
-
-        //    //BiomeInfoSerializer.SaveBiomeInfoToDisk(info);
-
-
-        //    BiomeInfo info = BiomeInfoSerializer.LoadBiomeInfoFromDisk(BiomeType.DickGrease);
-
-
-        //    Debug.Log(info.ToString());
-
-        //}
-
         if (map != null)
         {
             HexCell cell = map.WorldPositionToHexCell(mouse);
@@ -119,14 +96,6 @@ public class WorldController : MonoBehaviour {
                     hoveroverArea = cell.ParentArea;
                 }
             }
-
-            //}
-            //else
-            //{
-            //    // Debug.Log("MAP IS NULL WHAT IS GOING ON");
-            //}
-
-
         }
     }
 

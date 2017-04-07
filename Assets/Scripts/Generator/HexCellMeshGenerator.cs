@@ -9,8 +9,9 @@ public static  class HexCellMeshGenerator {
     /// Generate a Mesh for a given HexCell
     /// </summary>
     /// <param name="cell">The Cell</param>
+    /// <param name="repeat">Specifies if texture is repeat or clamping, repeat when true, otherwise clamp</param>
     /// <returns>The mesh for a hex cell</returns>
-    public static Mesh GenerateHexCellMesh(HexCell cell)
+    public static Mesh GenerateHexCellMesh(HexCell cell,bool repeat = true)
     {
         Mesh hexMesh = new Mesh();
         Vector2[] corners = cell.GetAllCorners();
@@ -22,7 +23,14 @@ public static  class HexCellMeshGenerator {
         hexMesh.vertices = Converter.V2ArrayToV3Array(corners);
         hexMesh.triangles = HexTriangles();
 
-        hexMesh.uv = GetUvs();//corners;
+        if(repeat)
+        {
+            hexMesh.uv = corners;
+        }
+        else
+        {
+            hexMesh.uv = GetUvs();
+        }
         return hexMesh;
     }
 
