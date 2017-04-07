@@ -22,7 +22,7 @@ public static  class HexCellMeshGenerator {
         hexMesh.vertices = Converter.V2ArrayToV3Array(corners);
         hexMesh.triangles = HexTriangles();
 
-        hexMesh.uv =  corners;
+        hexMesh.uv = GetUvs();//corners;
         return hexMesh;
     }
 
@@ -46,5 +46,19 @@ public static  class HexCellMeshGenerator {
                           0, 4, 3,
                           0, 5, 4};
     }
+
+    static Vector2[] GetUvs()
+    {
+        Vector2[] uvs = new Vector2[6];
+
+        uvs[0] = new Vector2(1.0f,0.25f); // right below center point
+        uvs[1] = new Vector2(0.5f,0.0f); // below center point
+        uvs[2] = new Vector2(0.0f,0.25f);//left below center point
+        uvs[3] = new Vector2(0.0f,0.75f);//left above center point
+        uvs[4] = new Vector2(0.5f,1.0f);// above center point
+        uvs[5] = new Vector2(1.0f,0.75f);// right above center point
+        return uvs;
+    }
+
 
 }
