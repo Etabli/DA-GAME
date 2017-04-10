@@ -81,6 +81,11 @@ public sealed class Tuple<T1, T2>
         {
             return object.ReferenceEquals(b, null);
         }
+        if (ReferenceEquals(b, null))
+        {
+            return ReferenceEquals(a, null);
+        }
+
         if (a.item1 == null && b.item1 != null) return false;
         if (a.item2 == null && b.item2 != null) return false;
         return

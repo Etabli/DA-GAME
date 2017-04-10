@@ -32,8 +32,7 @@ public class AttributePool
 
     public void CombineInto(AttributePool pool)
     {
-        // TODO: Maybe change so that odds stay even. Currently attributes in both pools have a higher chance to be drawn
-        lottery.CombineInto(pool.lottery);
+        lottery.CombineInto(pool.lottery, EntryOptions.Discard);
     }
     
     public AttributeType Evaluate()
@@ -129,8 +128,7 @@ public class AttributePool
         {
             data = data.Remove(index + 1, 1);
         }
-
-        Debug.Log(data);
+        
         reader.Close();
         file.Close();
 
