@@ -62,7 +62,7 @@ public class AttributeValueInfo
         }
         AttributeValue progressedMax = prog.Apply(baseValueMax, tier);
 
-        Debug.Log(string.Format("Progressed minimum: {0}, Progressed maximum: {1}, frac: {2}", progressedMin, progressedMax, frac));
+        //Debug.Log(string.Format("Progressed minimum: {0}, Progressed maximum: {1}, frac: {2}", progressedMin, progressedMax, frac));
 
         return progressedMin + (progressedMax - progressedMin) * frac;
     }
