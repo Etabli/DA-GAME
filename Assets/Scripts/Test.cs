@@ -39,13 +39,12 @@ public class Test : MonoBehaviour {
             //print(w);
 
             Lottery<string> l = new Lottery<string>();
-            l.Enter("first", 3);
-            l.Enter("second", 2);
+            l.Enter("first", 1);
+            l.Enter("second", 1);
+            l.Enter("third", 1);
+            l.Enter("fourth", 1);
 
-            Lottery<string> l2 = new Lottery<string>();
-            l2.Enter("first", 6);
-
-            print(l.CombineWith(l2, EntryOptions.Overwrite));
+            print(l.GetWinner(new HashSet<string>() { "second", "fourth" }));
 
             
         }

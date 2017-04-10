@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Runtime.Serialization;
+using System.Linq;
 
 /// <summary>
 /// Options for how to handle duplicates when entering a Lottery
@@ -143,11 +144,24 @@ public class Lottery<T>
         Enter(entree, 1, EntryOptions.Aggregate);
     }
 
-    public T GetWinner()
+    public T GetWinner(HashSet<T> blacklist)
     {
+        Tuple<T, int>[] entrees_copy = new Tuple<T, int>[entrees.Count];
+        entrees.CopyTo(entrees_copy);
+
+        var filtered_entrees = entrees.ToArray();
+        int max = maxRoll;
+
+        // Only filter if we actually have a blacklist
+        if (blacklist.Count > 0)
+        {
+            filtered_entrees = (from Tuple<T, int> e in entrees where !blacklist.Contains(e.Item1) select e).ToArray();
+            max = filtered_entrees.Aggregate(0, (sum, e) => sum + e.Item2);
+        }    
+
         T winner = default(T);
-        int roll = rng.Next(maxRoll);
-        foreach (Tuple<T, int> entree in entrees)
+        int roll = rng.Next(max);
+        foreach (Tuple<T, int> entree in filtered_entrees)
         {
             if (roll < entree.Item2)
             {
@@ -157,6 +171,11 @@ public class Lottery<T>
             roll -= entree.Item2;
         }
         return winner;
+    }
+
+    public T GetWinner()
+    {
+        return GetWinner(new HashSet<T>());
     }
 
     public void Remove(T entree)
