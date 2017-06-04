@@ -81,44 +81,23 @@ public abstract class ItemBase
         if (item.Tier > 3)
             tierLottery.Enter(item.Tier - 3, 1);
 
-        int quality = item.Quality;
-        //Debug.Log(string.Format("quality = {0}", quality));
+        int quality = item.Quality;  
 
         // Guaranteed attributes don't care about possible pool
         foreach (AttributeType attributeType in GuaranteedAttributes)
         {
             int tier = tierLottery.GetWinner();
+            tier = tier > quality ? quality : tier;
             item.Attributes.Add(attributeType, AttributeInfo.GetAttributeInfo(attributeType).GenerateAttribute(tier));
             quality -= tier;
-            GenerateAttributeForItem(tierLottery, ref quality, item, attributeType);
         }
-
+        
         // Fill up the rest of the attributes
-        while (quality > 0)
+        Attribute[] randomAttributes = PossibleAttributes.GetUniqueRandomAttributes(quality, tierLottery, new HashSet<AttributeType>(GuaranteedAttributes));
+        foreach (Attribute attribute in randomAttributes)
         {
-            Debug.Log("Generating random attribute");
-            GenerateAttributeForItem(tierLottery, ref quality, item, AttributeType.Random);
+            item.Attributes.Add(attribute.Type, attribute);
         }
-    }
-
-    protected void GenerateAttributeForItem(Lottery<int> tierLottery, ref int quality, Item item, AttributeType attributeType)
-    {
-        // Get perliminary tier of new attribute
-        int tier = tierLottery.GetWinner();
-        // Check if we have high enough quality left to allow this tier of attribute
-        if (tier > quality)
-            tier = quality;
-        quality -= tier;
-
-        Attribute attribute;
-        do
-        {
-            attribute = AttributeInfo.GetAttributeInfo(attributeType).GenerateAttribute(tier);
-            Debug.Log(attribute.Type);
-
-        } while (item.Attributes.ContainsKey(attribute.Type));
-
-        item.Attributes.Add(attribute.Type, attribute);
     }
 }
 

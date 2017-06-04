@@ -33,20 +33,10 @@ public class Test : MonoBehaviour {
     {
 		if (Input.GetKeyDown(KeyCode.Space))
         {
-            //WeaponBase wBase = new WeaponBase(ItemBaseType.Pistol ,new AttributeType[] { AttributeType.PhysDmgFlat }, new AttributeType[] { AttributeType.FireRate }, new AmmoClass[] { AmmoClass.Bullet, AmmoClass.Battery });
-            //Weapon w = wBase.GenerateItem(1, 1) as Weapon;
-            //print("Generated weapon!");
-            //print(w);
+            WeaponBase wBase = new WeaponBase(ItemBaseType.Pistol, new AttributeType[] { AttributeType.PhysDmgFlat }, new AttributeType[] { AttributeType.FireRate }, new AmmoClass[] { AmmoClass.Bullet, AmmoClass.Battery }, AttributePoolPreset.Weapon);
+            Weapon w = wBase.GenerateItem(7, 15) as Weapon;
+            print(w);
 
-            Lottery<string> l = new Lottery<string>();
-            l.Enter("first", 1);
-            l.Enter("second", 1);
-            l.Enter("third", 1);
-            l.Enter("fourth", 1);
-
-            print(l.GetWinner(new HashSet<string>() { "second", "fourth" }));
-
-            
         }
-	}
+    }
 }
