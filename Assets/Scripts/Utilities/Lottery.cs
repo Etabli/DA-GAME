@@ -18,6 +18,24 @@ public enum EntryOptions
 }
 
 /// <summary>
+/// A general Exception from mishandling a Lottery
+/// </summary>
+public class LotteryException : Exception
+{
+    // Only throw this if it's something seriously dumb, otherwise just log error
+    public LotteryException()
+    {
+
+    }
+
+    public LotteryException(string message) : base(message)
+    { }
+
+    public LotteryException(string message, Exception inner) : base(message, inner)
+    { }
+}
+
+/// <summary>
 /// A lottery for randomly drawing from a pool of objects.
 /// </summary>
 /// <typeparam name="T">The type of object the lottery is for</typeparam>
@@ -30,6 +48,9 @@ public class Lottery<T>
     // Our own random generator to make seeding possible
     System.Random rng;
     int maxRoll = 0;
+
+    List<Tuple<T, int>> batchDrawEntrants;
+    int batchDrawMaxRoll = 0;
 
     public Lottery() : this((int)DateTime.Now.Ticks)
     { }
@@ -45,6 +66,90 @@ public class Lottery<T>
         rng = new System.Random((int)DateTime.Now.Ticks);
         src.CombineInto(this);
     }
+
+    #region BatchDraw
+    /// <summary>
+    /// Initializes a batch draw with a preexisting blacklist
+    /// </summary>
+    /// <param name="blacklist"></param>
+    public void StartBatchDraw(HashSet<T> blacklist)
+    {
+        batchDrawEntrants = (List<Tuple<T, int>>) (from Tuple<T, int> e in entrants where !blacklist.Contains(e.Item1) select e);
+        batchDrawMaxRoll = batchDrawEntrants.Aggregate(0, (sum, e) => sum + e.Item2);
+    }
+
+    /// <summary>
+    /// Initializes a batch draw
+    /// </summary>
+    public void StartBatchDraw()
+    {
+        batchDrawEntrants = new List<Tuple<T, int>>(entrants);
+        batchDrawMaxRoll = maxRoll;
+    }
+
+    /// <summary>
+    /// Draws a batch of winners.
+    /// </summary>
+    /// <param name="n">The number of winners to draw</param>
+    /// <returns>The list of winners. Null if there were no entrants left.</returns>
+    public T[] BatchDraw(int n)
+    {
+        if (batchDrawEntrants == null)
+        {
+            throw new LotteryException("Trying to BatchDraw without initializing!");
+        }
+
+        List<T> batch = new List<T>();
+        // Draw n times
+        for (; n > 0; n--)
+        {
+            // Break if we've exhausted all entrants
+            if (batchDrawEntrants.Count == 0)
+            {
+                break;
+            }
+
+            int roll = rng.Next(batchDrawMaxRoll);
+            foreach (Tuple<T, int> e in batchDrawEntrants)
+            {
+                if (roll < e.Item2)
+                {
+                    batch.Add(e.Item1);
+                    batchDrawEntrants.Remove(e);
+                    break;
+                }
+                roll -= e.Item2;
+            }
+        }
+
+        if (batch.Count > 0)
+        {
+            return batch.ToArray();
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Draws a single winner from the batch-drawing list.
+    /// </summary>
+    /// <returns></returns>
+    public T BatchDraw()
+    {
+        T[] batch = BatchDraw(1);
+        if (batch == null)
+            return default(T);
+        return batch[0];
+    }
+
+    /// <summary>
+    /// Ends a batch draw, so that accidental draws without restarting throw an error
+    /// </summary>
+    public void EndBatchDraw()
+    {
+        batchDrawEntrants = null;
+        batchDrawMaxRoll = 0;
+    }
+    #endregion
 
     /// <summary>
     /// Changes the current seed of the lottery
