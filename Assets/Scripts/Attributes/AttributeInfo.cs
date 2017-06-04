@@ -50,12 +50,12 @@ public class AttributeInfo
     /// <returns></returns>
     public Attribute GenerateAttribute(int tier)
     {
-        return new Attribute(Type, ValueType, ValueInfo.GetValueForTier(tier));
+        return new Attribute(Type, ValueType, ValueInfo.GetValueForTier(tier), tier);
     }
 
     public Attribute GenerateAttribute(int tier, AttributeProgression progression)
     {
-        return new Attribute(Type, ValueType, ValueInfo.GetValueForTier(tier, progression));
+        return new Attribute(Type, ValueType, ValueInfo.GetValueForTier(tier, progression), tier);
     }
 
     public override string ToString()
