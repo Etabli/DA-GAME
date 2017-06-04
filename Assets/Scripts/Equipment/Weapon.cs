@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum WeaponType
+public enum AmmoClass
 {
-    Pistol,
-    Fireball
+    Bullet,
+    Crystal,
+    Battery
 }
 
 /// <summary>
@@ -13,19 +14,10 @@ public enum WeaponType
 /// </summary>
 public class Weapon : Item
 {
-    public WeaponType Type { get; protected set; }
-    public AmmoType[] AllowedAmmoTypes { get; protected set; }
-
     protected List<Ammo> AmmoQueue;
 
-    public Weapon(WeaponType type)
+    public Weapon(string name, int tier, int quality, ItemBaseType baseType, ItemBase itemBase) : base(name, tier, quality, baseType, itemBase)
     {
-        Type = type;
-        GenerateBaseAttributes();
-    }
-
-    public override void GenerateBaseAttributes()
-    {
-
+        AmmoQueue = new List<Ammo>();
     }
 }
