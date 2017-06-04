@@ -4,12 +4,12 @@
     <Key>Ammo</Key>
     <Value>
       <lottery xmlns="http://schemas.datacontract.org/2004/07/">
-        <entrees>
+        <entrants>
           <TupleOfAttributeTypeInt32>
             <item1>PhysDmgFlat</item1>
             <item2>1</item2>
           </TupleOfAttributeTypeInt32>
-        </entrees>
+        </entrants>
       </lottery>
     </Value>
   </KeyValueOfAttributePoolPresetAttributePool>
@@ -17,7 +17,7 @@
     <Key>Armor</Key>
     <Value>
       <lottery xmlns="http://schemas.datacontract.org/2004/07/">
-        <entrees>
+        <entrants>
           <TupleOfAttributeTypeInt32>
             <item1>Health</item1>
             <item2>1</item2>
@@ -26,7 +26,7 @@
             <item1>PhysDmgFlat</item1>
             <item2>1</item2>
           </TupleOfAttributeTypeInt32>
-        </entrees>
+        </entrants>
       </lottery>
     </Value>
   </KeyValueOfAttributePoolPresetAttributePool>
@@ -34,7 +34,7 @@
     <Key>Weapon</Key>
     <Value>
       <lottery xmlns="http://schemas.datacontract.org/2004/07/">
-        <entrees>
+        <entrants>
           <TupleOfAttributeTypeInt32>
             <item1>FireRate</item1>
             <item2>1</item2>
@@ -47,7 +47,7 @@
             <item1>Health</item1>
             <item2>1</item2>
           </TupleOfAttributeTypeInt32>
-        </entrees>
+        </entrants>
       </lottery>
     </Value>
   </KeyValueOfAttributePoolPresetAttributePool>

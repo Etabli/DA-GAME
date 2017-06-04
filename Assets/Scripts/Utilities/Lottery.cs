@@ -74,7 +74,7 @@ public class Lottery<T>
     /// <param name="blacklist"></param>
     public void StartBatchDraw(HashSet<T> blacklist)
     {
-        batchDrawEntrants = (List<Tuple<T, int>>) (from Tuple<T, int> e in entrants where !blacklist.Contains(e.Item1) select e);
+        batchDrawEntrants = new List<Tuple<T, int>>(from Tuple<T, int> e in entrants where !blacklist.Contains(e.Item1) select e);
         batchDrawMaxRoll = batchDrawEntrants.Aggregate(0, (sum, e) => sum + e.Item2);
     }
 
@@ -92,7 +92,7 @@ public class Lottery<T>
     /// </summary>
     /// <param name="n">The number of winners to draw</param>
     /// <returns>The list of winners. Null if there were no entrants left.</returns>
-    public T[] BatchDraw(int n)
+    public T[] DrawBatch(int n)
     {
         if (batchDrawEntrants == null)
         {
@@ -116,6 +116,7 @@ public class Lottery<T>
                 {
                     batch.Add(e.Item1);
                     batchDrawEntrants.Remove(e);
+                    batchDrawMaxRoll -= e.Item2;
                     break;
                 }
                 roll -= e.Item2;
@@ -133,9 +134,9 @@ public class Lottery<T>
     /// Draws a single winner from the batch-drawing list.
     /// </summary>
     /// <returns></returns>
-    public T BatchDraw()
+    public T DrawBatch()
     {
-        T[] batch = BatchDraw(1);
+        T[] batch = DrawBatch(1);
         if (batch == null)
             return default(T);
         return batch[0];
@@ -158,6 +159,11 @@ public class Lottery<T>
     public void ChangeSeed(int seed)
     {
         rng = new System.Random(seed);
+    }
+
+    public void ChangeSeed()
+    {
+        ChangeSeed((int)DateTime.Now.Ticks);
     }
 
     /// <summary>
@@ -291,6 +297,16 @@ public class Lottery<T>
     public T GetWinner()
     {
         return GetWinner(new HashSet<T>());
+    }
+
+    public T Draw()
+    {
+        return GetWinner();
+    }
+
+    public T Draw(HashSet<T> blacklist)
+    {
+        return GetWinner(blacklist);
     }
 
     public void Remove(T entrant)

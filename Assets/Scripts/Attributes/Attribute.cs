@@ -7,6 +7,7 @@ using UnityEngine;
 /// </summary>
 public enum AttributeType
 {
+    None,
     Health,
     PhysDmgFlat,
     FireRate,
@@ -37,6 +38,6 @@ public class Attribute
 
     public override string ToString()
     {
-        return string.Format(info.Description, Value) + string.Format("({0})", Tier);
+        return string.Format(info.Description, Value) + string.Format(" ({0})", Tier);
     }
 }
