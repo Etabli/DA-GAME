@@ -5,15 +5,16 @@ using UnityEngine;
 using System.Runtime.Serialization;
 using System.Linq;
 
+
 /// <summary>
 /// Options for how to handle duplicates when entering a Lottery
 /// </summary>
 public enum EntryOptions
 {
-    NoChecks,
-    Aggregate,
-    Overwrite,
-    Discard
+    NoChecks,       // Don't perform any checks
+    Aggregate,      // Aggregate duplicate entries into a single entry
+    Overwrite,      // Overwrite old entries with the new one
+    Discard         // Discard entry if one of the same type is already in the lottery
 }
 
 /// <summary>
@@ -24,7 +25,7 @@ public enum EntryOptions
 public class Lottery<T>
 {
     [DataMember]
-    List<Tuple<T, int>> entrees;
+    List<Tuple<T, int>> entrants;
 
     // Our own random generator to make seeding possible
     System.Random rng;
@@ -36,7 +37,7 @@ public class Lottery<T>
     public Lottery(int seed)
     {
         rng = new System.Random(seed);
-        entrees = new List<Tuple<T, int>>();
+        entrants = new List<Tuple<T, int>>();
     }
 
     public Lottery(Lottery<T> src)
@@ -45,23 +46,32 @@ public class Lottery<T>
         src.CombineInto(this);
     }
 
+    /// <summary>
+    /// Changes the current seed of the lottery
+    /// </summary>
+    /// <param name="seed">The new seed</param>
     public void ChangeSeed(int seed)
     {
         rng = new System.Random(seed);
     }
 
     /// <summary>
-    /// Enters all entrees of this lottery into another lottery
+    /// Enters all entrants of this lottery into another lottery
     /// </summary>
     /// <param name="lottery">The lottery to be entered into</param>
+    /// <param name="options">Strategy to use for duplicate entries</param>
     public void CombineInto(Lottery<T> lottery, EntryOptions options)
     {
-        foreach (Tuple<T, int> e in entrees)
+        foreach (Tuple<T, int> e in entrants)
         {
             lottery.Enter(e.Item1, e.Item2, options);
         }
     }
 
+    /// <summary>
+    /// Enters all entrants of this lottery into another lottery. Uses Aggregate option
+    /// </summary>
+    /// <param name="lottery"></param>
     public void CombineInto(Lottery<T> lottery)
     {
         CombineInto(lottery, EntryOptions.Aggregate);
@@ -98,15 +108,15 @@ public class Lottery<T>
     /// <summary>
     /// Enters an object into the lottery
     /// </summary>
-    /// <param name="entree">The object to be entered into the lottery</param>
+    /// <param name="entrant">The object to be entered into the lottery</param>
     /// <param name="nTickets">The number of tickets to assign to the object</param>
     /// <param name="options">Options regarding what to do when a duplicate is found</param>
-    public void Enter(T entree, int nTickets, EntryOptions options)
+    public void Enter(T entrant, int nTickets, EntryOptions options)
     {
         // Check for duplicates if we care about them
         if (options != EntryOptions.NoChecks)
         {
-            Tuple<T, int> duplicate = GetEntree(entree);
+            Tuple<T, int> duplicate = GetEntrant(entrant);
 
             // We found a duplicate
             if (duplicate != null)
@@ -120,55 +130,55 @@ public class Lottery<T>
                 {
                     // Remove duplicate and update ticket amount
                     nTickets += duplicate.Item2;
-                    Remove(entree);
+                    Remove(entrant);
                 }
                 else if (options == EntryOptions.Overwrite)
                 {
                     // Simply remove duplicate
-                    Remove(entree);
+                    Remove(entrant);
                 }
             }
         }             
 
         maxRoll += nTickets;
-        entrees.Add(new Tuple<T, int>(entree, nTickets));
+        entrants.Add(new Tuple<T, int>(entrant, nTickets));
     }
 
-    public void Enter(T entree, int nTickets)
+    public void Enter(T entrant, int nTickets)
     {
-        Enter(entree, nTickets, EntryOptions.Aggregate);
+        Enter(entrant, nTickets, EntryOptions.Aggregate);
     }
 
-    public void Enter(T entree)
+    public void Enter(T entrant)
     {
-        Enter(entree, 1, EntryOptions.Aggregate);
+        Enter(entrant, 1, EntryOptions.Aggregate);
     }
 
     public T GetWinner(HashSet<T> blacklist)
     {
-        Tuple<T, int>[] entrees_copy = new Tuple<T, int>[entrees.Count];
-        entrees.CopyTo(entrees_copy);
+        Tuple<T, int>[] entrants_copy = new Tuple<T, int>[entrants.Count];
+        entrants.CopyTo(entrants_copy);
 
-        var filtered_entrees = entrees.ToArray();
+        var filtered_entrants = entrants.ToArray();
         int max = maxRoll;
 
         // Only filter if we actually have a blacklist
         if (blacklist.Count > 0)
         {
-            filtered_entrees = (from Tuple<T, int> e in entrees where !blacklist.Contains(e.Item1) select e).ToArray();
-            max = filtered_entrees.Aggregate(0, (sum, e) => sum + e.Item2);
+            filtered_entrants = (from Tuple<T, int> e in entrants where !blacklist.Contains(e.Item1) select e).ToArray();
+            max = filtered_entrants.Aggregate(0, (sum, e) => sum + e.Item2);
         }    
 
         T winner = default(T);
         int roll = rng.Next(max);
-        foreach (Tuple<T, int> entree in filtered_entrees)
+        foreach (Tuple<T, int> entrant in filtered_entrants)
         {
-            if (roll < entree.Item2)
+            if (roll < entrant.Item2)
             {
-                winner = entree.Item1;
+                winner = entrant.Item1;
                 break;
             }
-            roll -= entree.Item2;
+            roll -= entrant.Item2;
         }
         return winner;
     }
@@ -178,10 +188,10 @@ public class Lottery<T>
         return GetWinner(new HashSet<T>());
     }
 
-    public void Remove(T entree)
+    public void Remove(T entrant)
     {
-        entrees.RemoveAll(t => {
-            if (t.Item1.Equals(entree))
+        entrants.RemoveAll(t => {
+            if (t.Item1.Equals(entrant))
             {
                 maxRoll -= t.Item2;
                 return true;
@@ -192,8 +202,8 @@ public class Lottery<T>
 
     public override string ToString()
     {
-        string result = string.Format("Lottery of type '{0}':\n", typeof(T));
-        foreach(Tuple<T, int> e in entrees)
+        string result = string.Format("Lottery of type '{0}' with {1} entrants:\n", typeof(T));
+        foreach(Tuple<T, int> e in entrants)
         {
             result += string.Format("{0}: {1}\n", e.Item1, e.Item2);
         }
@@ -201,12 +211,12 @@ public class Lottery<T>
     }
 
     /// <summary>
-    /// Returns a proper entree for a given object, if there is one
+    /// Returns a proper entrant for a given object, if there is one
     /// </summary>
-    private Tuple<T, int> GetEntree(T value)
+    private Tuple<T, int> GetEntrant(T value)
     {
         Tuple<T, int> result = null;
-        foreach(Tuple<T, int> e in entrees)
+        foreach(Tuple<T, int> e in entrants)
         {
             if (e.Item1.Equals(value))
             {
@@ -215,5 +225,25 @@ public class Lottery<T>
             }
         }
         return result;
+    }
+
+    /// <summary>
+    /// Returns all entrants for a given object, if there are any
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    private Tuple<T, int>[] GetEntrants(T value)
+    {
+        List<Tuple<T, int>> result = new List<Tuple<T, int>>();
+
+        foreach (Tuple<T, int> e in entrants)
+        {
+            if (e.Item1.Equals(value))
+            {
+                result.Add(e);
+            }
+        }
+
+        return result.ToArray();
     }
 }
