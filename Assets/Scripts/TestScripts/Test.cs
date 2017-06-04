@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Test : MonoBehaviour {
-    
-	// Use this for initialization
-	void Start ()
+public class Test : MonoBehaviour
+{
+
+    // Use this for initialization
+    void Start()
     {
         AttributeInfoSerializer.LoadFromDisk(AttributeType.Health);
         AttributeInfoSerializer.LoadFromDisk(AttributeType.PhysDmgFlat);
@@ -27,16 +28,15 @@ public class Test : MonoBehaviour {
 
         AttributePool.SavePoolsToDisk();
     }
-	
-	// Update is called once per frame
-	void Update ()
+
+    // Update is called once per frame
+    void Update()
     {
-		if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             WeaponBase wBase = new WeaponBase(ItemBaseType.Pistol, new AttributeType[] { AttributeType.PhysDmgFlat }, new AttributeType[] { AttributeType.FireRate }, new AmmoClass[] { AmmoClass.Bullet, AmmoClass.Battery }, AttributePoolPreset.Weapon);
             Weapon w = wBase.GenerateItem(7, 15) as Weapon;
             print(w);
-
         }
     }
 }

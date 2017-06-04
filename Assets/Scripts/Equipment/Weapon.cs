@@ -2,13 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum AmmoClass
-{
-    Bullet,
-    Crystal,
-    Battery
-}
-
 /// <summary>
 /// Represents a specific Weapon
 /// </summary>
