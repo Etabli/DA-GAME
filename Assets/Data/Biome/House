@@ -11,9 +11,9 @@
     <EnemyType>Snickers</EnemyType>
   </PossibleEnemiesToSpawn>
   <PossibleItemsToSpawn>
-    <ItemType>Hands</ItemType>
-    <ItemType>NotHands</ItemType>
-    <ItemType>Feet</ItemType>
+    <ItemBaseType>Breastplate</ItemBaseType>
+    <ItemBaseType>FireCrystals</ItemBaseType>
+    <ItemBaseType>Cockring</ItemBaseType>
   </PossibleItemsToSpawn>
   <PossibleResourceToSpawn>
     <ResourceType>Asshair</ResourceType>

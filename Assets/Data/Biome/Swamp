@@ -11,8 +11,8 @@
     <EnemyType>Snickers</EnemyType>
   </PossibleEnemiesToSpawn>
   <PossibleItemsToSpawn>
-    <ItemType>Hands</ItemType>
-    <ItemType>Feet</ItemType>
+    <ItemBaseType>PhysicalBullets</ItemBaseType>
+    <ItemBaseType>Cockring</ItemBaseType>
   </PossibleItemsToSpawn>
   <PossibleResourceToSpawn>
     <ResourceType>Blood</ResourceType>
