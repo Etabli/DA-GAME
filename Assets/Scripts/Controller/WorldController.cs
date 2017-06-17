@@ -81,7 +81,7 @@ public class WorldController : MonoBehaviour {
                     hoveroverArea = cell.ParentArea;
                     if (prevHoverOver != hoveroverArea)
                     {
-                        Debug.Log("Area Capacity: " + hoveroverArea.Cells.Capacity + " Actual Size: " + hoveroverArea.Cells.Count + "\nBiome: " + hoveroverArea.AreaBiome.ToString());
+                       // Debug.Log("Area Capacity: " + hoveroverArea.Cells.Capacity + " Actual Size: " + hoveroverArea.Cells.Count + "\nBiome: " + hoveroverArea.AreaBiome.ToString());
                     }
                     foreach (HexCell c in hoveroverArea.Cells)
                     {
