@@ -28,7 +28,7 @@ public class BiomeInfo{
     [DataMember]
     public List<EnemyType> PossibleEnemiesToSpawn { get; protected set; }
     [DataMember]
-    public List<ItemType> PossibleItemsToSpawn { get; protected set; }
+    public List<ItemBaseType> PossibleItemsToSpawn { get; protected set; }
     [DataMember]
     public List<ResourceType> PossibleResourceToSpawn { get; protected set; }
     [DataMember]
@@ -37,7 +37,7 @@ public class BiomeInfo{
     #endregion
 
     #region ctor
-    public BiomeInfo(BiomeType type, List<EnemyType>enemyList, List<ItemType> itemList, List<ResourceType> resourceList,Range minMaxTier)
+    public BiomeInfo(BiomeType type, List<EnemyType>enemyList, List<ItemBaseType> itemList, List<ResourceType> resourceList,Range minMaxTier)
     {
         Type = type;
         PossibleEnemiesToSpawn = enemyList;
@@ -57,7 +57,7 @@ public class BiomeInfo{
         }
     }
 
-    public BiomeInfo(BiomeType type, List<EnemyType> enemyList, List<ItemType> itemList, List<ResourceType> resourceList,int minTier, int maxtier):
+    public BiomeInfo(BiomeType type, List<EnemyType> enemyList, List<ItemBaseType> itemList, List<ResourceType> resourceList,int minTier, int maxtier):
         this(type,enemyList,itemList,resourceList,new Range((float)minTier,(float)maxtier))
     {
 

@@ -45,14 +45,14 @@ public class Biome
     public int Tier { get; protected set; }
     public List<EnemyType> SpawnableEnemies { get; protected set; }
     public List<ResourceType> SpawnableResource { get; protected set; }
-    public List<ItemType> SpawnableItems { get; protected set; }
+    public List<ItemBaseType> SpawnableItems { get; protected set; }
     #endregion
 
 
     #region ctor
 
 
-    public Biome(BiomeType type, int tier, List<EnemyType> EnemiesSpawnable, List<ResourceType> ResourcesSpawnable, List<ItemType> ItemsSpawnable)
+    public Biome(BiomeType type, int tier, List<EnemyType> EnemiesSpawnable, List<ResourceType> ResourcesSpawnable, List<ItemBaseType> ItemsSpawnable)
     {
         Type = type;
         Tier = tier;
@@ -68,7 +68,7 @@ public class Biome
 
         SpawnableEnemies = new List<EnemyType>();
         SpawnableResource = new List<ResourceType>();
-        SpawnableItems = new List<ItemType>();
+        SpawnableItems = new List<ItemBaseType>();
 
         FillSpawnableEnemies(info.PossibleEnemiesToSpawn);
         FillSpawnableResources(info.PossibleResourceToSpawn);
@@ -95,13 +95,13 @@ public class Biome
 
 
         //TODO: USE enmeies for this tier not poss enemies
-        if(WorldController.Instance.EnemyVariatyPerBiome >= possEnemyType.Count)
+        if (WorldController.Instance.EnemyVariatyPerBiome >= possEnemyType.Count)
         {
             SpawnableEnemies = possEnemyType;
             return;
         }
 
-        while(SpawnableEnemies.Count < WorldController.Instance.EnemyVariatyPerBiome)
+        while (SpawnableEnemies.Count < WorldController.Instance.EnemyVariatyPerBiome)
         {
             //TODO: Use enmeiesFor this tier not poss enemis.
             EnemyType type = possEnemyType[rng.Next(possEnemyType.Count)];
@@ -146,7 +146,7 @@ public class Biome
     /// 
     /// </summary>
     /// <param name="possItemType"></param>
-    void FillSpawnableItems(List<ItemType> possItemType)
+    void FillSpawnableItems(List<ItemBaseType> possItemType)
     {
         Debug.LogWarning("Biome::FillSpwanableItems - Currently uses items of all types wihtoug checking for tier");
 
@@ -165,7 +165,7 @@ public class Biome
         while (SpawnableResource.Count < WorldController.Instance.ItemVariatyPerBiome)
         {
             //TODO: Use enmeiesFor this tier not poss enemis.
-            ItemType type = possItemType[rng.Next(possItemType.Count)];
+            ItemBaseType type = possItemType[rng.Next(possItemType.Count)];
             if (!SpawnableItems.Contains(type))
                 SpawnableItems.Add(type);
         }
@@ -202,7 +202,7 @@ public class Biome
     /// returns a random itemType that is spawnable in this biome
     /// </summary>
     /// <returns></returns>
-    public ItemType GetRandomItemToSpawn()
+    public ItemBaseType GetRandomItemToSpawn()
     {
         System.Random rng = new System.Random((int)System.DateTime.Now.Ticks);
         return SpawnableItems[rng.Next(SpawnableItems.Count)];
@@ -219,7 +219,7 @@ public class Biome
             Tier,
             string.Join(", ", SpawnableEnemies.Select(e => e.ToString()).ToArray<string>()),
             string.Join(", ", SpawnableResource.Select(e => e.ToString()).ToArray<string>()),
-            string.Join(", ", SpawnableItems.Select(e=>e.ToString()).ToArray<string>()));
+            string.Join(", ", SpawnableItems.Select(e => e.ToString()).ToArray<string>()));
     }
 
     #endregion

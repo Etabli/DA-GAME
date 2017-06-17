@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfKeyValueOfAttributePoolPresetAttributePool xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+  <KeyValueOfAttributePoolPresetAttributePool>
+    <Key>Ammo</Key>
+    <Value>
+      <lottery xmlns="http://schemas.datacontract.org/2004/07/">
+        <entrants>
+          <TupleOfAttributeTypeInt32>
+            <item1>PhysDmgFlat</item1>
+            <item2>1</item2>
+          </TupleOfAttributeTypeInt32>
+        </entrants>
+      </lottery>
+    </Value>
+  </KeyValueOfAttributePoolPresetAttributePool>
+  <KeyValueOfAttributePoolPresetAttributePool>
+    <Key>Armor</Key>
+    <Value>
+      <lottery xmlns="http://schemas.datacontract.org/2004/07/">
+        <entrants>
+          <TupleOfAttributeTypeInt32>
+            <item1>Health</item1>
+            <item2>1</item2>
+          </TupleOfAttributeTypeInt32>
+          <TupleOfAttributeTypeInt32>
+            <item1>PhysDmgFlat</item1>
+            <item2>1</item2>
+          </TupleOfAttributeTypeInt32>
+        </entrants>
+      </lottery>
+    </Value>
+  </KeyValueOfAttributePoolPresetAttributePool>
+  <KeyValueOfAttributePoolPresetAttributePool>
+    <Key>Weapon</Key>
+    <Value>
+      <lottery xmlns="http://schemas.datacontract.org/2004/07/">
+        <entrants>
+          <TupleOfAttributeTypeInt32>
+            <item1>FireRate</item1>
+            <item2>1</item2>
+          </TupleOfAttributeTypeInt32>
+          <TupleOfAttributeTypeInt32>
+            <item1>PhysDmgFlat</item1>
+            <item2>1</item2>
+          </TupleOfAttributeTypeInt32>
+          <TupleOfAttributeTypeInt32>
+            <item1>Health</item1>
+            <item2>1</item2>
+          </TupleOfAttributeTypeInt32>
+        </entrants>
+      </lottery>
+    </Value>
+  </KeyValueOfAttributePoolPresetAttributePool>
+</ArrayOfKeyValueOfAttributePoolPresetAttributePool>

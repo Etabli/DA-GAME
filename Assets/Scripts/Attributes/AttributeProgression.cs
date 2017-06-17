@@ -56,10 +56,20 @@ public class AttributeProgression
     {
         if (parameters.Length != 2)
         {
-            Debug.LogError("Linear Progression requires exactly 2 parameters!");
+            Debug.LogError("Linear progression requires exactly 2 parameters!");
             return null;
         }
         return (parameters[0] + parameters[1] * tier) * value;
+    }
+
+    public static AttributeValue Constant(AttributeValue value, int tier, float[] parameters)
+    {
+        if (parameters.Length != 1)
+        {
+            Debug.LogError("Constant progression requires exactly 1 parameter!");
+            return null;
+        }
+        return (value * 0) + parameters[0];
     }
     #endregion
 }
