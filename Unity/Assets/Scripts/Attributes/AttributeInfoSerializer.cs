@@ -8,6 +8,15 @@ using System.Xml;
 
 public class AttributeInfoSerializer
 {
+    //TODO: Move Serialization of different objects into same class/file
+
+    const string DATA_PATH = "Assets\\Data\\";
+
+    /// <summary>
+    /// Takes an AttributeInfo object and returns a string containing formatted XML describing it
+    /// </summary>
+    /// <param name="info">The AttributeInfo object to be serialized</param>
+    /// <returns>A strong containing formatted XML</returns>
     public static string SerializeAttributeInfo(AttributeInfo info)
     {
         MemoryStream stream = new MemoryStream();
@@ -24,6 +33,11 @@ public class AttributeInfoSerializer
         return data;
     }
 
+    /// <summary>
+    /// Deserializes an AttributeInfo object from a string
+    /// </summary>
+    /// <param name="data">The XML string describing the AttributeInfo object</param>
+    /// <returns>The usable AttributeInfo object</returns>
     public static AttributeInfo DeserializeAttributeInfo(string data)
     { 
         MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(data));
@@ -78,6 +92,6 @@ public class AttributeInfoSerializer
 
     private static string GetPathFromType(AttributeType type)
     {
-        return "Assets\\Data\\" + type;
+        return DATA_PATH + type;
     }
 }
