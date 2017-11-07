@@ -87,6 +87,7 @@ public class AttributeInfoSerializer
         string data = reader.ReadToEnd();
         reader.Close();
         file.Close();
+        // Create new AttributeInfo object in order to call its constructor which takes care of setup work
         return new AttributeInfo(DeserializeAttributeInfo(data));
     }
 

@@ -33,7 +33,7 @@ public class AttributeValueInfo
     /// <summary>
     /// Generates an AttributeValue of this type given a tier.
     /// </summary>
-    /// <param name="tier">The tier of affix to be generated</param>
+    /// <param name="tier">The tier of attribute to be generated</param>
     /// <returns></returns>
     public AttributeValue GetValueForTier(int tier)
     {
@@ -52,10 +52,10 @@ public class AttributeValueInfo
         // At this point we are sure that the prog function is set, but not if parameters are valid
 
         float frac = UnityEngine.Random.Range(0, 100) / 100.0f;
-        // Progress min and max values before combining them into a random value between them
 
+        // Progress min and max values before combining them into a random value between them
         AttributeValue progressedMin = prog.Apply(baseValueMin, tier);
-        if (prog == null)
+        if (progressedMin == null)
         {
             // Parameters were invalid
             return null;

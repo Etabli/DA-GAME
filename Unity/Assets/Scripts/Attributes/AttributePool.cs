@@ -14,6 +14,11 @@ public enum AttributePoolPreset
     Ammo
 }
 
+/// <summary>
+/// Represents a pool of AttributeTypes that can be randomly drawn from with the option
+/// to immediately generate the Attributes. In that case either a fixed tier or tier
+/// lottery can be used.
+/// </summary>
 [DataContract]
 [KnownType(typeof(Lottery<AttributeType>))]
 public class AttributePool
