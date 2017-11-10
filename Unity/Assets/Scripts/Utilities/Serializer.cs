@@ -10,7 +10,9 @@ using UnityEngine;
 abstract class Serializer
 {
     const string DATA_FOLDER_PATH = "Data\\";
-    const string ATTRIBUTE_POOL_FILE_PATH = DATA_FOLDER_PATH + "AttributePools";
+    const string ATTRIBUTE_FOLDER_PATH = DATA_FOLDER_PATH + "Attribute\\";
+    const string ATTRIBUTE_INFO_FOLDER_PATH = ATTRIBUTE_FOLDER_PATH + "AttributeInfo\\";
+    const string ATTRIBUTE_POOL_FILE_PATH = ATTRIBUTE_FOLDER_PATH + "AttributePools";
     const string BIOME_FOLDER_PATH = DATA_FOLDER_PATH + "Biome\\";
 
     #region AttributeInfo
@@ -95,7 +97,7 @@ abstract class Serializer
 
     private static string GetPathFromAttributeType(AttributeType type)
     {
-        return DATA_FOLDER_PATH + type;
+        return ATTRIBUTE_INFO_FOLDER_PATH + type;
     }
     #endregion
 
@@ -153,8 +155,6 @@ abstract class Serializer
         DataContractSerializer serializer = new DataContractSerializer(pools.GetType());
         pools = serializer.ReadObject(stream) as Dictionary<AttributePoolPreset, AttributePool>;
         stream.Close();
-
-        Debug.Log(pools.Count);
 
         // Create new random objects
         foreach (var pool in pools)
