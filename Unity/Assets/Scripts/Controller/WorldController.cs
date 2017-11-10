@@ -104,7 +104,7 @@ public class WorldController : MonoBehaviour {
     /// </summary>
     void LoadBiomeInfo()
     {
-        BiomeInfoSerializer.LoadAllBiomeInfosFromDisk();
+        Serializer.LoadAllBiomeInfosFromDisk();
         LoadBiomeMaterials();
     }
 
