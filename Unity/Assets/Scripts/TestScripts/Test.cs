@@ -8,12 +8,12 @@ public class Test : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        AttributeInfoSerializer.LoadFromDisk(AttributeType.Health);
-        AttributeInfoSerializer.LoadFromDisk(AttributeType.PhysDmgFlat);
-        AttributeInfoSerializer.LoadFromDisk(AttributeType.FireRate);
+        Serializer.LoadAttributeInfoFromDisk(AttributeType.Health);
+        Serializer.LoadAttributeInfoFromDisk(AttributeType.PhysDmgFlat);
+        Serializer.LoadAttributeInfoFromDisk(AttributeType.FireRate);
 
         //CreateTestPools();
-        AttributePool.LoadPoolsFromDisk();
+        AttributePool.LoadPresets();
     }
 
     void CreateTestPools()
@@ -26,7 +26,7 @@ public class Test : MonoBehaviour
         AttributePool.RegisterPresetPool(AttributePoolPreset.Armor, armorPool);
         AttributePool.RegisterPresetPool(AttributePoolPreset.Weapon, weaponPool);
 
-        AttributePool.SavePoolsToDisk();
+        AttributePool.SavePresets();
     }
 
     // Update is called once per frame

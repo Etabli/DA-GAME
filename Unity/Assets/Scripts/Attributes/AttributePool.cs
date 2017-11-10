@@ -35,6 +35,23 @@ public class AttributePool
         }
     }
 
+    /// <summary>
+    /// Changes the seed of the internal lottery to its default value.
+    /// </summary>
+    public void ChangeSeed()
+    {
+        lottery.ChangeSeed();
+    }
+
+    /// <summary>
+    /// Changes the seed of the internal lottery.
+    /// </summary>
+    /// <param name="seed">The seed to change to</param>
+    public void ChangeSeed(int seed)
+    {
+        lottery.ChangeSeed(seed);
+    }
+
     public void CombineInto(AttributePool pool)
     {
         lottery.CombineInto(pool.lottery, EntryOptions.Discard);
@@ -205,64 +222,14 @@ public class AttributePool
         return result;
     }
 
-    public static void SavePoolsToDisk()
+    public static void SavePresets()
     {
-        FileStream file = new FileStream("Assets\\Data\\" + SAVE_FILE_NAME, FileMode.Create);     
-        
-        DataContractSerializer serializer = new DataContractSerializer(PresetPools.GetType());
-        XmlWriterSettings settings = new XmlWriterSettings() { Indent = true };
-
-        using (XmlWriter writer = XmlWriter.Create(file, settings))
-            serializer.WriteObject(writer, PresetPools);
-        file.Close();
+        Serializer.SaveAttributePoolsToDisk(PresetPools);
     }
 
-    public static void LoadPoolsFromDisk()
+    public static void LoadPresets()
     {
-        FileStream file;
-        try
-        {
-            file = new FileStream("Assets\\Data\\" + SAVE_FILE_NAME, FileMode.Open);
-        }
-        catch (FileNotFoundException e)
-        {
-            Debug.LogError(e.Message);
-            return;
-        }
-        catch (Exception e)
-        {
-            Debug.LogError(e.Message);
-            return;
-        }
-
-        StreamReader reader = new StreamReader(file);
-        string data = reader.ReadToEnd();
-
-        // Remove all newlines and spaces between individual tags because apparently this serializer doesn't like them
-        int index;
-        while ((index = data.IndexOf(Environment.NewLine)) != -1)
-        {
-            data = data.Remove(index, 2);
-        }
-        while ((index = data.IndexOf("> ")) != -1)
-        {
-            data = data.Remove(index + 1, 1);
-        }
-        
-        reader.Close();
-        file.Close();
-
-        MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(data));
-
-        DataContractSerializer serializer = new DataContractSerializer(PresetPools.GetType());
-        PresetPools = serializer.ReadObject(stream) as Dictionary<AttributePoolPreset, AttributePool>;
-        stream.Close();
-        
-        // Create new random objects
-        foreach (var pool in PresetPools)
-        {
-            pool.Value.lottery.ChangeSeed();
-        }
+        PresetPools = Serializer.LoadAttributePoolsFromDisk();
     }
     #endregion
 }
