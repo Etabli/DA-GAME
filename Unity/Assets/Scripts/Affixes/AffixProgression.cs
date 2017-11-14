@@ -5,10 +5,10 @@ using System.Runtime.Serialization;
 using System.Reflection;
 
 /// <summary>
-/// Represents a progression function that can be applied to an AttributeValue
+/// Represents a progression function that can be applied to an AffixValue
 /// </summary>
 [DataContract]
-public class AttributeProgression
+public class AffixProgression
 {
     [DataMember]
     public float[] Parameters;
@@ -17,7 +17,7 @@ public class AttributeProgression
 
     protected MethodInfo progressionFunction;
 
-    public AttributeProgression(string name, params float[] parameters)
+    public AffixProgression(string name, params float[] parameters)
     {
         Parameters = new float[parameters.Length];
         parameters.CopyTo(Parameters, 0);
@@ -50,30 +50,30 @@ public class AttributeProgression
     }
 
     /// <summary>
-    /// Applies the progression function to an instance of AttributeValue
+    /// Applies the progression function to an instance of AffixValue
     /// </summary>
     /// <param name="value">The value to apply the funciton to</param>
-    /// <param name="tier">The tier of the attribute</param>
-    /// <returns>The progressed AttributeValue</returns>
-    public AttributeValue Apply(AttributeValue value, int tier)
+    /// <param name="tier">The tier of the affix</param>
+    /// <returns>The progressed AffixValue</returns>
+    public AffixValue Apply(AffixValue value, int tier)
     {
         if (progressionFunction == null)
         {
             Debug.LogError("No progression function set!");
             return null;
         }
-        return (AttributeValue)progressionFunction.Invoke(null, new object[] { value, tier, Parameters });
+        return (AffixValue)progressionFunction.Invoke(null, new object[] { value, tier, Parameters });
     }
 
     #region Static Progression Functions
     // Valid progression functions should follow the signature
-    // public static Attributevalue <name>(AttributeValue, int, float[])
+    // public static Affixvalue <name>(AffixValue, int, float[])
     // and return null if the given parameters are invalid
 
     /// <summary>
     /// Simple linear progression of the form y = kx + d
     /// </summary>
-    public static AttributeValue Linear(AttributeValue value, int tier, float[] parameters)
+    public static AffixValue Linear(AffixValue value, int tier, float[] parameters)
     {
         if (parameters.Length != 2)
         {
@@ -86,7 +86,7 @@ public class AttributeProgression
     /// <summary>
     /// Always returns the single parameter as result
     /// </summary>
-    public static AttributeValue Constant(AttributeValue value, int tier, float[] parameters)
+    public static AffixValue Constant(AffixValue value, int tier, float[] parameters)
     {
         if (parameters.Length != 1)
         {

@@ -30,23 +30,23 @@ public abstract class ItemBase
     [DataMember]
     public readonly ItemBaseType BaseType;
     [DataMember]
-    public readonly AttributeType[] BaseAttributes;
+    public readonly AffixType[] BaseAffixes;
     [DataMember]
-    public readonly AttributeType[] GuaranteedAttributes;
+    public readonly AffixType[] GuaranteedAffixes;
     [DataMember]
-    public readonly AttributePool PossibleAttributes;
+    public readonly AffixPool PossibleAffixes;
 
-    public ItemBase(ItemBaseType baseType, ItemClass itemClass, AttributeType[] baseAttributes, AttributeType[] guaranteedAttributes, AttributePool attributePool)
+    public ItemBase(ItemBaseType baseType, ItemClass itemClass, AffixType[] baseAffixs, AffixType[] guaranteedAffixes, AffixPool affixPool)
     {
         BaseType = baseType;
         Class = itemClass;
-        BaseAttributes = baseAttributes.Clone() as AttributeType[];
-        GuaranteedAttributes = guaranteedAttributes.Clone() as AttributeType[];
-        PossibleAttributes = attributePool;
+        BaseAffixes = baseAffixs.Clone() as AffixType[];
+        GuaranteedAffixes = guaranteedAffixes.Clone() as AffixType[];
+        PossibleAffixes = affixPool;
     }
 
-    public ItemBase(ItemBaseType baseType, ItemClass itemClass, AttributeType[] baseAttributes, AttributeType[] guaranteedAttributes, AttributePoolPreset attributePoolPreset)
-        : this(baseType, itemClass, baseAttributes, guaranteedAttributes, AttributePool.GetPool(attributePoolPreset))
+    public ItemBase(ItemBaseType baseType, ItemClass itemClass, AffixType[] baseAffixes, AffixType[] guaranteedAffixes, AffixPoolPreset affixPoolPreset)
+        : this(baseType, itemClass, baseAffixes, guaranteedAffixes, AffixPool.GetPool(affixPoolPreset))
     { }
 
     /// <summary>
@@ -58,19 +58,19 @@ public abstract class ItemBase
     public abstract Item GenerateItem(int tier, int quality);
 
     /// <summary>
-    /// Generates the Attributes and BaseAttributes for an item
+    /// Generates the Affixes and BaseAffixes for an item
     /// </summary>
-    protected void GenerateAttributes(Item item)
+    protected void GenerateAffixes(Item item)
     {
-        item.Attributes.Clear();
-        item.BaseAttributes.Clear();
+        item.Affixes.Clear();
+        item.BaseAffixes.Clear();
 
-        foreach (AttributeType attributeType in BaseAttributes)
+        foreach (AffixType affixType in BaseAffixes)
         {
-            item.BaseAttributes.Add(attributeType, AttributeInfo.GetAttributeInfo(attributeType).GenerateAttribute(item.Tier));
+            item.BaseAffixes.Add(affixType, AffixInfo.GetAffixInfo(affixType).GenerateAffix(item.Tier));
         }
 
-        // Create new lottery to decide tier roll of each attribute
+        // Create new lottery to decide tier roll of each affix
         // TODO: make nicer
         Lottery<int> tierLottery = new Lottery<int>();
         tierLottery.Enter(item.Tier, 10);
@@ -83,20 +83,20 @@ public abstract class ItemBase
 
         int quality = item.Quality;  
 
-        // Guaranteed attributes don't care about possible pool
-        foreach (AttributeType attributeType in GuaranteedAttributes)
+        // Guaranteed affixes don't care about possible pool
+        foreach (AffixType affixType in GuaranteedAffixes)
         {
             int tier = tierLottery.GetWinner();
             tier = tier > quality ? quality : tier;
-            item.Attributes.Add(attributeType, AttributeInfo.GetAttributeInfo(attributeType).GenerateAttribute(tier));
+            item.Affixes.Add(affixType, AffixInfo.GetAffixInfo(affixType).GenerateAffix(tier));
             quality -= tier;
         }
         
-        // Fill up the rest of the attributes
-        Attribute[] randomAttributes = PossibleAttributes.GetUniqueRandomAttributes(quality, tierLottery, new HashSet<AttributeType>(GuaranteedAttributes));
-        foreach (Attribute attribute in randomAttributes)
+        // Fill up the rest of the affixes
+        Affix[] randomAffixes = PossibleAffixes.GetUniqueRandomAffixes(quality, tierLottery, new HashSet<AffixType>(GuaranteedAffixes));
+        foreach (Affix affix in randomAffixes)
         {
-            item.Attributes.Add(attribute.Type, attribute);
+            item.Affixes.Add(affix.Type, affix);
         }
     }
 }
@@ -107,20 +107,20 @@ public class WeaponBase : ItemBase
     [DataMember]
     public readonly AmmoClass[] AllowedAmmoTypes;
 
-    public WeaponBase(ItemBaseType baseType, AttributeType[] baseAttributes, AttributeType[] guaranteedAttributes, AmmoClass[] allowedAmmoTypes, AttributePool attributePool)
-        : base(baseType, ItemClass.Weapon, baseAttributes, guaranteedAttributes, attributePool)
+    public WeaponBase(ItemBaseType baseType, AffixType[] baseAffixes, AffixType[] guaranteedAffixes, AmmoClass[] allowedAmmoTypes, AffixPool affixPool)
+        : base(baseType, ItemClass.Weapon, baseAffixes, guaranteedAffixes, affixPool)
     {
         AllowedAmmoTypes = allowedAmmoTypes.Clone() as AmmoClass[];
     }
 
-    public WeaponBase(ItemBaseType baseType, AttributeType[] baseAttributes, AttributeType[] guaranteedAttributes, AmmoClass[] allowedAmmoTypes, AttributePoolPreset attributePoolPreset)
-        : this(baseType, baseAttributes, guaranteedAttributes, allowedAmmoTypes, AttributePool.GetPool(attributePoolPreset))
+    public WeaponBase(ItemBaseType baseType, AffixType[] baseAffixes, AffixType[] guaranteedAffixes, AmmoClass[] allowedAmmoTypes, AffixPoolPreset affixPoolPreset)
+        : this(baseType, baseAffixes, guaranteedAffixes, allowedAmmoTypes, AffixPool.GetPool(affixPoolPreset))
     { }
 
     public override Item GenerateItem(int tier, int quality)
     {
         Weapon weapon = new Weapon(BaseType.ToString(), tier, quality, BaseType, this);
-        GenerateAttributes(weapon);
+        GenerateAffixes(weapon);
         return weapon;
     }
 }
@@ -131,20 +131,20 @@ public class ArmorBase : ItemBase
     [DataMember]
     public readonly Slot[] Slots;
 
-    public ArmorBase(ItemBaseType baseType, AttributeType[] baseAttributes, AttributeType[] guaranteedAttributes, Slot[] slots, AttributePool attributePool)
-        : base(baseType, ItemClass.Armor, baseAttributes, guaranteedAttributes, attributePool)
+    public ArmorBase(ItemBaseType baseType, AffixType[] baseAffixes, AffixType[] guaranteedAffixes, Slot[] slots, AffixPool affixPool)
+        : base(baseType, ItemClass.Armor, baseAffixes, guaranteedAffixes, affixPool)
     {
         Slots = slots.Clone() as Slot[];
     }
 
-    public ArmorBase(ItemBaseType baseType, AttributeType[] baseAttributes, AttributeType[] guaranteedAttributes, Slot[] slots, AttributePoolPreset attributePoolPreset)
-        : base(baseType, ItemClass.Armor, baseAttributes, guaranteedAttributes, AttributePool.GetPool(attributePoolPreset))
+    public ArmorBase(ItemBaseType baseType, AffixType[] baseAffixes, AffixType[] guaranteedAffixes, Slot[] slots, AffixPoolPreset affixPoolPreset)
+        : base(baseType, ItemClass.Armor, baseAffixes, guaranteedAffixes, AffixPool.GetPool(affixPoolPreset))
     { }
 
     public override Item GenerateItem(int tier, int quality)
     {
         Armor armor = new Armor(BaseType.ToString(), tier, quality, BaseType, this);
-        GenerateAttributes(armor);
+        GenerateAffixes(armor);
         return armor;
     }
 }
@@ -154,20 +154,20 @@ public class AmmoBase : ItemBase
     [DataMember]
     public readonly AmmoClass AmmoClass;
 
-    public AmmoBase(ItemBaseType baseType, AttributeType[] baseAttributes, AttributeType[] guaranteedAttributes, AmmoClass ammoClass, AttributePool attributePool)
-        : base(baseType, ItemClass.Ammo, baseAttributes, guaranteedAttributes, attributePool)
+    public AmmoBase(ItemBaseType baseType, AffixType[] baseAffixes, AffixType[] guaranteedAffixes, AmmoClass ammoClass, AffixPool affixPool)
+        : base(baseType, ItemClass.Ammo, baseAffixes, guaranteedAffixes, affixPool)
     {
         AmmoClass = ammoClass;
     }
 
-    public AmmoBase(ItemBaseType baseType, AttributeType[] baseAttributes, AttributeType[] guaranteedAttributes, AmmoClass ammoClass, AttributePoolPreset attributePoolPreset)
-        : base(baseType, ItemClass.Ammo, baseAttributes, guaranteedAttributes, AttributePool.GetPool(attributePoolPreset))
+    public AmmoBase(ItemBaseType baseType, AffixType[] baseAffixes, AffixType[] guaranteedAffixes, AmmoClass ammoClass, AffixPoolPreset affixPoolPreset)
+        : base(baseType, ItemClass.Ammo, baseAffixes, guaranteedAffixes, AffixPool.GetPool(affixPoolPreset))
     { }
 
     public override Item GenerateItem(int tier, int quality)
     {
         Ammo ammo = new Ammo(BaseType.ToString(), tier, quality, BaseType, this);
-        GenerateAttributes(ammo);
+        GenerateAffixes(ammo);
         return ammo;
     }
 }

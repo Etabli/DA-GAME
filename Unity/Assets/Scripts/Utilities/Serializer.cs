@@ -10,21 +10,21 @@ using UnityEngine;
 abstract class Serializer
 {
     const string DATA_FOLDER_PATH = "Data\\";
-    const string ATTRIBUTE_FOLDER_PATH = DATA_FOLDER_PATH + "Attribute\\";
-    const string ATTRIBUTE_INFO_FOLDER_PATH = ATTRIBUTE_FOLDER_PATH + "AttributeInfo\\";
-    const string ATTRIBUTE_POOL_FILE_PATH = ATTRIBUTE_FOLDER_PATH + "AttributePools";
+    const string AFFIX_FOLDER_PATH = DATA_FOLDER_PATH + "Affix\\";
+    const string AFFIX_INFO_FOLDER_PATH = AFFIX_FOLDER_PATH + "AffixInfo\\";
+    const string AFFIX_POOL_FILE_PATH = AFFIX_FOLDER_PATH + "AffixPools";
     const string BIOME_FOLDER_PATH = DATA_FOLDER_PATH + "Biome\\";
 
-    #region AttributeInfo
+    #region AffixInfo
     /// <summary>
-    /// Takes an AttributeInfo object and returns a string containing formatted XML describing it
+    /// Takes an AffixInfo object and returns a string containing formatted XML describing it
     /// </summary>
-    /// <param name="info">The AttributeInfo object to be serialized</param>
+    /// <param name="info">The AffixInfo object to be serialized</param>
     /// <returns>A strong containing formatted XML</returns>
-    public static string SerializeAttributeInfo(AttributeInfo info)
+    public static string SerializeAffixInfo(AffixInfo info)
     {
         MemoryStream stream = new MemoryStream();
-        DataContractSerializer serializer = new DataContractSerializer(typeof(AttributeInfo));
+        DataContractSerializer serializer = new DataContractSerializer(typeof(AffixInfo));
         XmlWriterSettings settings = new XmlWriterSettings() { Indent = true };
 
         using (XmlWriter writer = XmlWriter.Create(stream, settings))
@@ -38,27 +38,27 @@ abstract class Serializer
     }
 
     /// <summary>
-    /// Deserializes an AttributeInfo object from a string
+    /// Deserializes an Affix Info object from a string
     /// </summary>
-    /// <param name="data">The XML string describing the AttributeInfo object</param>
-    /// <returns>The usable AttributeInfo object</returns>
-    public static AttributeInfo DeserializeAttributeInfo(string data)
+    /// <param name="data">The XML string describing the AffixInfo object</param>
+    /// <returns>The usable AffixInfo object</returns>
+    public static AffixInfo DeserializeAffixInfo(string data)
     {
         MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(data));
-        DataContractSerializer serializer = new DataContractSerializer(typeof(AttributeInfo));
-        AttributeInfo info = serializer.ReadObject(stream) as AttributeInfo;
+        DataContractSerializer serializer = new DataContractSerializer(typeof(AffixInfo));
+        AffixInfo info = serializer.ReadObject(stream) as AffixInfo;
         stream.Close();
         return info;
     }
 
     /// <summary>
-    /// Saves info about a certain attribute type to disk.
+    /// Saves info about a certain affix type to disk.
     /// </summary>
-    public static void SaveAttributeInfoToDisk(AttributeInfo info)
+    public static void SaveAffixInfoToDisk(AffixInfo info)
     {
-        string data = SerializeAttributeInfo(info);
+        string data = SerializeAffixInfo(info);
 
-        FileStream file = new FileStream(GetPathFromAttributeType(info.Type), FileMode.Create);
+        FileStream file = new FileStream(GetPathFromAffixType(info.Type), FileMode.Create);
         StreamWriter writer = new StreamWriter(file);
         writer.Write(data);
         writer.Close();
@@ -66,15 +66,15 @@ abstract class Serializer
     }
 
     /// <summary>
-    /// Loads info about a certain attribute type at disk and automatically calls its constructor so that it is added to the AttributeInfoDictionary.
+    /// Loads info about a certain affix type at disk and automatically calls its constructor so that it is added to the AffixInfoDictionary.
     /// </summary>
-    /// <returns>The AttributeInfo object, or null if nothing was found.</returns>
-    public static AttributeInfo LoadAttributeInfoFromDisk(AttributeType type)
+    /// <returns>The AffixInfo object, or null if nothing was found.</returns>
+    public static AffixInfo LoadAffixInfoFromDisk(AffixType type)
     {
         FileStream file;
         try
         {
-            file = new FileStream(GetPathFromAttributeType(type), FileMode.Open);
+            file = new FileStream(GetPathFromAffixType(type), FileMode.Open);
         }
         catch (FileLoadException e)
         {
@@ -91,22 +91,22 @@ abstract class Serializer
         string data = reader.ReadToEnd();
         reader.Close();
         file.Close();
-        // Create new AttributeInfo object in order to call its constructor which takes care of setup work
-        return new AttributeInfo(DeserializeAttributeInfo(data));
+        // Create new AffixInfo object in order to call its constructor which takes care of setup work
+        return new AffixInfo(DeserializeAffixInfo(data));
     }
 
-    private static string GetPathFromAttributeType(AttributeType type)
+    private static string GetPathFromAffixType(AffixType type)
     {
-        return ATTRIBUTE_INFO_FOLDER_PATH + type;
+        return AFFIX_INFO_FOLDER_PATH + type;
     }
     #endregion
 
-    #region AttributePool
-    public static void SaveAttributePoolsToDisk(Dictionary<AttributePoolPreset, AttributePool> pools)
+    #region AffixPool
+    public static void SaveAffixPoolsToDisk(Dictionary<AffixPoolPreset, AffixPool> pools)
     {
-        FileStream file = new FileStream(ATTRIBUTE_POOL_FILE_PATH, FileMode.Create);
+        FileStream file = new FileStream(AFFIX_POOL_FILE_PATH, FileMode.Create);
 
-        DataContractSerializer serializer = new DataContractSerializer(typeof(Dictionary<AttributePoolPreset, AttributePool>));
+        DataContractSerializer serializer = new DataContractSerializer(typeof(Dictionary<AffixPoolPreset, AffixPool>));
         XmlWriterSettings settings = new XmlWriterSettings() { Indent = true };
 
         using (XmlWriter writer = XmlWriter.Create(file, settings))
@@ -114,12 +114,12 @@ abstract class Serializer
         file.Close();
     }
 
-    public static Dictionary<AttributePoolPreset, AttributePool> LoadAttributePoolsFromDisk()
+    public static Dictionary<AffixPoolPreset, AffixPool> LoadAffixPoolsFromDisk()
     {
         FileStream file;
         try
         {
-            file = new FileStream(ATTRIBUTE_POOL_FILE_PATH, FileMode.Open);
+            file = new FileStream(AFFIX_POOL_FILE_PATH, FileMode.Open);
         }
         catch (FileNotFoundException e)
         {
@@ -151,9 +151,9 @@ abstract class Serializer
 
         MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(data));
 
-        Dictionary<AttributePoolPreset, AttributePool> pools = new Dictionary<AttributePoolPreset, AttributePool>();
+        Dictionary<AffixPoolPreset, AffixPool> pools = new Dictionary<AffixPoolPreset, AffixPool>();
         DataContractSerializer serializer = new DataContractSerializer(pools.GetType());
-        pools = serializer.ReadObject(stream) as Dictionary<AttributePoolPreset, AttributePool>;
+        pools = serializer.ReadObject(stream) as Dictionary<AffixPoolPreset, AffixPool>;
         stream.Close();
 
         // Create new random objects

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AffixInfo xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.datacontract.org/2004/07/">
+  <Description>Increases your fire rate by {0}</Description>
+  <Name>Fire Rate</Name>
+  <Type>FireRate</Type>
+  <ValueInfo>
+    <baseValueMax i:type="AffixValueSingle">
+      <Value>0.8</Value>
+    </baseValueMax>
+    <baseValueMin i:type="AffixValueSingle">
+      <Value>0.5</Value>
+    </baseValueMin>
+    <progression>
+      <Parameters xmlns:d4p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+        <d4p1:float>0</d4p1:float>
+        <d4p1:float>1</d4p1:float>
+      </Parameters>
+      <ProgressionFunctionName>Linear</ProgressionFunctionName>
+    </progression>
+  </ValueInfo>
+  <ValueType>SingleValue</ValueType>
+</AffixInfo>

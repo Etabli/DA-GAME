@@ -18,8 +18,8 @@ public abstract class Item
     public int Tier { get; protected set; }
     public int Quality { get; protected set; }
     public ItemBaseType BaseType { get; protected set; }
-    public Dictionary<AttributeType, Attribute> Attributes = new Dictionary<AttributeType, Attribute>();
-    public Dictionary<AttributeType, Attribute> BaseAttributes = new Dictionary<AttributeType, Attribute>();
+    public Dictionary<AffixType, Affix> Affixes = new Dictionary<AffixType, Affix>();
+    public Dictionary<AffixType, Affix> BaseAffixes = new Dictionary<AffixType, Affix>();
 
     protected ItemBase itemBase;
 
@@ -31,20 +31,20 @@ public abstract class Item
         BaseType = baseType;
         this.itemBase = itemBase;
 
-        Attributes = new Dictionary<AttributeType, Attribute>();
-        BaseAttributes = new Dictionary<AttributeType, Attribute>();
+        Affixes = new Dictionary<AffixType, Affix>();
+        BaseAffixes = new Dictionary<AffixType, Affix>();
     }
 
     public override string ToString()
     {
         string result = string.Format("{0} (t{1}, q{2}): \n", Name, Tier, Quality);
-        foreach (Attribute a in BaseAttributes.Values)
+        foreach (Affix a in BaseAffixes.Values)
         {
             result += a + "\n";
         }
         result += "-------------------------------------------\n";
 
-        foreach (Attribute a in Attributes.Values)
+        foreach (Affix a in Affixes.Values)
         {
             result += a + "\n";
         }
