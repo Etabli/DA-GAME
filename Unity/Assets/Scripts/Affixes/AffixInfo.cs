@@ -46,13 +46,14 @@ public class AffixInfo
     /// <summary>
     /// Generates an affix of this type given a tier.
     /// </summary>
-    /// <param name="tier">The tier of the affix to be generated</param>
-    /// <returns></returns>
     public Affix GenerateAffix(int tier)
     {
         return new Affix(Type, ValueType, ValueInfo.GetValueForTier(tier), tier);
     }
 
+    /// <summary>
+    /// Generates an affix of this type with a non-default progression function.
+    /// </summary>
     public Affix GenerateAffix(int tier, AffixProgression progression)
     {
         return new Affix(Type, ValueType, ValueInfo.GetValueForTier(tier, progression), tier);
@@ -69,8 +70,6 @@ public class AffixInfo
     /// <summary>
     /// Returns the AffixInfo object for a certain AffixType, provided it exists
     /// </summary>
-    /// <param name="type"></param>
-    /// <returns></returns>
     public static AffixInfo GetAffixInfo(AffixType type)
     {
         // If the requested type is random, select a random affix
@@ -85,6 +84,14 @@ public class AffixInfo
             return AffixInfoDictionary[type];
         }
         return null;
+    }
+
+    /// <summary>
+    /// Generates an affix of the given type and tier.
+    /// </summary>
+    public static Affix GenerateAffix(AffixType type, int tier)
+    {
+        return GetAffixInfo(type).GenerateAffix(tier);
     }
     #endregion
 }
