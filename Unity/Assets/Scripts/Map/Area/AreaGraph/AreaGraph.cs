@@ -118,23 +118,6 @@ public class AreaGraph{
             mergingLists.Add(nodesToMerge);
 
         }// end foreach ndoe
-
-
-        #region debug about areas to merge
-        Debug.Log("All areas to Merge: ");
-        string mergerstring = "";
-        foreach (List<uint> merger in mergingLists)
-        {
-            mergerstring += nodes[merger[0]].GetColor().ToString() + " Areas to merge: ";
-            foreach (uint id in merger)
-            {
-                mergerstring += id.ToString() + ", ";
-            }
-            mergerstring += "\n";
-        }
-        Debug.Log(mergerstring);
-        Debug.Log("--------------------------------------------------");
-        #endregion
         return mergingLists;
     }
 

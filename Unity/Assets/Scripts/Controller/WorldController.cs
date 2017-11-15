@@ -156,7 +156,6 @@ public class WorldController : MonoBehaviour {
         hexGO.layer = LayerMask.NameToLayer("Map");
         //set layer
 
-
         MeshFilter meshFilter = hexGO.AddComponent<MeshFilter>();
         meshFilter.mesh = HexCellMeshGenerator.GenerateHexCellMesh(cell);
         MeshRenderer renderer = hexGO.AddComponent<MeshRenderer>();
