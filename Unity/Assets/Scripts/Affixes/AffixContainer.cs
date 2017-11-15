@@ -10,7 +10,7 @@ using System.Linq;
 public class AffixContainer
 {
     #region Member Variables
-    protected Dictionary<AffixType, List<Affix>> affixTypeMap = new Dictionary<AffixType, List<Affix>>();
+    protected Dictionary<AffixType, HashSet<Affix>> affixTypeMap = new Dictionary<AffixType, HashSet<Affix>>();
     protected AffixContainer parent = null;
     protected List<AffixContainer> children = new List<AffixContainer>();
     #endregion
@@ -39,13 +39,19 @@ public class AffixContainer
     {
         if (affixTypeMap.ContainsKey(affix.Type))
         {
+            if (affixTypeMap[affix.Type].Contains(affix))
+            {
+                Debug.LogError($"Container already contains this affix! {affix}");
+                return;
+            }
             affixTypeMap[affix.Type].Add(affix);
         }
         else
         {
-            affixTypeMap[affix.Type] = new List<Affix>();
+            affixTypeMap[affix.Type] = new HashSet<Affix>();
             affixTypeMap[affix.Type].Add(affix);
         }
+        Propagate(affix);
     }
 
     /// <summary>
@@ -59,10 +65,14 @@ public class AffixContainer
             return;
         }
 
+        // This tries to remove and returns whether or not it was successful
         if (!affixTypeMap[affix.Type].Remove(affix))
         {
-            Debug.LogError($"Could not find affix {affix}");
+            Debug.LogError($"Could not find affix \"{affix}\"");
+            return;
         }
+
+        PropagateRemove(affix);
     }
 
     /// <summary>
@@ -70,6 +80,7 @@ public class AffixContainer
     /// </summary>
     public void Clear()
     {
+        PropagateRemoveAll();
         affixTypeMap.Clear();
     }
     #endregion
@@ -101,6 +112,7 @@ public class AffixContainer
 
         children.Add(child);
         child.parent = this;
+        child.PropagateAll();
     }
 
     /// <summary>
@@ -116,6 +128,35 @@ public class AffixContainer
     }
 
     /// <summary>
+    /// Attaches this node to a parent.
+    /// </summary>
+    /// <param name="parent"></param>
+    public void AttachToParent(AffixContainer parent)
+    {
+        parent.AppendChild(this);
+    }
+
+    /// <summary>
+    /// Disconnects this code from its parent
+    /// </summary>
+    public void DisconnectFromParent()
+    {
+        // Since we already contain all the information from our children, this is sufficient
+        PropagateRemoveAll();
+        parent.children.Remove(this);
+        parent = null;
+    }
+
+    /// <summary>
+    /// Removes a child from this node
+    /// </summary>
+    /// <param name="child"></param>
+    public void RemoveChild(AffixContainer child)
+    {
+        child.DisconnectFromParent();
+    }
+
+    /// <summary>
     /// Checks if adding a node as a child of this node would produce a loop.
     /// </summary>
     /// <param name="child">The new child</param>
@@ -128,6 +169,48 @@ public class AffixContainer
                 return true;
         }
         return false;
+    }
+    #endregion
+
+    #region Propagation
+    /// <summary>
+    /// Propagates a single affix upwards through the hierarchy.
+    /// </summary>
+    /// <param name="affix">The affix to be propagated</param>
+    protected void Propagate(Affix affix)
+    {
+        parent?.Add(affix);
+    }
+
+    /// <summary>
+    /// Propagates the removal of an affix upwards.
+    /// </summary>
+    /// <param name="affix"></param>
+    protected void PropagateRemove(Affix affix)
+    {
+        parent?.Remove(affix);
+    }
+
+    /// <summary>
+    /// Propagates all affixes in this container upwards.
+    /// </summary>
+    protected void PropagateAll()
+    {
+        foreach (var affix in affixTypeMap.Values.SelectMany(a => a ))
+        {
+            Propagate(affix);
+        }
+    }
+
+    /// <summary>
+    /// Propagates the removal of all affixes upwards
+    /// </summary>
+    protected void PropagateRemoveAll()
+    {
+        foreach (var affix in affixTypeMap.Values.SelectMany(a => a))
+        {
+            PropagateRemove(affix);
+        }
     }
     #endregion
 

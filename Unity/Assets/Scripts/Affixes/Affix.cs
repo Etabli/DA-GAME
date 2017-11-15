@@ -24,6 +24,7 @@ public class Affix
     public readonly AffixValue Value;
     public readonly int Tier;
 
+    // TODO: Decide if this is actually necessary
     protected readonly AffixInfo info;
 
     public Affix(AffixType type, AffixValueType affixClass, AffixValue value, int tier)

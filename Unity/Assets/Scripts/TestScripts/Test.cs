@@ -50,6 +50,7 @@ public class Test : MonoBehaviour
         Affix health1 = AffixInfo.GetAffixInfo(AffixType.Health).GenerateAffix(2);
         container.Add(health1);
         container.Add(AffixInfo.GetAffixInfo(AffixType.Health).GenerateAffix(2));
+        container.Add(health1);
         container.Add(AffixInfo.GetAffixInfo(AffixType.PhysDmgFlat).GenerateAffix(3));
 
         print(container);
@@ -57,25 +58,48 @@ public class Test : MonoBehaviour
         container.Remove(health1);
 
         print(container);
+
+        Affix fireRate = AffixInfo.GetAffixInfo(AffixType.FireRate).GenerateAffix(5);
+        container.Remove(fireRate);
+
+        Affix health2 = AffixInfo.GetAffixInfo(AffixType.Health).GenerateAffix(3);
+        container.Remove(health2);
     }
 
     void TestAffixContainerGraph()
     {
-        AffixContainer c1 = new AffixContainer();
-        AffixContainer c2 = new AffixContainer();
-        AffixContainer c3 = new AffixContainer();
-        AffixContainer c4 = new AffixContainer();
+        AffixContainer c1 = new AffixContainer(new Affix[] { AffixInfo.GenerateAffix(AffixType.Health, 4) });
+        AffixContainer c2 = new AffixContainer(new Affix[] { AffixInfo.GenerateAffix(AffixType.FireRate, 4) });
+        AffixContainer c3 = new AffixContainer(new Affix[] { AffixInfo.GenerateAffix(AffixType.Health, 20) });
+        AffixContainer c4 = new AffixContainer(new Affix[] { AffixInfo.GenerateAffix(AffixType.PhysDmgFlat, 4) });
 
+        print(c1);
+        print(c2);
+        print(c3);
+        print(c4);
 
-        c1.AppendChild(c1);
+        //c1.AppendChild(c1);
 
         c1.AppendChild(c2);
-        c2.AppendChild(c1);
+        print("Appended c2 to c1");
+        print(c1);
+        //c2.AppendChild(c1);
 
         c2.AppendChild(c3);
-        c3.AppendChild(c1);
+        print("Appended c3 to c2");
+        print(c1);
+        print(c2);
+        //c3.AppendChild(c1);
 
-        c3.AppendChild(c2);
+        //c3.AppendChild(c2);
+
+        c1.AppendChild(c4);
+        print("Appendecd c4 to c1");
+        print(c1);
+
+        c2.DisconnectFromParent();
+        print("Disconnected c2 from c1");
+        print(c1);
     }
 
     // Update is called once per frame
