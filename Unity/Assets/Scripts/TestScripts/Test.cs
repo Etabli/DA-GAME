@@ -20,8 +20,8 @@ public class Test : MonoBehaviour
         Serializer.LoadAffixInfoFromDisk(AffixType.PhysDmgFlat);
         Serializer.LoadAffixInfoFromDisk(AffixType.FireRate);
 
-        //CreateTestPools();
-        AffixPool.LoadPresets();
+        CreateTestPools();
+        //AffixPool.LoadPresets();
     }
 
     void CreateTestPools()
@@ -37,14 +37,53 @@ public class Test : MonoBehaviour
         AffixPool.SavePresets();
     }
 
+    void GenerateTestWeapon()
+    {
+        WeaponBase wBase = new WeaponBase(ItemBaseType.Pistol, new AffixType[] { AffixType.PhysDmgFlat }, new AffixType[] { AffixType.FireRate }, new AmmoClass[] { AmmoClass.Bullet, AmmoClass.Battery }, AffixPoolPreset.Weapon);
+        Weapon w = wBase.GenerateItem(7, 15) as Weapon;
+        print(w);
+    }
+
+    void GenerateTestAffixContainer()
+    {
+        AffixContainer container = new AffixContainer();
+        Affix health1 = AffixInfo.GetAffixInfo(AffixType.Health).GenerateAffix(2);
+        container.Add(health1);
+        container.Add(AffixInfo.GetAffixInfo(AffixType.Health).GenerateAffix(2));
+        container.Add(AffixInfo.GetAffixInfo(AffixType.PhysDmgFlat).GenerateAffix(3));
+
+        print(container);
+
+        container.Remove(health1);
+
+        print(container);
+    }
+
+    void TestAffixContainerGraph()
+    {
+        AffixContainer c1 = new AffixContainer();
+        AffixContainer c2 = new AffixContainer();
+        AffixContainer c3 = new AffixContainer();
+        AffixContainer c4 = new AffixContainer();
+
+
+        c1.AppendChild(c1);
+
+        c1.AppendChild(c2);
+        c2.AppendChild(c1);
+
+        c2.AppendChild(c3);
+        c3.AppendChild(c1);
+
+        c3.AppendChild(c2);
+    }
+
     // Update is called once per frame
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            WeaponBase wBase = new WeaponBase(ItemBaseType.Pistol, new AffixType[] { AffixType.PhysDmgFlat }, new AffixType[] { AffixType.FireRate }, new AmmoClass[] { AmmoClass.Bullet, AmmoClass.Battery }, AffixPoolPreset.Weapon);
-            Weapon w = wBase.GenerateItem(7, 15) as Weapon;
-            print(w);
+            TestAffixContainerGraph();
         }
     }
 }

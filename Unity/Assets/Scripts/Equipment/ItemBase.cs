@@ -67,7 +67,7 @@ public abstract class ItemBase
 
         foreach (AffixType affixType in BaseAffixes)
         {
-            item.BaseAffixes.Add(affixType, AffixInfo.GetAffixInfo(affixType).GenerateAffix(item.Tier));
+            item.BaseAffixes.Add(AffixInfo.GetAffixInfo(affixType).GenerateAffix(item.Tier));
         }
 
         // Create new lottery to decide tier roll of each affix
@@ -88,7 +88,7 @@ public abstract class ItemBase
         {
             int tier = tierLottery.GetWinner();
             tier = tier > quality ? quality : tier;
-            item.Affixes.Add(affixType, AffixInfo.GetAffixInfo(affixType).GenerateAffix(tier));
+            item.Affixes.Add(AffixInfo.GetAffixInfo(affixType).GenerateAffix(tier));
             quality -= tier;
         }
         
@@ -96,7 +96,7 @@ public abstract class ItemBase
         Affix[] randomAffixes = PossibleAffixes.GetUniqueRandomAffixes(quality, tierLottery, new HashSet<AffixType>(GuaranteedAffixes));
         foreach (Affix affix in randomAffixes)
         {
-            item.Affixes.Add(affix.Type, affix);
+            item.Affixes.Add(affix);
         }
     }
 }

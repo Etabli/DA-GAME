@@ -1,54 +1,54 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ArrayOfKeyValueOfAffixPoolPresetAffixPool xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
-  <KeyValueOfAffixPoolPresetAffixPool>
+<ArrayOfKeyValueOfAffixPoolPresetAffixPoolaI91Yjnm xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+  <KeyValueOfAffixPoolPresetAffixPoolaI91Yjnm>
     <Key>Ammo</Key>
-    <Value>
-      <lottery xmlns="http://schemas.datacontract.org/2004/07/">
-        <entrants>
-          <TupleOfAffixTypeInt32>
-            <item1>PhysDmgFlat</item1>
-            <item2>1</item2>
-          </TupleOfAffixTypeInt32>
-        </entrants>
-      </lottery>
+    <Value xmlns:d3p1="http://schemas.datacontract.org/2004/07/">
+      <d3p1:lottery>
+        <d3p1:entrants>
+          <d3p1:TupleOfAffixTypeintQMN0Fzzj>
+            <d3p1:item1>PhysDmgFlat</d3p1:item1>
+            <d3p1:item2>1</d3p1:item2>
+          </d3p1:TupleOfAffixTypeintQMN0Fzzj>
+        </d3p1:entrants>
+      </d3p1:lottery>
     </Value>
-  </KeyValueOfAffixPoolPresetAffixPool>
-  <KeyValueOfAffixPoolPresetAffixPool>
+  </KeyValueOfAffixPoolPresetAffixPoolaI91Yjnm>
+  <KeyValueOfAffixPoolPresetAffixPoolaI91Yjnm>
     <Key>Armor</Key>
-    <Value>
-      <lottery xmlns="http://schemas.datacontract.org/2004/07/">
-        <entrants>
-          <TupleOfAffixTypeInt32>
-            <item1>Health</item1>
-            <item2>1</item2>
-          </TupleOfAffixTypeInt32>
-          <TupleOfAffixTypeInt32>
-            <item1>PhysDmgFlat</item1>
-            <item2>1</item2>
-          </TupleOfAffixTypeInt32>
-        </entrants>
-      </lottery>
+    <Value xmlns:d3p1="http://schemas.datacontract.org/2004/07/">
+      <d3p1:lottery>
+        <d3p1:entrants>
+          <d3p1:TupleOfAffixTypeintQMN0Fzzj>
+            <d3p1:item1>Health</d3p1:item1>
+            <d3p1:item2>1</d3p1:item2>
+          </d3p1:TupleOfAffixTypeintQMN0Fzzj>
+          <d3p1:TupleOfAffixTypeintQMN0Fzzj>
+            <d3p1:item1>PhysDmgFlat</d3p1:item1>
+            <d3p1:item2>1</d3p1:item2>
+          </d3p1:TupleOfAffixTypeintQMN0Fzzj>
+        </d3p1:entrants>
+      </d3p1:lottery>
     </Value>
-  </KeyValueOfAffixPoolPresetAffixPool>
-  <KeyValueOfAffixPoolPresetAffixPool>
+  </KeyValueOfAffixPoolPresetAffixPoolaI91Yjnm>
+  <KeyValueOfAffixPoolPresetAffixPoolaI91Yjnm>
     <Key>Weapon</Key>
-    <Value>
-      <lottery xmlns="http://schemas.datacontract.org/2004/07/">
-        <entrants>
-          <TupleOfAffixTypeInt32>
-            <item1>FireRate</item1>
-            <item2>1</item2>
-          </TupleOfAffixTypeInt32>
-          <TupleOfAffixTypeInt32>
-            <item1>PhysDmgFlat</item1>
-            <item2>1</item2>
-          </TupleOfAffixTypeInt32>
-          <TupleOfAffixTypeInt32>
-            <item1>Health</item1>
-            <item2>1</item2>
-          </TupleOfAffixTypeInt32>
-        </entrants>
-      </lottery>
+    <Value xmlns:d3p1="http://schemas.datacontract.org/2004/07/">
+      <d3p1:lottery>
+        <d3p1:entrants>
+          <d3p1:TupleOfAffixTypeintQMN0Fzzj>
+            <d3p1:item1>FireRate</d3p1:item1>
+            <d3p1:item2>1</d3p1:item2>
+          </d3p1:TupleOfAffixTypeintQMN0Fzzj>
+          <d3p1:TupleOfAffixTypeintQMN0Fzzj>
+            <d3p1:item1>PhysDmgFlat</d3p1:item1>
+            <d3p1:item2>1</d3p1:item2>
+          </d3p1:TupleOfAffixTypeintQMN0Fzzj>
+          <d3p1:TupleOfAffixTypeintQMN0Fzzj>
+            <d3p1:item1>Health</d3p1:item1>
+            <d3p1:item2>1</d3p1:item2>
+          </d3p1:TupleOfAffixTypeintQMN0Fzzj>
+        </d3p1:entrants>
+      </d3p1:lottery>
     </Value>
-  </KeyValueOfAffixPoolPresetAffixPool>
-</ArrayOfKeyValueOfAffixPoolPresetAffixPool>
+  </KeyValueOfAffixPoolPresetAffixPoolaI91Yjnm>
+</ArrayOfKeyValueOfAffixPoolPresetAffixPoolaI91Yjnm>
