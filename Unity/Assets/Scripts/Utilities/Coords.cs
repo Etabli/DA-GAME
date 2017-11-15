@@ -38,7 +38,6 @@ public class Coords
     }
     #endregion
 
-
     #region operators
     public static Coords operator +(Coords lhs, Coords rhs)
     {
@@ -147,4 +146,24 @@ public class Coords
     }
 
     #endregion
+
+    #region overloads
+    /// <summary>
+    /// Calculates a hashcode put of the coordinates of the Coord object
+    /// primes used: 79, 41, 67, 29
+    /// </summary>
+    /// <returns>a hascode for this object</returns>
+    public override int GetHashCode()
+    {
+       return (((((79 + X) * 41) +  Y) * 67) + (X << Y)) *29;
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj == null || GetType() != obj.GetType())
+            return false;
+        return X == ((Coords)obj).X && Y == ((Coords)obj).Y;
+    }
+    #endregion
+
 }

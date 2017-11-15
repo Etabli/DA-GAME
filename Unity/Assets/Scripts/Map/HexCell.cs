@@ -38,17 +38,15 @@ public enum HexCorner
 
 public class HexCell
 {
-
     //size of one cell
     public static readonly float HEXCELL_SIZE = 3;
  
-
     #region MemberVariables
     public Coords Coords { get; protected set; }
 
-    Area _ParentArea;
-    public Area ParentArea { get{ return _ParentArea; }
-                            set { _ParentArea = value; WorldController.Instance.UpdateCellTexture(this);  } }
+    Area _parentArea;
+    public Area ParentArea { get{ return _parentArea; }
+                            set { _parentArea = value;} }
 
     public Base LocalBase { get; set; }
     #endregion
@@ -60,7 +58,6 @@ public class HexCell
         Coords = coords;
         WorldController.Instance.OnHexCellCreated(this);
     }
-
 
     public HexCell(int x, int y)
     : this(new Coords(x, y))
@@ -108,7 +105,6 @@ public class HexCell
         }
     }
 
-
     /// <summary>
     /// Returns a given the world position of a given hex Cell
     /// </summary>
@@ -140,7 +136,6 @@ public class HexCell
     #endregion
 
     #region static hexCellFunctions
-
 
     /// <summary>
     /// Returns the coords of the nearest hex that contain these fractional coords
@@ -178,6 +173,27 @@ public class HexCell
     }
 
     #endregion
+
+    #region overrides
+    public override bool Equals(object obj)
+    {
+        if (obj == null || GetType() != obj.GetType())
+            return false;
+        return Coords.Equals(((HexCell)obj).Coords);
+    }
+
+    public override int GetHashCode()
+    {
+        return Coords.GetHashCode();
+    }
+
+    public override string ToString()
+    {
+        return string.Format("HexCell:\n Coords: {0}\n Area It belongs to:\t{1}\r\n Base in Cell: NOT IMPLEMENTED",
+                            Coords.ToString(),(ParentArea != null ) ? ParentArea.ToString() : "Not in any area");
+    }
+
+    #endregion  
 
 }
 

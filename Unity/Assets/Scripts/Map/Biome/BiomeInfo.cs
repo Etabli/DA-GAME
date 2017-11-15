@@ -44,24 +44,22 @@ public class BiomeInfo{
         PossibleItemsToSpawn = itemList;
         PossibleResourceToSpawn = resourceList;
         MinMaxTier = minMaxTier;
-        Debug.Log("Created Biome Info for type " + Type);
+        //Debug.Log("Created Biome Info for type " + Type);
         if(!BiomeInfoDictionary.ContainsKey(Type))
         {
-            Debug.Log("Adding BiomeTpye " + Type + " to biomeinfo dictionary");
+            //Debug.Log("Adding BiomeTpye " + Type + " to biomeinfo dictionary");
             BiomeInfoDictionary.Add(Type, this);
         }
         else if(BiomeInfoDictionary[type] == null)
         {
-            Debug.Log("Updating BiomeTpye " + Type + " to biomeinfo dictionary");
+            //Debug.Log("Updating BiomeTpye " + Type + " to biomeinfo dictionary");
             BiomeInfoDictionary[type] = this;
         }
     }
 
     public BiomeInfo(BiomeType type, List<EnemyType> enemyList, List<ItemBaseType> itemList, List<ResourceType> resourceList,int minTier, int maxtier):
         this(type,enemyList,itemList,resourceList,new Range((float)minTier,(float)maxtier))
-    {
-
-    }
+    { }
 
     public BiomeInfo(BiomeInfo src):this(src.Type,src.PossibleEnemiesToSpawn,src.PossibleItemsToSpawn,src.PossibleResourceToSpawn,src.MinMaxTier)
     { }
@@ -81,7 +79,6 @@ public class BiomeInfo{
     }
 
     #endregion
-
 
     #region static Functionality
 
@@ -124,9 +121,5 @@ public class BiomeInfo{
         return possBiomes;
     }
 
-
     #endregion
-
-
-
 }
