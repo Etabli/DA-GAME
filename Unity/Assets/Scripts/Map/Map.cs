@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-
+using System;
 
 public class Map
 {
@@ -10,9 +10,12 @@ public class Map
     
     public int Radius { get; protected set; }
 
-    HexCell[,] WorldMap;
-    
-    int WorldMapLength;
+    //HexCell[,] WorldMap;
+    Dictionary<Coords, HexCell> worldMap;
+    Dictionary<uint, Area> areas;
+
+    //temporary
+    public AreaGraph AreaGraph { get; protected set; }
 
     #endregion
 
@@ -22,12 +25,44 @@ public class Map
     {
         Radius = radius;
 
-        WorldMapLength = 2 * radius + 1;
+        areas = new Dictionary<uint, Area>();
 
-        WorldMap = new HexCell[WorldMapLength, WorldMapLength];
-
+        //WorldMap = new HexCell[WorldMapLength, WorldMapLength];
+        worldMap = new Dictionary<Coords, HexCell>();
+        //long before = System.DateTime.Now.Millisecond;
         Generate();
-        Debug.Log("Finished generating");
+        //long after = System.DateTime.Now.Millisecond;
+        //Debug.Log("Finished generating in " + (after - before) + " Miliseconds");
+
+        #region testing cell duplicate
+        //foreach(Area a in Areas)
+        //{
+        //    foreach(HexCell c in a.Cells)
+        //    {
+        //        foreach (Area ar in Areas)
+        //        {
+        //            if (!a.Equals(ar))
+        //            {
+        //                foreach (HexCell cr in ar.Cells)
+        //                {
+        //                    //Debug.Log("Checking agians:");
+        //                    //Debug.Log(i++ +"Area1: " +a);
+        //                    //Debug.Log(j++ +"Area2:"+ ar);
+        //                    //Debug.Log("Cell1: " + c);
+        //                    //Debug.Log("Cell2: " + cr);
+        //                    if (c.Equals(cr))
+        //                    {
+        //                        Debug.Log("Found Areas that contain the same cell " + c);
+        //                        Debug.Log("Area 1: " + a);
+        //                        Debug.Log("Area 2: " + ar);
+        //                    }// end if
+        //                }// end foreach hexcell II
+        //            }// end if areas equal
+        //        }// end foreach areas II
+        //    }// end for each hex cell
+
+        //}// end for each areas
+#endregion
     }
 
     #endregion
@@ -38,13 +73,11 @@ public class Map
     /// </summary>
     void Generate()
     {
-        System.Random rng = new System.Random();
         Debug.Log("Map::Generate - WARNING:  Finsihed IMPLEMENTING SUBJECT TO CHANGE");
-        Area centerArea = new Area(0, rng.Next(1, 4));
+        //Area centerArea = new Area(0, rng.Next(1, 4));
         HexCell center = new HexCell(0, 0);
-        //center.ParentArea.AddToCellList(center);
-        centerArea.EstablishAreaCellRelationship(center);
-        //generate start area
+        //Debug.Log(center.Coords.ToString() + " Has hash: " + center.Coords.GetHashCode());
+        worldMap.Add(center.Coords, center);
 
         //set center in world map
         this[center.Coords] = center;
@@ -53,6 +86,10 @@ public class Map
         {
             GenerateRing(i);
         }
+
+        GenerateAreas();
+
+        GenerateBiomes();
     }
 
     /// <summary>
@@ -68,63 +105,187 @@ public class Map
         {
             for (int k = 0; k < distanceOfRingFromCenter; k++)
             {
-                this[coord] = new HexCell(coord);
-                HandleAreaForCell(this[coord]);
+                //this[coord] = new HexCell(coord);
+                //Debug.Log(coord.ToString() + " Has hash: " + coord.GetHashCode());
+                worldMap.Add(coord, new HexCell(coord));
+                //HandleAreaForCell(this[coord]);
                 coord = Coords.GetNeighborCoords(coord, (HexDirection)j);
             }
         }
     }
 
     /// <summary>
-    /// Handels the area assignment for a given cell
+    /// Generates the areas for the map
     /// </summary>
-    /// <param name="cell">The Cell we want to find an area for</param>
-    void HandleAreaForCell(HexCell cell)
+    void GenerateAreas()
     {
-        List<HexCell> existingNeighbors = GetNeighbors(cell).GetExistingNeighbors();
+        System.Random rng = new System.Random((int)DateTime.Now.Ticks);
+        // lottery for area size
+        Lottery<int> lottery = new Lottery<int>();
+        lottery.Enter(1, 30);
+        lottery.Enter(2, 50);
+        lottery.Enter(3, 42);
+        lottery.Enter(4, 17);
 
-        foreach (HexCell neighbor in existingNeighbors)
+        List<HexCell> nextPossibleAreaCenters = new List<HexCell>();
+        nextPossibleAreaCenters.Add(this[0, 0]);
+        Debug.Log("Map::GenerateAreas - Start generating areas");
+        //int i= 0;
+        while (nextPossibleAreaCenters.Count > 0)
         {
-            if(neighbor.ParentArea != null)
+
+            HexCell AreaBegin = nextPossibleAreaCenters[rng.Next(0, nextPossibleAreaCenters.Count)];
+            nextPossibleAreaCenters.Remove(AreaBegin);
+            List<HexCell> possibleCellsForArea = new List<HexCell>(GetNeighborsWithoutArea(AreaBegin));
+
+            int tier = DistanceBetweenCells(AreaBegin, this[0, 0]);
+            Area newArea = new Area(tier, lottery.GetWinner());
+            areas.Add(newArea.AreaID, newArea);
+            newArea.EstablishAreaCellRelationship(AreaBegin);
+            //Debug.Log("Map::GenerateAreas - Chose Cell: " + AreaBegin.ToString());
+            while (!newArea.IsFull() &&
+                  possibleCellsForArea.Count > 0)
             {
-                if(!neighbor.ParentArea.AreaIsFull())
+                // get random cell from possible entries
+                HexCell cell = possibleCellsForArea[rng.Next(0, possibleCellsForArea.Count)];
+                //Debug.Log("Map::GenerateAreas - Chose Cell: " + cell.ToString());
+                // add to area
+
+                newArea.EstablishAreaCellRelationship(cell);
+       
+                // if cell was added to area
+                // remove slectred cell form possneighbors and 
+                // if in nextPossibleAreaCenters remove it as well
+                if(cell.ParentArea != null)
                 {
-                    Lottery<int> lottery = new Lottery<int>();
-
-                    lottery.Enter(1, 55 + 2 * (neighbor.ParentArea.Cells.Capacity - neighbor.ParentArea.Cells.Count));
-                    lottery.Enter(2, 35 - 2 * (neighbor.ParentArea.Cells.Capacity - neighbor.ParentArea.Cells.Count));
-
-                    if (lottery.GetWinner() == 1)
+                    possibleCellsForArea.Remove(cell);
+                    if (nextPossibleAreaCenters.Contains(cell))
                     {
-                        neighbor.ParentArea.EstablishAreaCellRelationship(cell);
-                        //cell.ParentArea = neighbor.ParentArea;
-                        //cell.ParentArea.AddToCellList(cell);
-                        break;
-                    }
+                        //Debug.Log("Map::GenerateAreas - Removing cell from next possible area centers list");
+                        nextPossibleAreaCenters.Remove(cell);
+                    }// end if next area begin contains
+                }// end if cell parent area null
+
+                // get all neigbors without areas from this recently added cell
+                // add them to possible neighbors
+                foreach(HexCell c in GetNeighborsWithoutArea(cell))
+                {
+                    if(!possibleCellsForArea.Contains(c))
+                        possibleCellsForArea.Add(c);
+                }
+            }// end while area not full and poss neighbors count > 0
+            //area finsihed
+            //Debug.Log("Map::GenerateAreas - Finiehsd Area: "+ newArea.ToString());
+            // add all cells in poss neigbors that are not already in nextPossibleAreaCenters to the list of
+            // next possible area Centers
+            //Debug.Log(possibleCellsForArea.Count + " cells left in possible cells for area");
+            foreach(HexCell c in possibleCellsForArea)
+            {
+                if (!nextPossibleAreaCenters.Contains(c))
+                {
+                    //Debug.Log("Adding cell");
+                    nextPossibleAreaCenters.Add(c);
                 }
             }
-        }
-        
-        if(cell.ParentArea == null)
+        }// end while next poss area begins  count > 0
+        Debug.Log("Map::GenerateAreas - Finished generating areas");
+    }
+
+    /// <summary>
+    /// Generates the biomes each area has
+    /// </summary>
+    void GenerateBiomes()
+    {
+        Debug.Log("Map::GenerateBiomes() - Starting to generate Biomes");
+        AreaGraph = new AreaGraph(areas.Values.ToList(),this);
+        AreaGraph.ColorGraph();
+
+        MergeAreasWithSameBiome();
+
+        foreach (AreaNode node in AreaGraph.GetNodes())
         {
-            Lottery<int> lottery = new Lottery<int>();
+            if (areas.ContainsKey(node.NodeID))
+            {
+                Area areaForNode = areas[node.NodeID];
+                areaForNode.GenerateBiomeForArea(node.GetColor());
+            }
+        }
+        Debug.Log("Map::GenerateBiomes() - Finished generateing Biomes");
+    }
 
-            lottery.Enter(1, 30);
-            lottery.Enter(2, 50);
-            lottery.Enter(3, 42);
-            lottery.Enter(4, 17);
+    /// <summary>
+    /// Merges areas that have the same color in the area graph
+    /// </summary>
+    void MergeAreasWithSameBiome()
+    {
+        //TODO: 
+        // FIND ALL AREAS THAT HAVE TO MERGED WITH THIS AREA
+        // MERGE ALL AT ONCE
 
+        List<List<uint>> listOfAreasToMerge = AreaGraph.GetAreasToMerge();
 
-            new Area(DistanceBetweenCells(cell, this[0, 0]), lottery.GetWinner()).EstablishAreaCellRelationship(cell);
-            //cell.ParentArea.AddToCellList(cell);
+        foreach (List<uint> areasToMerge in listOfAreasToMerge)
+        {
+            int size = 0;
+            List<HexCell> cellsInNewArea = new List<HexCell>();
+            int tier = 0;
+
+            foreach(uint areaID in areasToMerge)
+            {
+                if (areas.ContainsKey(areaID))
+                {
+                    Area mergeArea = areas[areaID];
+
+                    // use capacity if merge area not completely filled
+                    // aka can add to this area if map is expanding
+                    size += mergeArea.Cells.Capacity;
+                    cellsInNewArea.AddRange(mergeArea.Cells);
+                    tier = (tier < mergeArea.Tier) ? mergeArea.Tier : tier;
+                    RemoveArea(areaID);
+                }
+                else
+                {
+                    Debug.LogError("Map::MergeAreasWithSameBiome - trying to acces area that does not exist. ID: " + areaID);
+                }
+            }
+            // accumulated all things about the merging ares from cell to capcaity to tier
+            Area newMergedArea = new Area(tier, size);
+            foreach (HexCell cellInNewArea in cellsInNewArea)
+            {
+                newMergedArea.EstablishAreaCellRelationship(cellInNewArea);
+            }
+            areas.Add(newMergedArea.AreaID, newMergedArea);
+            //Debug.Log("Created new Area  with ID: " + newMergedArea.AreaID);
+            AreaGraph.MergeNodes(areasToMerge, newMergedArea.AreaID);
+        }// end foreach list uint
+    }
+
+    /// <summary>
+    /// Removes an area by id, and sets parentArea for the hexcells in this area null
+    /// <param name="areaId">the ID of the Area</param>
+    void RemoveArea(uint areaId)
+    {
+        if (areas.ContainsKey(areaId))
+        {
+            Area areaToRemove = areas[areaId];
+            foreach (HexCell cell in areaToRemove.Cells)
+            {
+                cell.ParentArea = null;
+            }
+            areas.Remove(areaId);
         }
     }
 
+    /// <summary>
+    /// Returns all neighbors of a cell that don't have an area assigned
+    /// </summary>
+    /// <param name="cell">the cell from which we want the area less neighbors</param>
+    /// <returns></returns>
     List<HexCell> GetNeighborsWithoutArea(HexCell cell)
     {
         List<HexCell> neighors = new List<HexCell>();
 
-        Neighbors neigh = GetNeighbors(cell);
+        Neighbors neigh = GetNeighborsForCell(cell);
 
         foreach(HexCell c in neigh.GetNeighbors())
         {
@@ -165,6 +326,28 @@ public class Map
         return ring;
     }
 
+    /// <summary>
+    /// Returns an Area by a given area ID
+    /// </summary>
+    /// <param name="id">The ID of the area</param>
+    /// <returns>The area wanted, if it exists otherwise null</returns>
+    public Area getAreaByID(uint id)
+    {
+        if (areas.ContainsKey(id))
+        {
+            return areas[id];
+        }
+        else
+        {
+            Debug.Log("Map::getAreaByID - There exists no area with this ID");
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Calculates the total number of hexcells in the map
+    /// </summary>
+    /// <returns>the number of cells in the map</returns>
     public int GetTotalNumberOfHexCellsInMap()
     {
         // (2*radius +1) ^ 2 - (radius * (radius +1)) 
@@ -175,11 +358,21 @@ public class Map
     {
         get
         {
-            return WorldMap[coord.Y + Radius, coord.X + Radius + Mathf.Min(0, coord.Y)];
+            if(worldMap.ContainsKey(coord))
+                return worldMap[coord];
+            //Debug.LogWarning("Map::this[Coords coord] - No HexCell in Map for these coords: " + coord.ToString());
+            return null;
         }
         set
         {
-            WorldMap[coord.Y + Radius, coord.X + Radius + Mathf.Min(0, coord.Y)] = value;
+            if (worldMap.ContainsKey(coord))
+            {
+                worldMap[coord] = value;
+            }
+            else
+            {
+                worldMap.Add(coord,value);
+            }
         }
 
     }
@@ -188,11 +381,25 @@ public class Map
     {
         get
         {
-            return WorldMap[y + Radius, x + Radius + Mathf.Min(0, y)];
+            //return WorldMap[y + Radius, x + Radius + Mathf.Min(0, y)];
+            Coords c = new Coords(x, y);
+            if (worldMap.ContainsKey(c))
+                return worldMap[c];
+            //Debug.LogWarning("Map::this[int x, int y] - No HexCell in Map for these coords: " + c.ToString());
+            return null;
         }
         set
         {
-            WorldMap[y + Radius, x + Radius + Mathf.Min(0, y)] = value;
+            //WorldMap[y + Radius, x + Radius + Mathf.Min(0, y)] = value;
+            Coords c = new Coords(x, y);
+            if (worldMap.ContainsKey(c))
+            {
+                worldMap[c] = value;
+            }
+            else
+            {
+                worldMap.Add(c, value);
+            }
         }
     }
 
@@ -212,7 +419,7 @@ public class Map
     /// </summary>
     /// <param name="center">the center cell of which we want the neigbors</param>
     /// <returns>A neighbors struct containint an array with all the neighbors and the center</returns>
-    public Neighbors GetNeighbors(HexCell center)
+    public Neighbors GetNeighborsForCell(HexCell center)
     {
         Coords[] neighborCoords = Coords.GetAllNeighborCoords(center.Coords);
         HexCell[] neighbors = new HexCell[6];
@@ -226,6 +433,30 @@ public class Map
         }
 
         return new Neighbors(center, neighbors);
+    }
+
+    /// <summary>
+    /// Returns all neigboring areas
+    /// </summary>
+    /// <param name="area">The center area where we want the ngihbors from</param>
+    /// <returns></returns>
+    public List<Area> GetNeighboringAreas(Area area)
+    {
+        List<Area> neighboringAreas = new List<Area>();
+
+        foreach (HexCell cell in area.Cells)
+        {
+            Neighbors neigh = GetNeighborsForCell(cell);
+            foreach (HexCell c in neigh.GetExistingNeighbors())
+            {
+                if (c.ParentArea != cell.ParentArea)
+                {
+                    neighboringAreas.Add(c.ParentArea);
+                }
+            }
+
+        }
+        return neighboringAreas;
     }
 
     /// <summary>
@@ -257,10 +488,15 @@ public class Map
         Coords hexCoords = HexCell.RoundToNearestHexCell(hexCoordsFractional);
 
         if (CheckCoordsInRange(hexCoords))
+        {
+            //if(dictMap.ContainsKey(hexCoords))
+            //{
+            //    Debug.Log("COORD:" + hexCoords.ToString() + " WOULD HAVE BEEN FOUND IN DICT MAP");
+            //}
             return this[hexCoords];
+        }
         return null;
     }
-
 
     /// <summary>
     /// Returns the world position coords of the cell center point
@@ -272,6 +508,4 @@ public class Map
         return new Vector2(HexCell.HEXCELL_SIZE * Mathf.Sqrt(3) * ((float)cell.Coords.X + (float)cell.Coords.Y / 2f),
                             HexCell.HEXCELL_SIZE * (3.0f / 2.0f) * cell.Coords.Y);
     }
-
-
 }

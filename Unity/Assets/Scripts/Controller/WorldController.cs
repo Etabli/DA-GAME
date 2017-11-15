@@ -9,7 +9,6 @@ public class WorldController : MonoBehaviour {
 
     #region Member Variables
 
- 
     [Range(1,5)]
     public int EnemyVariatyPerBiome;
 
@@ -19,23 +18,23 @@ public class WorldController : MonoBehaviour {
     [Range(1, 5)]
     public  int ResourceVariatyPerBiome;
 
+    [Range(1, 20)]
+    public int radius;
+
     public Map map;// = new Map(20);
 
     public Material testMat;
     public Material markMaterial;
-
-    Area hoveroverArea;
-    Area prevHoverOver;
+    public GameObject hexCellPrefab;
 
     public static WorldController Instance { get; protected set; }
 
-    Dictionary<HexCell, GameObject> HexCellToGameObjectDictionary;
-    Dictionary<BiomeType, Material> BiomeTypeToMaterialDictionary;
+    Dictionary<HexCell, GameObject> hexCellToGameObjectDictionary;
+    Dictionary<BiomeType, Material> biomeTypeToMaterialDictionary;
+
+    HexCell prevHoverOver;
 
     #endregion
-
-
-
 
     void OnEnable()
     {
@@ -45,15 +44,12 @@ public class WorldController : MonoBehaviour {
         }
         Instance = this;
 	}
-
-
+    
     void Start()
     {
-        HexCellToGameObjectDictionary = new Dictionary<HexCell, GameObject>();
+        hexCellToGameObjectDictionary = new Dictionary<HexCell, GameObject>();
         LoadBiomeInfo();
-        hoveroverArea = null;
-        prevHoverOver = null;
-        map = new Map(5);
+        map = new Map(radius);
         if (Instance == null)
         {
             Instance = this;
@@ -64,36 +60,53 @@ public class WorldController : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
-
+        if (prevHoverOver != null)
+        {
+            // revert changes to previous frame if new hoverover
+            UnmarkAreaHexCellIsIn(prevHoverOver);
+        }
         Vector2 mouse = Converter.V3ToV2(Camera.main.ScreenToWorldPoint(Input.mousePosition));
         if (map != null)
         {
             HexCell cell = map.WorldPositionToHexCell(mouse);
-            if (cell != null)
+            if(cell != null)
             {
-                if (hoveroverArea != null)
+                // not over same cell as prev frame
+                MarkAreaHexCellIsIn(cell);
+                prevHoverOver = cell;
+                // else do nothing
+            }// end if cell null
+        }//end if map null
+    }
+
+    /// <summary>
+    /// TEMP
+    /// </summary>
+    /// <param name="cell"></param>
+    void UnmarkAreaHexCellIsIn(HexCell cell)
+    {
+        if(cell.ParentArea != null)
+        {
+            foreach (HexCell c in cell.ParentArea.Cells)
+            {
+                UpdateCellTexture(c);
+            }
+        }
+    }
+    /// <summary>
+    /// TEMP
+    /// </summary>
+    /// <param name="cell"></param>
+    void MarkAreaHexCellIsIn(HexCell cell)
+    {
+        if(cell.ParentArea != null)
+        {
+            Debug.Log("Area: " + cell.ParentArea.ToString());
+            foreach(HexCell c in cell.ParentArea.Cells)
+            {
+                if (hexCellToGameObjectDictionary.ContainsKey(c))
                 {
-                    foreach (HexCell c in hoveroverArea.Cells)
-                    {
-                        UpdateCellTexture(c);
-                    }
-                    prevHoverOver = hoveroverArea;
-                    hoveroverArea = cell.ParentArea;
-                    if (prevHoverOver != hoveroverArea)
-                    {
-                       // Debug.Log("Area Capacity: " + hoveroverArea.Cells.Capacity + " Actual Size: " + hoveroverArea.Cells.Count + "\nBiome: " + hoveroverArea.AreaBiome.ToString());
-                    }
-                    foreach (HexCell c in hoveroverArea.Cells)
-                    {
-                        if (HexCellToGameObjectDictionary.ContainsKey(c))
-                        {
-                            HexCellToGameObjectDictionary[c].GetComponent<MeshRenderer>().material.color = Color.blue;
-                        }
-                    }
-                }
-                else
-                {
-                    hoveroverArea = cell.ParentArea;
+                    hexCellToGameObjectDictionary[c].GetComponent<MeshRenderer>().material = markMaterial;
                 }
             }
         }
@@ -113,24 +126,24 @@ public class WorldController : MonoBehaviour {
     /// </summary>
     void LoadBiomeMaterials()
     {
-        BiomeTypeToMaterialDictionary = new Dictionary<BiomeType, Material>();
+        biomeTypeToMaterialDictionary = new Dictionary<BiomeType, Material>();
 
         Material[] materials = Resources.LoadAll<Material>("Materials/BiomeMaterials/");
 
         foreach (Material mat in materials)
         {
             BiomeType type = (BiomeType)Enum.Parse(typeof(BiomeType), mat.name);
-            Debug.Log("WorldController::LoadBiomeMaterials - Creating entry for " + type);
-            if(!BiomeTypeToMaterialDictionary.ContainsKey(type))
+            //Debug.Log("WorldController::LoadBiomeMaterials - Creating entry for " + type);
+            if(!biomeTypeToMaterialDictionary.ContainsKey(type))
             {
-                BiomeTypeToMaterialDictionary.Add(type, mat);
+                biomeTypeToMaterialDictionary.Add(type, mat);
             }
         }
     }
 
-
     public void OnHexCellCreated(HexCell cell)
     {
+        //GameObject hexGO = Instantiate(hexCellPrefab);
         GameObject hexGO = new GameObject();
 
         //set parent to mabye not clogg hirachy view
@@ -149,12 +162,12 @@ public class WorldController : MonoBehaviour {
         MeshRenderer renderer = hexGO.AddComponent<MeshRenderer>();
         renderer.material = default(Material);
 
-        if (HexCellToGameObjectDictionary.ContainsKey(cell))
+        if (hexCellToGameObjectDictionary.ContainsKey(cell))
         {
             Debug.LogError("WorldController::OnHexCellCreated - There already exists an entry for this hex cell in the <HexCell,GameObject> Dictionary");
             return;
         }
-        HexCellToGameObjectDictionary.Add(cell, hexGO);
+        hexCellToGameObjectDictionary.Add(cell, hexGO);
 
     }
 
@@ -164,15 +177,22 @@ public class WorldController : MonoBehaviour {
     /// <param name="cell"></param>
     public void UpdateCellTexture(HexCell cell)
     {
-        if(HexCellToGameObjectDictionary.ContainsKey(cell))
+        if(hexCellToGameObjectDictionary.ContainsKey(cell))
         {
-           if(BiomeTypeToMaterialDictionary.ContainsKey(cell.ParentArea.AreaBiome.Type))
+           if(cell.ParentArea.AreaBiome != null)
            {
-                HexCellToGameObjectDictionary[cell].GetComponent<MeshRenderer>().material = BiomeTypeToMaterialDictionary[cell.ParentArea.AreaBiome.Type];
+               if(biomeTypeToMaterialDictionary.ContainsKey(cell.ParentArea.AreaBiome.Type))
+               {
+                    hexCellToGameObjectDictionary[cell].GetComponent<MeshRenderer>().material = biomeTypeToMaterialDictionary[cell.ParentArea.AreaBiome.Type];
+               }
+               else
+               {
+                    Debug.Log("WorldController::UpdateCellTexture - There is no material for this biome type " + cell.ParentArea.AreaBiome.Type);
+               }
            }
            else
            {
-                Debug.Log("WorldController::UpdateCellTexture - There is no material for this biome type " + cell.ParentArea.AreaBiome.Type);
+                hexCellToGameObjectDictionary[cell].GetComponent<MeshRenderer>().material = default(Material);
            }
         }
         else
@@ -180,7 +200,6 @@ public class WorldController : MonoBehaviour {
             Debug.Log("WorldController::UpdateCellTexture - This HexCell does not exist in the HexCell dictionary");
         }
     }
-
 
     /// <summary>
     /// Colors a ring of certain radius in the given color
@@ -193,34 +212,43 @@ public class WorldController : MonoBehaviour {
 
         foreach (HexCell cell in ring)
         {
-            HexCellToGameObjectDictionary[cell].GetComponent<MeshRenderer>().material.color = color;
+            hexCellToGameObjectDictionary[cell].GetComponent<MeshRenderer>().material.color = color;
         }
     }
 
-    
+    private void OnDrawGizmos()
+    {
+        if (map != null)
+        {
+            if (map.AreaGraph != null)
+            {
+                DrawGraph(map.AreaGraph);
+            }// end if ar graph not null
+        }// end if map not null
+    }
 
-    //private void OnDrawGizmos()
-    //{
-    //    if (map != null)
-    //    {
+    /// <summary>
+    /// TEMP
+    /// </summary>
+    /// <param name="g"></param>
+    void DrawGraph(AreaGraph g)
+    {
+        foreach (AreaNode node in g.GetNodes())
+        {
+            Gizmos.color = biomeTypeToMaterialDictionary[node.GetColor()].color;
+            HexCell centerCell = map.getAreaByID(node.NodeID).Cells[0];
+            Vector3 nodePos = Converter.V2ToV3(Map.HexCellToWorldPosition(centerCell));
+            Gizmos.DrawSphere(nodePos, 1);
 
-    //        Gizmos.color = Color.black;
-    //        HexCell center = map[0, 0];
-
-    //        Gizmos.DrawSphere(Converter.V2ToV3(Map.HexCellToWorldPosition(center)), 1);
-
-    //        DrawHexagonInEditor(center, Color.black);
-
-    //        Neighbors neigh = map.GetNeighbors(center);
-
-    //        foreach (HexCell cell in neigh.GetNeighbors())
-    //        {
-    //            Gizmos.DrawSphere(Converter.V2ToV3(Map.HexCellToWorldPosition(cell)), 1);
-    //            DrawHexagonInEditor(cell, Color.blue);
-    //        }
-    //    }
-    //}
-
+            Gizmos.color = Color.cyan;
+            foreach (uint node2 in node.Edges)
+            {
+                HexCell  edgeNode =  map.getAreaByID(node2).Cells[0];
+                Vector3 nodePos2 = Converter.V2ToV3(Map.HexCellToWorldPosition(edgeNode));
+                Gizmos.DrawLine(nodePos, nodePos2);
+            }
+        }// end i
+    }
 
     //void DrawHexagonInEditor(HexCell cell, Color color)
     //{
@@ -240,8 +268,4 @@ public class WorldController : MonoBehaviour {
 
     //    }
     //}
-
-    
-
-
 }

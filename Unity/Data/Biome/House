@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <BiomeInfo xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.datacontract.org/2004/07/">
   <MinMaxTier>
-    <MaxValue>13</MaxValue>
-    <MinValue>5</MinValue>
+    <MaxValue>5</MaxValue>
+    <MinValue>0</MinValue>
   </MinMaxTier>
   <PossibleEnemiesToSpawn>
     <EnemyType>Bat</EnemyType>

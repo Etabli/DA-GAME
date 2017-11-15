@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-
-
-
 /// <summary>
 /// EnemyType Enum
 /// IMPORTANT: REMOVE FROM HERE
@@ -18,7 +15,6 @@ public enum EnemyType
     Nutts
 }
 
-
 /// <summary>
 /// IMPORTANT: REMOVE FROM HERE
 /// </summary>
@@ -30,7 +26,6 @@ public enum ResourceType
     Guts
 }
 
-
 /// <summary>
 /// Contains all information about a Biome depending on Tier
 /// The Resources and Items and Enemies that are in here are the one spawnable in this biome
@@ -39,7 +34,6 @@ public enum ResourceType
 /// </summary>
 public class Biome
 {
-
     #region Member Variables
     public BiomeType Type { get; protected set; }
     public int Tier { get; protected set; }
@@ -48,10 +42,8 @@ public class Biome
     public List<ItemBaseType> SpawnableItems { get; protected set; }
     #endregion
 
-
     #region ctor
-
-
+    
     public Biome(BiomeType type, int tier, List<EnemyType> EnemiesSpawnable, List<ResourceType> ResourcesSpawnable, List<ItemBaseType> ItemsSpawnable)
     {
         Type = type;
@@ -87,7 +79,7 @@ public class Biome
     /// <param name="possEnemyType"></param>
     void FillSpawnableEnemies(List<EnemyType> possEnemyType)
     {
-        Debug.LogWarning("Biome::FillSpwanableEnemies - Currently uses enemies of all types wihtoug checking for tier");
+        //Debug.LogWarning("Biome::FillSpwanableEnemies - Currently uses enemies of all types wihtoug checking for tier");
         List<EnemyType> enemiesForThisTier = new List<EnemyType>();
         //= EnemyInfo.GetEnemiesForTier(Tier, possEnemyTpye);  
 
@@ -117,7 +109,7 @@ public class Biome
     /// <param name="possResourceType"></param>
     void FillSpawnableResources(List<ResourceType> possResourceType)
     {
-        Debug.LogWarning("Biome::FillSpwanableResources - Currently uses resources of all types wihtoug checking for tier");
+        //Debug.LogWarning("Biome::FillSpwanableResources - Currently uses resources of all types wihtoug checking for tier");
 
         //List<ResourceType> ResourceForThisTier = new List<ResourceType>();
         //= ResourceInfo.GetResourcesForTier(Tier, possEnemyTpye);  
@@ -148,7 +140,7 @@ public class Biome
     /// <param name="possItemType"></param>
     void FillSpawnableItems(List<ItemBaseType> possItemType)
     {
-        Debug.LogWarning("Biome::FillSpwanableItems - Currently uses items of all types wihtoug checking for tier");
+        //Debug.LogWarning("Biome::FillSpwanableItems - Currently uses items of all types wihtoug checking for tier");
 
         //List<ResourceType> ResourceForThisTier = new List<ResourceType>();
         //= ResourceInfo.GetResourcesForTier(Tier, possEnemyTpye);  
@@ -171,9 +163,7 @@ public class Biome
         }
     }
 
-
     #endregion
-
 
     #region Random Type to Spwan
 
