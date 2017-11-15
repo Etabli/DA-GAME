@@ -18,13 +18,13 @@ public enum AffixType
 /// Represents a single instance of an Affix.
 /// </summary>
 public class Affix
-{ 
-    public AffixType Type { get; protected set; }
-    public AffixValueType Class { get; protected set; }
-    public AffixValue Value { get; protected set; }
-    public int Tier { get; protected set; }
+{
+    public readonly AffixType Type;
+    public readonly AffixValueType Class;
+    public readonly AffixValue Value;
+    public readonly int Tier;
 
-    protected AffixInfo info;
+    protected readonly AffixInfo info;
 
     public Affix(AffixType type, AffixValueType affixClass, AffixValue value, int tier)
     {
