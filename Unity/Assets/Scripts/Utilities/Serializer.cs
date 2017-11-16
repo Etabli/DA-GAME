@@ -7,7 +7,7 @@ using System.Xml;
 using System.Runtime.Serialization;
 using UnityEngine;
 
-abstract class Serializer
+public abstract class Serializer
 {
     const string DATA_FOLDER_PATH = "Data\\";
     const string AFFIX_FOLDER_PATH = DATA_FOLDER_PATH + "Affix\\";
