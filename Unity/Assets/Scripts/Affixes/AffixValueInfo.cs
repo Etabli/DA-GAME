@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using UnityEngine;
 using System;
 
 /// <summary>
@@ -46,12 +45,14 @@ public class AffixValueInfo
         {
             if (!prog.AttachProgressionFunction())
             {
-                Debug.LogError(string.Format("Invalid progression function set for AffixValueInfo of type {0}", baseValueMin.GetType()));
+                //Debug.LogError(string.Format("Invalid progression function set for AffixValueInfo of type {0}", baseValueMin.GetType()));
+                throw new InvalidOperationException("Trying to generate affix value with no or invalid progression function set!");
             }
         }
         // At this point we are sure that the prog function is set, but not if parameters are valid
 
-        float frac = UnityEngine.Random.Range(0, 100) / 100.0f;
+        var rng = new System.Random();
+        float frac = rng.Next(101) / 100.0f;
 
         // Progress min and max values before combining them into a random value between them
         AffixValue progressedMin = prog.Apply(baseValueMin, tier);

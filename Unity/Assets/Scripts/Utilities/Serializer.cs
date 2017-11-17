@@ -95,6 +95,16 @@ public abstract class Serializer
         return new AffixInfo(DeserializeAffixInfo(data));
     }
 
+    public static void LoadAllAffixInfosFromDisk()
+    {
+        foreach(AffixType type in Enum.GetValues(typeof(AffixType)))
+        {
+            if (type == AffixType.None || type == AffixType.Random)
+                continue;
+            LoadAffixInfoFromDisk(type);
+        }
+    }
+
     private static string GetPathFromAffixType(AffixType type)
     {
         return AFFIX_INFO_FOLDER_PATH + type;

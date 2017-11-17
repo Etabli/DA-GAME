@@ -12,16 +12,44 @@ namespace AffixEditor
 {
     public partial class FormMain : Form
     {
+        // List of all affix types for easier access
+        // (Don't need to filter out None and Random)
+        private List<AffixType> affixTypes;
+
+        #region Initialization
         public FormMain()
         {
             InitializeComponent();
 
-            Serializer.LoadAffixInfoFromDisk(AffixType.Health);
+            Serializer.LoadAllAffixInfosFromDisk();
+            InitializeAffixTypeList();
+            PopulateAffixInfoListBox();
         }
 
-        private void BtnTest_Click(object sender, EventArgs e)
+        private void InitializeAffixTypeList()
         {
-            MessageBox.Show(AffixInfo.GenerateAffix(AffixType.PhysDmgFlat, 5).ToString());
+            affixTypes = new List<AffixType>();
+            foreach (AffixType type in Enum.GetValues(typeof(AffixType)))
+            {
+                if (type != AffixType.None && type != AffixType.Random)
+                    affixTypes.Add(type);
+            }
+        }
+
+        private void PopulateAffixInfoListBox()
+        {
+            foreach (var type in affixTypes)
+                AffixInfosListBox.Items.Add(type);
+        }
+        #endregion
+
+        private void AffixInfosSearchTextBox_TextChanged(object sender, EventArgs e)
+        {
+            AffixInfosListBox.Items.Clear();
+
+            var filteredTypes = affixTypes.FindAll(type => type.ToString().ToLower().Contains(AffixInfosSearchTextBox.Text.ToLower()));
+            foreach (var type in filteredTypes)
+                AffixInfosListBox.Items.Add(type);
         }
     }
 }
