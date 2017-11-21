@@ -115,6 +115,11 @@ namespace AffixEditor
 
                 AffixValueTypeSingleMinTextBox.Text = "";
                 AffixValueTypeSingleMaxTextBox.Text = "";
+
+                AffixValueTypeRangeMinMinTextBox.Text = "";
+                AffixValueTypeRangeMinMaxTextBox.Text = "";
+                AffixValueTypeRangeMaxMinTextBox.Text = "";
+                AffixValueTypeRangeMaxMaxTextBox.Text = "";
             }
             else
             {
@@ -131,6 +136,13 @@ namespace AffixEditor
                 {
                     AffixValueTypeSingleMinTextBox.Text = currentInfo.ValueInfo.BaseValueMin.ToString();
                     AffixValueTypeSingleMaxTextBox.Text = currentInfo.ValueInfo.BaseValueMax.ToString();
+                }
+                else if (currentInfo.ValueType == AffixValueType.Range)
+                {
+                    AffixValueTypeRangeMinMinTextBox.Text = (currentInfo.ValueInfo.BaseValueMin as AffixValueRange).Value.MinValue.ToString();
+                    AffixValueTypeRangeMinMaxTextBox.Text = (currentInfo.ValueInfo.BaseValueMin as AffixValueRange).Value.MaxValue.ToString();
+                    AffixValueTypeRangeMaxMinTextBox.Text = (currentInfo.ValueInfo.BaseValueMax as AffixValueRange).Value.MinValue.ToString();
+                    AffixValueTypeRangeMaxMaxTextBox.Text = (currentInfo.ValueInfo.BaseValueMax as AffixValueRange).Value.MaxValue.ToString();
                 }
             }
         }

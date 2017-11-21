@@ -32,12 +32,14 @@
             this.AffixInfosSearchTextBox = new System.Windows.Forms.TextBox();
             this.MainSplitContainer = new System.Windows.Forms.SplitContainer();
             this.AffixValueTypeSinglePanel = new System.Windows.Forms.Panel();
+            this.AffixValueTypeSingleMaxTextBox = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.AffixValueTypeSingleMinTextBox = new System.Windows.Forms.TextBox();
             this.AffixValueTypeSingleLabel = new System.Windows.Forms.Label();
             this.AffixValueTypeRangePanel = new System.Windows.Forms.Panel();
-            this.AffixValueTypeRangeMaxTextBox = new System.Windows.Forms.TextBox();
+            this.AffixValueTypeRangeMaxMinTextBox = new System.Windows.Forms.TextBox();
             this.AffixValueTypeRangeMaxLabel = new System.Windows.Forms.Label();
-            this.AffixValueTypeRangeMinimumTextBox = new System.Windows.Forms.TextBox();
+            this.AffixValueTypeRangeMinMinTextBox = new System.Windows.Forms.TextBox();
             this.AffixValueTypeRangeMinLabel = new System.Windows.Forms.Label();
             this.AffixInfoDisplaySplitContainer = new System.Windows.Forms.SplitContainer();
             this.AffixNameLabel = new System.Windows.Forms.Label();
@@ -49,10 +51,12 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openDataFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.label1 = new System.Windows.Forms.Label();
-            this.AffixValueTypeSingleMaxTextBox = new System.Windows.Forms.TextBox();
             this.testToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.generateSampleAffixToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.AffixValueTypeRangeMinMaxTextBox = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.AffixValueTypeRangeMaxMaxTextBox = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.MainSplitContainer)).BeginInit();
             this.MainSplitContainer.Panel1.SuspendLayout();
             this.MainSplitContainer.Panel2.SuspendLayout();
@@ -104,8 +108,8 @@
             // 
             // MainSplitContainer.Panel2
             // 
-            this.MainSplitContainer.Panel2.Controls.Add(this.AffixValueTypeSinglePanel);
             this.MainSplitContainer.Panel2.Controls.Add(this.AffixValueTypeRangePanel);
+            this.MainSplitContainer.Panel2.Controls.Add(this.AffixValueTypeSinglePanel);
             this.MainSplitContainer.Panel2.Controls.Add(this.AffixInfoDisplaySplitContainer);
             this.MainSplitContainer.Size = new System.Drawing.Size(834, 527);
             this.MainSplitContainer.SplitterDistance = 296;
@@ -123,6 +127,23 @@
             this.AffixValueTypeSinglePanel.Size = new System.Drawing.Size(528, 287);
             this.AffixValueTypeSinglePanel.TabIndex = 0;
             this.AffixValueTypeSinglePanel.Visible = false;
+            // 
+            // AffixValueTypeSingleMaxTextBox
+            // 
+            this.AffixValueTypeSingleMaxTextBox.Location = new System.Drawing.Point(245, 13);
+            this.AffixValueTypeSingleMaxTextBox.Name = "AffixValueTypeSingleMaxTextBox";
+            this.AffixValueTypeSingleMaxTextBox.Size = new System.Drawing.Size(217, 20);
+            this.AffixValueTypeSingleMaxTextBox.TabIndex = 3;
+            this.AffixValueTypeSingleMaxTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.CheckAffixValueTextBoxInput);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(223, 16);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(16, 13);
+            this.label1.TabIndex = 2;
+            this.label1.Text = "to";
             // 
             // AffixValueTypeSingleMinTextBox
             // 
@@ -143,9 +164,13 @@
             // 
             // AffixValueTypeRangePanel
             // 
-            this.AffixValueTypeRangePanel.Controls.Add(this.AffixValueTypeRangeMaxTextBox);
+            this.AffixValueTypeRangePanel.Controls.Add(this.AffixValueTypeRangeMaxMaxTextBox);
+            this.AffixValueTypeRangePanel.Controls.Add(this.label3);
+            this.AffixValueTypeRangePanel.Controls.Add(this.AffixValueTypeRangeMinMaxTextBox);
+            this.AffixValueTypeRangePanel.Controls.Add(this.label2);
+            this.AffixValueTypeRangePanel.Controls.Add(this.AffixValueTypeRangeMaxMinTextBox);
             this.AffixValueTypeRangePanel.Controls.Add(this.AffixValueTypeRangeMaxLabel);
-            this.AffixValueTypeRangePanel.Controls.Add(this.AffixValueTypeRangeMinimumTextBox);
+            this.AffixValueTypeRangePanel.Controls.Add(this.AffixValueTypeRangeMinMinTextBox);
             this.AffixValueTypeRangePanel.Controls.Add(this.AffixValueTypeRangeMinLabel);
             this.AffixValueTypeRangePanel.Location = new System.Drawing.Point(6, 237);
             this.AffixValueTypeRangePanel.Name = "AffixValueTypeRangePanel";
@@ -153,13 +178,13 @@
             this.AffixValueTypeRangePanel.TabIndex = 2;
             this.AffixValueTypeRangePanel.Visible = false;
             // 
-            // AffixValueTypeRangeMaxTextBox
+            // AffixValueTypeRangeMaxMinTextBox
             // 
-            this.AffixValueTypeRangeMaxTextBox.Location = new System.Drawing.Point(0, 52);
-            this.AffixValueTypeRangeMaxTextBox.Name = "AffixValueTypeRangeMaxTextBox";
-            this.AffixValueTypeRangeMaxTextBox.Size = new System.Drawing.Size(217, 20);
-            this.AffixValueTypeRangeMaxTextBox.TabIndex = 3;
-            this.AffixValueTypeRangeMaxTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.CheckAffixValueTextBoxInput);
+            this.AffixValueTypeRangeMaxMinTextBox.Location = new System.Drawing.Point(0, 52);
+            this.AffixValueTypeRangeMaxMinTextBox.Name = "AffixValueTypeRangeMaxMinTextBox";
+            this.AffixValueTypeRangeMaxMinTextBox.Size = new System.Drawing.Size(217, 20);
+            this.AffixValueTypeRangeMaxMinTextBox.TabIndex = 3;
+            this.AffixValueTypeRangeMaxMinTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.CheckAffixValueTextBoxInput);
             // 
             // AffixValueTypeRangeMaxLabel
             // 
@@ -170,13 +195,13 @@
             this.AffixValueTypeRangeMaxLabel.TabIndex = 2;
             this.AffixValueTypeRangeMaxLabel.Text = "Maximum Value";
             // 
-            // AffixValueTypeRangeMinimumTextBox
+            // AffixValueTypeRangeMinMinTextBox
             // 
-            this.AffixValueTypeRangeMinimumTextBox.Location = new System.Drawing.Point(0, 13);
-            this.AffixValueTypeRangeMinimumTextBox.Name = "AffixValueTypeRangeMinimumTextBox";
-            this.AffixValueTypeRangeMinimumTextBox.Size = new System.Drawing.Size(217, 20);
-            this.AffixValueTypeRangeMinimumTextBox.TabIndex = 1;
-            this.AffixValueTypeRangeMinimumTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.CheckAffixValueTextBoxInput);
+            this.AffixValueTypeRangeMinMinTextBox.Location = new System.Drawing.Point(0, 13);
+            this.AffixValueTypeRangeMinMinTextBox.Name = "AffixValueTypeRangeMinMinTextBox";
+            this.AffixValueTypeRangeMinMinTextBox.Size = new System.Drawing.Size(217, 20);
+            this.AffixValueTypeRangeMinMinTextBox.TabIndex = 1;
+            this.AffixValueTypeRangeMinMinTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.CheckAffixValueTextBoxInput);
             // 
             // AffixValueTypeRangeMinLabel
             // 
@@ -294,23 +319,6 @@
             this.openDataFolderToolStripMenuItem.Text = "Open Data Folder";
             this.openDataFolderToolStripMenuItem.Click += new System.EventHandler(this.openDataFolderToolStripMenuItem_Click);
             // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(223, 16);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(16, 13);
-            this.label1.TabIndex = 2;
-            this.label1.Text = "to";
-            // 
-            // AffixValueTypeSingleMaxTextBox
-            // 
-            this.AffixValueTypeSingleMaxTextBox.Location = new System.Drawing.Point(245, 13);
-            this.AffixValueTypeSingleMaxTextBox.Name = "AffixValueTypeSingleMaxTextBox";
-            this.AffixValueTypeSingleMaxTextBox.Size = new System.Drawing.Size(217, 20);
-            this.AffixValueTypeSingleMaxTextBox.TabIndex = 3;
-            this.AffixValueTypeSingleMaxTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.CheckAffixValueTextBoxInput);
-            // 
             // testToolStripMenuItem
             // 
             this.testToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -325,6 +333,38 @@
             this.generateSampleAffixToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
             this.generateSampleAffixToolStripMenuItem.Text = "Generate Sample Affix";
             this.generateSampleAffixToolStripMenuItem.Click += new System.EventHandler(this.generateSampleAffixToolStripMenuItem_Click);
+            // 
+            // AffixValueTypeRangeMinMaxTextBox
+            // 
+            this.AffixValueTypeRangeMinMaxTextBox.Location = new System.Drawing.Point(245, 13);
+            this.AffixValueTypeRangeMinMaxTextBox.Name = "AffixValueTypeRangeMinMaxTextBox";
+            this.AffixValueTypeRangeMinMaxTextBox.Size = new System.Drawing.Size(217, 20);
+            this.AffixValueTypeRangeMinMaxTextBox.TabIndex = 5;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(223, 16);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(16, 13);
+            this.label2.TabIndex = 4;
+            this.label2.Text = "to";
+            // 
+            // AffixValueTypeRangeMaxMaxTextBox
+            // 
+            this.AffixValueTypeRangeMaxMaxTextBox.Location = new System.Drawing.Point(245, 52);
+            this.AffixValueTypeRangeMaxMaxTextBox.Name = "AffixValueTypeRangeMaxMaxTextBox";
+            this.AffixValueTypeRangeMaxMaxTextBox.Size = new System.Drawing.Size(217, 20);
+            this.AffixValueTypeRangeMaxMaxTextBox.TabIndex = 7;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(223, 55);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(16, 13);
+            this.label3.TabIndex = 6;
+            this.label3.Text = "to";
             // 
             // FormMain
             // 
@@ -377,14 +417,18 @@
         private System.Windows.Forms.Label AffixValueTypeSingleLabel;
         private System.Windows.Forms.TextBox AffixValueTypeSingleMinTextBox;
         private System.Windows.Forms.Panel AffixValueTypeRangePanel;
-        private System.Windows.Forms.TextBox AffixValueTypeRangeMaxTextBox;
+        private System.Windows.Forms.TextBox AffixValueTypeRangeMaxMinTextBox;
         private System.Windows.Forms.Label AffixValueTypeRangeMaxLabel;
-        private System.Windows.Forms.TextBox AffixValueTypeRangeMinimumTextBox;
+        private System.Windows.Forms.TextBox AffixValueTypeRangeMinMinTextBox;
         private System.Windows.Forms.Label AffixValueTypeRangeMinLabel;
         private System.Windows.Forms.TextBox AffixValueTypeSingleMaxTextBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ToolStripMenuItem testToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem generateSampleAffixToolStripMenuItem;
+        private System.Windows.Forms.TextBox AffixValueTypeRangeMaxMaxTextBox;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox AffixValueTypeRangeMinMaxTextBox;
+        private System.Windows.Forms.Label label2;
     }
 }
 
