@@ -38,9 +38,8 @@ public class AffixInfo
         Name = name;
         Description = description;
         ValueInfo = valueInfo;
-
-        //Debug.Log(string.Format("Adding {0} to dictionary", type));
-        AffixInfoDictionary.Add(type, this);
+        
+        AffixInfoDictionary[type] = this;
     }
 
     /// <summary>
