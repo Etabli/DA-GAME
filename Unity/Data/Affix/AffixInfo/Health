@@ -4,12 +4,12 @@
   <Name>Health</Name>
   <Type>Health</Type>
   <ValueInfo>
-    <baseValueMax i:type="AffixValueSingle">
-      <Value>3</Value>
-    </baseValueMax>
-    <baseValueMin i:type="AffixValueSingle">
+    <BaseValueMax i:type="AffixValueSingle">
       <Value>5</Value>
-    </baseValueMin>
+    </BaseValueMax>
+    <BaseValueMin i:type="AffixValueSingle">
+      <Value>3</Value>
+    </BaseValueMin>
     <progression>
       <Parameters xmlns:d4p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
         <d4p1:float>0</d4p1:float>

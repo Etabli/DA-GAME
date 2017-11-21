@@ -101,7 +101,7 @@ public class WorldController : MonoBehaviour {
     {
         if(cell.ParentArea != null)
         {
-            Debug.Log("Area: " + cell.ParentArea.ToString());
+            //Debug.Log("Area: " + cell.ParentArea.ToString());
             foreach(HexCell c in cell.ParentArea.Cells)
             {
                 if (hexCellToGameObjectDictionary.ContainsKey(c))

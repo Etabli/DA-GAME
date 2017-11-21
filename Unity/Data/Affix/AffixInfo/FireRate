@@ -4,12 +4,12 @@
   <Name>Fire Rate</Name>
   <Type>FireRate</Type>
   <ValueInfo>
-    <baseValueMax i:type="AffixValueSingle">
+    <BaseValueMax i:type="AffixValueSingle">
       <Value>0.8</Value>
-    </baseValueMax>
-    <baseValueMin i:type="AffixValueSingle">
+    </BaseValueMax>
+    <BaseValueMin i:type="AffixValueSingle">
       <Value>0.5</Value>
-    </baseValueMin>
+    </BaseValueMin>
     <progression>
       <Parameters xmlns:d4p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
         <d4p1:float>0</d4p1:float>

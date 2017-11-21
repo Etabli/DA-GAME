@@ -39,7 +39,7 @@ public class AffixInfo
         Description = description;
         ValueInfo = valueInfo;
         
-        AffixInfoDictionary[type] = this;
+        affixInfoDictionary[type] = this;
     }
 
     /// <summary>
@@ -64,7 +64,7 @@ public class AffixInfo
     }
 
     #region Static Functionality
-    private static Dictionary<AffixType, AffixInfo> AffixInfoDictionary = new Dictionary<AffixType, AffixInfo>();
+    private static Dictionary<AffixType, AffixInfo> affixInfoDictionary = new Dictionary<AffixType, AffixInfo>();
 
     /// <summary>
     /// Returns the AffixInfo object for a certain AffixType, provided it exists
@@ -75,12 +75,12 @@ public class AffixInfo
         if (type == AffixType.Random)
         {
             System.Random rng = new System.Random();
-            return AffixInfoDictionary.ElementAt(rng.Next() % AffixInfoDictionary.Count).Value;
+            return affixInfoDictionary.ElementAt(rng.Next() % affixInfoDictionary.Count).Value;
         }
 
-        if (AffixInfoDictionary.ContainsKey(type))
+        if (affixInfoDictionary.ContainsKey(type))
         {
-            return AffixInfoDictionary[type];
+            return affixInfoDictionary[type];
         }
         return null;
     }

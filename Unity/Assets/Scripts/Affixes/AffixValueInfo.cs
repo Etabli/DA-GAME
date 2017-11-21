@@ -13,9 +13,9 @@ using System;
 public class AffixValueInfo
 {
     [DataMember]
-    protected AffixValue baseValueMin;
+    public readonly AffixValue BaseValueMin;
     [DataMember]
-    protected AffixValue baseValueMax;
+    public readonly AffixValue BaseValueMax;
     [DataMember]
     protected AffixProgression progression;
 
@@ -24,8 +24,8 @@ public class AffixValueInfo
 
     public AffixValueInfo(AffixValue baseValueMin, AffixValue baseValueMax, AffixProgression progression)
     {
-        this.baseValueMin = baseValueMin;
-        this.baseValueMax = baseValueMax;
+        BaseValueMin = baseValueMin;
+        BaseValueMax = baseValueMax;
         this.progression = progression;        
     }
 
@@ -55,13 +55,13 @@ public class AffixValueInfo
         float frac = rng.Next(101) / 100.0f;
 
         // Progress min and max values before combining them into a random value between them
-        AffixValue progressedMin = prog.Apply(baseValueMin, tier);
+        AffixValue progressedMin = prog.Apply(BaseValueMin, tier);
         if (progressedMin == null)
         {
             // Parameters were invalid
             return null;
         }
-        AffixValue progressedMax = prog.Apply(baseValueMax, tier);
+        AffixValue progressedMax = prog.Apply(BaseValueMax, tier);
 
         //Debug.Log(string.Format("Progressed minimum: {0}, Progressed maximum: {1}, frac: {2}", progressedMin, progressedMax, frac));
 
@@ -70,6 +70,6 @@ public class AffixValueInfo
 
     public override string ToString()
     {
-        return string.Format("{0} - {1}", baseValueMin, baseValueMax);
+        return string.Format("{0} - {1}", BaseValueMin, BaseValueMax);
     }
 }

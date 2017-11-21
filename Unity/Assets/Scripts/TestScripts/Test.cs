@@ -8,7 +8,7 @@ public class Test : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        //AffixInfo healthInfo = new AffixInfo(AffixType.Health, AffixValueType.SingleValue, "Health", new AffixValueInfo(3.0f, 3.0f, new AffixProgression("Linear", 0, 1)), "Increases your health by {0}");
+        //AffixInfo healthInfo = new AffixInfo(AffixType.Health, AffixValueType.SingleValue, "Health", new AffixValueInfo(3.0f, 5.0f, new AffixProgression("Linear", 0, 1)), "Increases your health by {0}");
         //AffixInfo physDmgFlatInfo = new AffixInfo(AffixType.PhysDmgFlat, AffixValueType.Range, "Flat Physical Damage", new AffixValueInfo(new AffixValueRange(1, 1.3f), new AffixValueRange(1.5f, 2f)), "Increases your physical damage by {0}");
         //AffixInfo fireRateInfo = new AffixInfo(AffixType.FireRate, AffixValueType.SingleValue, "Fire Rate", new AffixValueInfo(0.5f, 0.8f), "Increases your fire rate by {0}");
 
@@ -102,12 +102,17 @@ public class Test : MonoBehaviour
         print(c1);
     }
 
+    void TestAffixGeneration()
+    {
+        print(AffixInfo.GenerateAffix(AffixType.Health, 1).ToString());
+    }
+
     // Update is called once per frame
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            TestAffixContainerGraph();
+            TestAffixGeneration();
         }
     }
 }
