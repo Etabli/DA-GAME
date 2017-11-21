@@ -55,9 +55,17 @@ public abstract class Serializer
     /// </summary>
     public static void SaveAffixInfoToDisk(AffixInfo info)
     {
+        SaveAffixInfoToDisk(info, GetPathFromAffixType(info.Type));
+    }
+
+    /// <summary>
+    /// Saves an AffixInfo to disk at a specified location.
+    /// </summary>
+    public static void SaveAffixInfoToDisk(AffixInfo info, string path)
+    {
         string data = SerializeAffixInfo(info);
 
-        FileStream file = new FileStream(GetPathFromAffixType(info.Type), FileMode.Create);
+        FileStream file = new FileStream(path, FileMode.Create);
         StreamWriter writer = new StreamWriter(file);
         writer.Write(data);
         writer.Close();
@@ -67,28 +75,37 @@ public abstract class Serializer
     /// <summary>
     /// Loads info about a certain affix type at disk and automatically calls its constructor so that it is added to the AffixInfoDictionary.
     /// </summary>
-    /// <returns>The AffixInfo object, or null if nothing was found.</returns>
+    /// <returns>The newly constructed AffixInfo object.</returns>
     public static AffixInfo LoadAffixInfoFromDisk(AffixType type)
+    {
+        return LoadAffixInfoFromDisk(GetPathFromAffixType(type));
+    }
+
+    /// <summary>
+    /// Loads the affix info file at the specified location
+    /// </summary>
+    /// <returns>The newly constructed AffixInfo object.</returns>
+    public static AffixInfo LoadAffixInfoFromDisk(string path)
     {
         FileStream file;
         try
         {
-            file = new FileStream(GetPathFromAffixType(type), FileMode.Open);
+            file = new FileStream(path, FileMode.Open);
         }
         catch (FileNotFoundException e)
         {
-            throw new FileNotFoundException("Could not find affix info file!", GetPathFromAffixType(type), e);
+            throw new FileNotFoundException("Could not find affix info file!", path, e);
         }
         catch (Exception e)
         {
-            throw new Exception($"Exception while trying to open affix info file for type {type}!", e);
+            throw new Exception($"Exception while trying to load affix info file at \"{path}\"", e);
         }
 
         StreamReader reader = new StreamReader(file);
         string data = reader.ReadToEnd();
         reader.Close();
         file.Close();
-        // Create new AffixInfo object in order to call its constructor which takes care of setup work
+
         return new AffixInfo(DeserializeAffixInfo(data));
     }
 
