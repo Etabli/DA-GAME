@@ -5,7 +5,6 @@ using System.Text;
 using System.IO;
 using System.Xml;
 using System.Runtime.Serialization;
-using UnityEngine;
 
 public abstract class Serializer
 {
@@ -76,15 +75,13 @@ public abstract class Serializer
         {
             file = new FileStream(GetPathFromAffixType(type), FileMode.Open);
         }
-        catch (FileLoadException e)
-        {
-            Debug.LogError(e.Message);
-            return null;
-        }
         catch (FileNotFoundException e)
         {
-            Debug.LogError(e.Message);
-            return null;
+            throw new FileNotFoundException("Could not find affix info file!", GetPathFromAffixType(type), e);
+        }
+        catch (Exception e)
+        {
+            throw new Exception($"Exception while trying to open affix info file for type {type}!", e);
         }
 
         StreamReader reader = new StreamReader(file);
@@ -133,13 +130,11 @@ public abstract class Serializer
         }
         catch (FileNotFoundException e)
         {
-            Debug.LogError(e.Message);
-            return null;
+            throw new FileNotFoundException("Could not find affix pool file!", AFFIX_POOL_FILE_PATH, e);
         }
         catch (Exception e)
         {
-            Debug.LogError(e.Message);
-            return null;
+            throw new Exception("Exception while trying to open affix pool file!", e);
         }
 
         StreamReader reader = new StreamReader(file);
@@ -215,7 +210,7 @@ public abstract class Serializer
     {
         string data = SerializeBiomeInfo(info);
 
-        Debug.Log(data);
+        //Debug.Log(data);
 
         FileStream file = new FileStream(GetBiomePathFromType(info.Type), FileMode.Create);
         StreamWriter writer = new StreamWriter(file);
@@ -236,15 +231,13 @@ public abstract class Serializer
         {
             file = new FileStream(GetBiomePathFromType(type), FileMode.Open);
         }
-        catch (FileLoadException e)
-        {
-            Debug.LogError(e.Message);
-            return null;
-        }
         catch (FileNotFoundException e)
         {
-            Debug.LogError(e.Message);
-            return null;
+            throw new FileNotFoundException("Could not finde biome info file!", GetBiomePathFromType(type), e);
+        }
+        catch (Exception e)
+        {
+            throw new Exception($"Exception while trying to load biome info from disk for type {type}", e);
         }
 
         StreamReader reader = new StreamReader(file);
