@@ -109,19 +109,39 @@ public abstract class Serializer
         return new AffixInfo(DeserializeAffixInfo(data));
     }
 
+    /// <summary>
+    /// Loads all affix infos from a predefined location
+    /// </summary>
     public static void LoadAllAffixInfosFromDisk()
     {
-        foreach(AffixType type in Enum.GetValues(typeof(AffixType)))
+        LoadAllAffixInfosFromDisk(AFFIX_INFO_FOLDER_PATH);
+    }
+
+    public static void LoadAllAffixInfosFromDisk(string folder)
+    {
+        try
         {
-            if (type == AffixType.None || type == AffixType.Random)
-                continue;
-            LoadAffixInfoFromDisk(type);
+            foreach (AffixType type in Enum.GetValues(typeof(AffixType)))
+            {
+                if (type == AffixType.None || type == AffixType.Random)
+                    continue;
+                LoadAffixInfoFromDisk(folder + GetFileNameFromAffixType(type));
+            }
         }
+        catch (Exception e)
+        {
+            throw new ArgumentException($"{folder} is not a valid affix info folder path!", nameof(folder), e);
+        }
+    }
+
+    private static string GetFileNameFromAffixType(AffixType type)
+    {
+        return type.ToString();
     }
 
     private static string GetPathFromAffixType(AffixType type)
     {
-        return AFFIX_INFO_FOLDER_PATH + type;
+        return AFFIX_INFO_FOLDER_PATH + GetFileNameFromAffixType(type);
     }
     #endregion
 
