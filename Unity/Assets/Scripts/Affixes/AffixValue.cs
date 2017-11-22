@@ -171,6 +171,13 @@ public class AffixValueSingle : AffixValue
     }
     #endregion
 
+    #region Conversions
+    public static implicit operator float(AffixValueSingle value)
+    {
+        return value.Value;
+    }
+    #endregion
+
     public override string ToString()
     {
         return Value.ToString();
