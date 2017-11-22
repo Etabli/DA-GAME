@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Runtime.Serialization;
 using System.Reflection;
 using System.Linq;
+using System;
 
 /// <summary>
 /// Represents a progression function that can be applied to an AffixValue
@@ -64,17 +64,16 @@ public class AffixProgression
     /// in this object
     /// </summary>
     /// <returns>true if the function was found, false otherwise</returns>
-    public bool AttachProgressionFunction()
+    public void AttachProgressionFunction()
     {
         MethodInfo method = GetType().GetMethod(ProgressionFunctionName);
-        if (method != null)
+
+        if (method == null)
         {
-            progressionFunction = method;
-            //Debug.Log(string.Format("Succesfully found progression function '{0}'", ProgressionFunctionName));
-            return true;
+            throw new InvalidProgressionFunctionException($"Could not find progression function with name {ProgressionFunctionName}!");
         }
-        Debug.LogError(string.Format("Couldn't find progression function with name {0}", ProgressionFunctionName));
-        return false;
+
+        progressionFunction = method;
     }
 
     public bool HasProgressionFunction()
@@ -97,16 +96,16 @@ public class AffixProgression
     {
         if (progressionFunction == null)
         {
-            Debug.LogError("No progression function set!");
-            return null;
+            throw new InvalidOperationException("Can't apply progression without a valid progression function set!");
         }
+
         return (AffixValue)progressionFunction.Invoke(null, new object[] { value, tier, Parameters });
     }
 
     #region Static Progression Functions
     // Valid progression functions should follow the signature
     // public static Affixvalue <name>(AffixValue, int, float[])
-    // and return null if the given parameters are invalid
+    // and throw an exception if parameters are invalid
 
     /// <summary>
     /// Simple linear progression of the form y = kx + d
@@ -115,8 +114,7 @@ public class AffixProgression
     {
         if (parameters.Length != 2)
         {
-            Debug.LogError("Linear progression requires exactly 2 parameters!");
-            return null;
+            throw new ArgumentException("Linear progression requires exactly 2 parameters!", nameof(parameters));
         }
         return (parameters[0] + parameters[1] * tier) * value;
     }
@@ -128,10 +126,22 @@ public class AffixProgression
     {
         if (parameters.Length != 1)
         {
-            Debug.LogError("Constant progression requires exactly 1 parameter!");
-            return null;
+            throw new ArgumentException("Constant progression requires exactly 1 parameter!", nameof(parameters));
         }
         return (value * 0) + parameters[0];
+    }
+    #endregion
+
+    #region Exceptions
+    [System.Serializable]
+    public class InvalidProgressionFunctionException : Exception
+    {
+        public InvalidProgressionFunctionException() { }
+        public InvalidProgressionFunctionException(string message) : base(message) { }
+        public InvalidProgressionFunctionException(string message, Exception inner) : base(message, inner) { }
+        protected InvalidProgressionFunctionException(
+          SerializationInfo info,
+          StreamingContext context) : base(info, context) { }
     }
     #endregion
 }

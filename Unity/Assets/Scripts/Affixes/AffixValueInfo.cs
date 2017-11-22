@@ -46,24 +46,15 @@ public class AffixValueInfo
     {
         if (!prog.HasProgressionFunction())
         {
-            if (!prog.AttachProgressionFunction())
-            {
-                //Debug.LogError(string.Format("Invalid progression function set for AffixValueInfo of type {0}", baseValueMin.GetType()));
-                throw new InvalidOperationException("Trying to generate affix value with no or invalid progression function set!");
-            }
+            throw new InvalidOperationException("Trying to generate affix value with no or invalid progression function set!");
         }
         // At this point we are sure that the prog function is set, but not if parameters are valid
 
-        var rng = new System.Random();
+        var rng = new Random();
         float frac = rng.Next(101) / 100.0f;
 
-        // Progress min and max values before combining them into a random value between them
+        // This will raise an exception if parameters are invalid
         AffixValue progressedMin = prog.Apply(BaseValueMin, tier);
-        if (progressedMin == null)
-        {
-            // Parameters were invalid
-            return null;
-        }
         AffixValue progressedMax = prog.Apply(BaseValueMax, tier);
 
         //Debug.Log(string.Format("Progressed minimum: {0}, Progressed maximum: {1}, frac: {2}", progressedMin, progressedMax, frac));
