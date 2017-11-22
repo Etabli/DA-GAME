@@ -128,6 +128,7 @@
             this.SaveAffixInfoButton.TabIndex = 2;
             this.SaveAffixInfoButton.Text = "Save";
             this.SaveAffixInfoButton.UseVisualStyleBackColor = true;
+            this.SaveAffixInfoButton.Click += new System.EventHandler(this.SaveAffixInfoButton_Click);
             // 
             // AffixValueTypeRangePanel
             // 

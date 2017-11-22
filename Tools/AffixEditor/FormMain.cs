@@ -198,7 +198,6 @@ namespace AffixEditor
         #endregion
 
         #region ValueType Range Panel
-        // TODO: Make this prettier
         private void AffixValueTypeRangeMinMinTextBox_TextChanged(object sender, EventArgs e)
         {
             // If the original type wasn't range we don't need to check for changes here
@@ -267,6 +266,11 @@ namespace AffixEditor
         #endregion
 
         #endregion
+
+        private void SaveAffixInfoButton_Click(object sender, EventArgs e)
+        {
+            //TODO: Implement Saving
+        }
 
         #endregion // UI Events
 
