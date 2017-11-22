@@ -18,6 +18,9 @@ public class AffixProgression
 
     protected MethodInfo progressionFunction;
 
+    public AffixProgression(AffixProgression src) : this(src.ProgressionFunctionName, src.Parameters)
+    { }
+
     public AffixProgression(string name, params float[] parameters)
     {
         Parameters = new float[parameters.Length];

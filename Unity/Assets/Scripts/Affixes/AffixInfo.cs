@@ -37,7 +37,7 @@ public class AffixInfo
         ValueType = valueType;
         Name = name;
         Description = description;
-        ValueInfo = valueInfo;
+        ValueInfo = new AffixValueInfo(valueInfo);
         
         affixInfoDictionary[type] = this;
     }
