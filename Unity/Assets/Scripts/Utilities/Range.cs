@@ -37,6 +37,35 @@ public struct Range
     }
     #endregion
 
+    #region Comparison
+    public override bool Equals(object obj)
+    {
+        if (obj is Range)
+            return this == (Range)obj;
+        return base.Equals(obj);
+    }
+
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
+    }
+
+    public static bool operator ==(Range lhs, Range rhs)
+    {
+        if (lhs.MinValue != rhs.MinValue ||
+            lhs.MaxValue != rhs.MaxValue)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    public static bool operator !=(Range lhs, Range rhs)
+    {
+        return !(lhs == rhs);
+    }
+    #endregion
+
     /// <summary>
     /// Returns a random float between MinValue and MaxValue
     /// </summary>

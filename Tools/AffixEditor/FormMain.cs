@@ -19,6 +19,12 @@ namespace AffixEditor
         private List<AffixType> affixTypes;        
         private AffixInfo currentInfo; // A reference to the AffixInfo object we're currently looking at
 
+        // Some variables to check for changes
+        private bool nameChanged;
+        private bool descriptionChanged;
+        private bool progressionChanged;
+        private bool valueTypeChanged;
+
         private string dataPath;
 
         #region Initialization
@@ -57,7 +63,10 @@ namespace AffixEditor
 
         private void PopulateAffixProgressionComboBox()
         {
-            AffixProgressionComboBox.Items.AddRange(typeof(AffixProgression).GetMethods(BindingFlags.Static | BindingFlags.Public).Select(method => method.Name).ToArray());
+            AffixProgressionComboBox.Items.AddRange(typeof(AffixProgression)
+                .GetMethods(BindingFlags.Static | BindingFlags.Public)
+                .Where(method => method.ReturnType == typeof(AffixValue))
+                .Select(method => method.Name).ToArray());
         }
         #endregion
 
@@ -98,8 +107,61 @@ namespace AffixEditor
         private void AffixValueTypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             SwitchAffixValuePanel((AffixValueType)AffixValueTypeComboBox.Items[AffixValueTypeComboBox.SelectedIndex]);
+
+            if (currentInfo.ValueType.ToString() == AffixValueTypeComboBox.Text)
+            {
+                AffixValueTypeLabel.Text = "Type";
+                valueTypeChanged = false;
+            }
+            else
+            {
+                AffixValueTypeLabel.Text = "Type*";
+                valueTypeChanged = true;
+            }
         }
-        #endregion
+
+        private void AffixNameTextBox_TextChanged(object sender, EventArgs e)
+        {
+            if (currentInfo.Name == AffixNameTextBox.Text)
+            {
+                AffixNameLabel.Text = "Name";
+                nameChanged = false;
+            }
+            else
+            {
+                AffixNameLabel.Text = "Name*";
+                nameChanged = true;
+            }
+        }
+
+        private void AffixDescriptionTextBox_TextChanged(object sender, EventArgs e)
+        {
+            if (currentInfo.Description == AffixDescriptionTextBox.Text)
+            {
+                AffixDescriptionLabel.Text = "Description";
+                descriptionChanged = false;
+            }
+            else
+            {
+                AffixDescriptionLabel.Text = "Description*";
+                descriptionChanged = true;
+            }
+        }
+
+        private void AffixProgressionComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (currentInfo.ValueInfo.Progression.GetName() == AffixProgressionComboBox.Text)
+            {
+                AffixProgressionLabel.Text = "Progression";
+                progressionChanged = false;
+            }
+            else
+            {
+                AffixProgressionLabel.Text = "Progression*";
+                progressionChanged = true;
+            }
+        }
+        #endregion // UI Events
 
         /// <summary>
         /// Fills in all forms based on currentInfo
@@ -203,6 +265,15 @@ namespace AffixEditor
         private void generateSampleAffixToolStripMenuItem_Click(object sender, EventArgs e)
         {
             MessageBox.Show(currentInfo.GenerateAffix(1).ToString());
+        }
+
+        private void AffixValueTypeRangeMinMinTextBox_TextChanged(object sender, EventArgs e)
+        {
+            // If the original type wasn't range we don't need to check for changes here
+            if (valueTypeChanged)
+                return;
+
+            AffixValueRange actualValue = currentInfo.ValueInfo.BaseValueMin as AffixValueRange;
         }
     }
 }

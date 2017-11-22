@@ -98,6 +98,52 @@ public class AffixValueSingle : AffixValue
         Value = value;
     }
 
+    #region Comparison
+    public override bool Equals(object obj)
+    {
+        if (obj is AffixValueSingle)
+            return this == (AffixValueSingle)obj;
+        if (obj is float)
+            return this == (float)obj;
+        return base.Equals(obj);
+    }
+
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
+    }
+
+    public static bool operator ==(AffixValueSingle lhs, AffixValueSingle rhs)
+    {
+        return lhs.Value == rhs.Value;
+    }
+
+    public static bool operator !=(AffixValueSingle lhs, AffixValueSingle rhs)
+    {
+        return !(lhs == rhs);
+    }
+
+    public static bool operator ==(AffixValueSingle lhs, float rhs)
+    {
+        return lhs.Value == rhs;
+    }
+
+    public static bool operator !=(AffixValueSingle lhs, float rhs)
+    {
+        return lhs.Value != rhs;
+    }
+
+    public static bool operator ==(float lhs, AffixValueSingle rhs)
+    {
+        return rhs == lhs;
+    }
+
+    public static bool operator !=(float lhs, AffixValueSingle rhs)
+    {
+        return rhs != lhs;
+    }
+    #endregion
+
     #region Operators
     public override AffixValue Invert()
     {
@@ -153,7 +199,53 @@ public class AffixValueRange : AffixValue
         Value = value;
     }
 
-    #region Operators
+    #region Comparison
+    public override bool Equals(object obj)
+    {
+        if (obj is AffixValueRange)
+            return this == (AffixValueRange)obj;
+        if (obj is Range)
+            return this == (Range)obj;
+        return base.Equals(obj);
+    }
+
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
+    }
+
+    public static bool operator ==(AffixValueRange lhs, AffixValueRange rhs)
+    {
+        return lhs == rhs.Value;
+    }
+
+    public static bool operator !=(AffixValueRange lhs, AffixValueRange rhs)
+    {
+        return !(lhs == rhs);
+    }
+
+    public static bool operator ==(AffixValueRange lhs, Range rhs)
+    {
+        return lhs.Value == rhs;
+    }
+
+    public static bool operator !=(AffixValueRange lhs, Range rhs)
+    {
+        return lhs.Value != rhs;
+    }
+
+    public static bool operator ==(Range lhs, AffixValueRange rhs)
+    {
+        return rhs == lhs;
+    }
+
+    public static bool operator !=(Range lhs, AffixValueRange rhs)
+    {
+        return rhs != lhs;
+    }
+    #endregion
+
+    #region Arithmetic Operators
     public override AffixValue Invert()
     {
         return new AffixValueRange(-Value);
@@ -214,6 +306,52 @@ public class AffixValueMultiple : AffixValue
         Values = new float[values.Length];
         values.CopyTo(Values, 0);
     }
+
+    #region Comparison
+    public override bool Equals(object obj)
+    {
+        if (obj is AffixValueMultiple)
+            return this == (AffixValueMultiple)obj;
+        if (obj is float[])
+            return this == (float[])obj;
+        return base.Equals(obj);
+    }
+
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
+    }
+
+    public static bool operator ==(AffixValueMultiple lhs, AffixValueMultiple rhs)
+    {
+        return lhs == rhs.Values;
+    }
+
+    public static bool operator !=(AffixValueMultiple lhs, AffixValueMultiple rhs)
+    {
+        return !(lhs == rhs);
+    }
+
+    public static bool operator ==(AffixValueMultiple lhs, float[] rhs)
+    {
+        return lhs.Values.SequenceEqual(rhs);
+    }
+
+    public static bool operator !=(AffixValueMultiple lhs, float[] rhs)
+    {
+        return !(lhs == rhs);
+    }
+
+    public static bool operator ==(float[] lhs, AffixValueMultiple rhs)
+    {
+        return rhs == lhs;
+    }
+
+    public static bool operator !=(float[] lhs, AffixValueMultiple rhs)
+    {
+        return rhs != lhs;
+    }
+    #endregion
 
     #region Operators
     public override AffixValue Invert()

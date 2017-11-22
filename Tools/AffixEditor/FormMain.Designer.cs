@@ -31,6 +31,7 @@
             this.AffixInfosListBox = new System.Windows.Forms.ListBox();
             this.AffixInfosSearchTextBox = new System.Windows.Forms.TextBox();
             this.MainSplitContainer = new System.Windows.Forms.SplitContainer();
+            this.SaveAffixInfoButton = new System.Windows.Forms.Button();
             this.AffixValueTypeRangePanel = new System.Windows.Forms.Panel();
             this.AffixValueTypeRangeMaxMaxTextBox = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
@@ -50,6 +51,8 @@
             this.AffixDescriptionTextBox = new System.Windows.Forms.TextBox();
             this.AffixDescriptionLabel = new System.Windows.Forms.Label();
             this.AffixNameTextBox = new System.Windows.Forms.TextBox();
+            this.AffixProgressionComboBox = new System.Windows.Forms.ComboBox();
+            this.AffixProgressionLabel = new System.Windows.Forms.Label();
             this.AffixValueTypeComboBox = new System.Windows.Forms.ComboBox();
             this.AffixValueTypeLabel = new System.Windows.Forms.Label();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
@@ -57,8 +60,6 @@
             this.openDataFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.testToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.generateSampleAffixToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.AffixProgressionComboBox = new System.Windows.Forms.ComboBox();
-            this.label4 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.MainSplitContainer)).BeginInit();
             this.MainSplitContainer.Panel1.SuspendLayout();
             this.MainSplitContainer.Panel2.SuspendLayout();
@@ -80,7 +81,7 @@
             this.AffixInfosListBox.FormattingEnabled = true;
             this.AffixInfosListBox.Location = new System.Drawing.Point(3, 29);
             this.AffixInfosListBox.Name = "AffixInfosListBox";
-            this.AffixInfosListBox.Size = new System.Drawing.Size(290, 485);
+            this.AffixInfosListBox.Size = new System.Drawing.Size(290, 446);
             this.AffixInfosListBox.TabIndex = 1;
             this.AffixInfosListBox.SelectedIndexChanged += new System.EventHandler(this.AffixInfosListBox_SelectedIndexChanged);
             // 
@@ -105,6 +106,7 @@
             // 
             // MainSplitContainer.Panel1
             // 
+            this.MainSplitContainer.Panel1.Controls.Add(this.SaveAffixInfoButton);
             this.MainSplitContainer.Panel1.Controls.Add(this.AffixInfosListBox);
             this.MainSplitContainer.Panel1.Controls.Add(this.AffixInfosSearchTextBox);
             // 
@@ -117,6 +119,15 @@
             this.MainSplitContainer.SplitterDistance = 296;
             this.MainSplitContainer.TabIndex = 2;
             this.MainSplitContainer.TabStop = false;
+            // 
+            // SaveAffixInfoButton
+            // 
+            this.SaveAffixInfoButton.Location = new System.Drawing.Point(218, 481);
+            this.SaveAffixInfoButton.Name = "SaveAffixInfoButton";
+            this.SaveAffixInfoButton.Size = new System.Drawing.Size(75, 23);
+            this.SaveAffixInfoButton.TabIndex = 2;
+            this.SaveAffixInfoButton.Text = "Save";
+            this.SaveAffixInfoButton.UseVisualStyleBackColor = true;
             // 
             // AffixValueTypeRangePanel
             // 
@@ -189,6 +200,7 @@
             this.AffixValueTypeRangeMinMinTextBox.Name = "AffixValueTypeRangeMinMinTextBox";
             this.AffixValueTypeRangeMinMinTextBox.Size = new System.Drawing.Size(217, 20);
             this.AffixValueTypeRangeMinMinTextBox.TabIndex = 1;
+            this.AffixValueTypeRangeMinMinTextBox.TextChanged += new System.EventHandler(this.AffixValueTypeRangeMinMinTextBox_TextChanged);
             this.AffixValueTypeRangeMinMinTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.CheckAffixValueTextBoxInput);
             // 
             // AffixValueTypeRangeMinLabel
@@ -264,7 +276,7 @@
             // AffixInfoDisplaySplitContainer.Panel2
             // 
             this.AffixInfoDisplaySplitContainer.Panel2.Controls.Add(this.AffixProgressionComboBox);
-            this.AffixInfoDisplaySplitContainer.Panel2.Controls.Add(this.label4);
+            this.AffixInfoDisplaySplitContainer.Panel2.Controls.Add(this.AffixProgressionLabel);
             this.AffixInfoDisplaySplitContainer.Panel2.Controls.Add(this.AffixValueTypeComboBox);
             this.AffixInfoDisplaySplitContainer.Panel2.Controls.Add(this.AffixValueTypeLabel);
             this.AffixInfoDisplaySplitContainer.Size = new System.Drawing.Size(534, 228);
@@ -292,6 +304,7 @@
             this.AffixDescriptionTextBox.Name = "AffixDescriptionTextBox";
             this.AffixDescriptionTextBox.Size = new System.Drawing.Size(514, 71);
             this.AffixDescriptionTextBox.TabIndex = 3;
+            this.AffixDescriptionTextBox.TextChanged += new System.EventHandler(this.AffixDescriptionTextBox_TextChanged);
             // 
             // AffixDescriptionLabel
             // 
@@ -309,6 +322,26 @@
             this.AffixNameTextBox.Name = "AffixNameTextBox";
             this.AffixNameTextBox.Size = new System.Drawing.Size(217, 20);
             this.AffixNameTextBox.TabIndex = 1;
+            this.AffixNameTextBox.TextChanged += new System.EventHandler(this.AffixNameTextBox_TextChanged);
+            // 
+            // AffixProgressionComboBox
+            // 
+            this.AffixProgressionComboBox.Enabled = false;
+            this.AffixProgressionComboBox.FormattingEnabled = true;
+            this.AffixProgressionComboBox.Location = new System.Drawing.Point(245, 16);
+            this.AffixProgressionComboBox.Name = "AffixProgressionComboBox";
+            this.AffixProgressionComboBox.Size = new System.Drawing.Size(217, 21);
+            this.AffixProgressionComboBox.TabIndex = 3;
+            this.AffixProgressionComboBox.SelectedIndexChanged += new System.EventHandler(this.AffixProgressionComboBox_SelectedIndexChanged);
+            // 
+            // AffixProgressionLabel
+            // 
+            this.AffixProgressionLabel.AutoSize = true;
+            this.AffixProgressionLabel.Location = new System.Drawing.Point(245, 0);
+            this.AffixProgressionLabel.Name = "AffixProgressionLabel";
+            this.AffixProgressionLabel.Size = new System.Drawing.Size(62, 13);
+            this.AffixProgressionLabel.TabIndex = 2;
+            this.AffixProgressionLabel.Text = "Progression";
             // 
             // AffixValueTypeComboBox
             // 
@@ -369,24 +402,6 @@
             this.generateSampleAffixToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
             this.generateSampleAffixToolStripMenuItem.Text = "Generate Sample Affix";
             this.generateSampleAffixToolStripMenuItem.Click += new System.EventHandler(this.generateSampleAffixToolStripMenuItem_Click);
-            // 
-            // AffixProgressionComboBox
-            // 
-            this.AffixProgressionComboBox.Enabled = false;
-            this.AffixProgressionComboBox.FormattingEnabled = true;
-            this.AffixProgressionComboBox.Location = new System.Drawing.Point(245, 16);
-            this.AffixProgressionComboBox.Name = "AffixProgressionComboBox";
-            this.AffixProgressionComboBox.Size = new System.Drawing.Size(217, 21);
-            this.AffixProgressionComboBox.TabIndex = 3;
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(245, 0);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(62, 13);
-            this.label4.TabIndex = 2;
-            this.label4.Text = "Progression";
             // 
             // FormMain
             // 
@@ -452,7 +467,8 @@
         private System.Windows.Forms.TextBox AffixValueTypeRangeMinMaxTextBox;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ComboBox AffixProgressionComboBox;
-        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label AffixProgressionLabel;
+        private System.Windows.Forms.Button SaveAffixInfoButton;
     }
 }
 
