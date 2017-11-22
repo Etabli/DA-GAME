@@ -49,6 +49,11 @@ public class AffixProgression
         return progressionFunction != null;
     }
 
+    public string GetName()
+    {
+        return ProgressionFunctionName;
+    }
+
     /// <summary>
     /// Applies the progression function to an instance of AffixValue
     /// </summary>

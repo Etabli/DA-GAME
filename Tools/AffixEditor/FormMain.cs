@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using System.Reflection;
 
 namespace AffixEditor
 {
@@ -29,6 +30,7 @@ namespace AffixEditor
             InitializeAffixTypeList();
             PopulateAffixInfoListBox();
             PopulateAffixValueTypeComboBox();
+            PopulateAffixProgressionComboBox();
         }
 
         private void InitializeAffixTypeList()
@@ -51,6 +53,11 @@ namespace AffixEditor
         private void PopulateAffixValueTypeComboBox()
         {
             AffixValueTypeComboBox.Items.AddRange(Enum.GetValues(typeof(AffixValueType)).Cast<object>().ToArray());
+        }
+
+        private void PopulateAffixProgressionComboBox()
+        {
+            AffixProgressionComboBox.Items.AddRange(typeof(AffixProgression).GetMethods(BindingFlags.Static | BindingFlags.Public).Select(method => method.Name).ToArray());
         }
         #endregion
 
@@ -110,6 +117,9 @@ namespace AffixEditor
                 AffixValueTypeComboBox.SelectedIndex = 0;
                 AffixValueTypeComboBox.Enabled = false;
 
+                AffixProgressionComboBox.SelectedIndex = 0;
+                AffixProgressionComboBox.Enabled = false;
+
                 AffixValueTypeSinglePanel.Visible = false;
                 AffixValueTypeRangePanel.Visible = false;
 
@@ -131,6 +141,9 @@ namespace AffixEditor
 
                 AffixValueTypeComboBox.SelectedIndex = AffixValueTypeComboBox.Items.IndexOf(currentInfo.ValueType);
                 AffixValueTypeComboBox.Enabled = true;
+
+                AffixProgressionComboBox.SelectedIndex = AffixProgressionComboBox.Items.IndexOf(currentInfo.ValueInfo.Progression.GetName());
+                AffixProgressionComboBox.Enabled = true;
 
                 if (currentInfo.ValueType == AffixValueType.SingleValue)
                 {

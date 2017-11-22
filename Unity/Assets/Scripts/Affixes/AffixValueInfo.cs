@@ -17,7 +17,7 @@ public class AffixValueInfo
     [DataMember]
     public readonly AffixValue BaseValueMax;
     [DataMember]
-    protected AffixProgression progression;
+    public readonly AffixProgression Progression;
 
     public AffixValueInfo(AffixValue baseValueMin, AffixValue baseValueMax) : this(baseValueMin, baseValueMax, new AffixProgression("Linear", 0, 1))
     { }
@@ -26,7 +26,7 @@ public class AffixValueInfo
     {
         BaseValueMin = baseValueMin;
         BaseValueMax = baseValueMax;
-        this.progression = progression;        
+        Progression = progression;        
     }
 
     /// <summary>
@@ -36,7 +36,7 @@ public class AffixValueInfo
     /// <returns></returns>
     public AffixValue GetValueForTier(int tier)
     {
-        return GetValueForTier(tier, progression);
+        return GetValueForTier(tier, Progression);
     }
 
     public AffixValue GetValueForTier(int tier, AffixProgression prog)
