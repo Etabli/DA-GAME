@@ -139,7 +139,7 @@
             this.AffixValueTypeRangePanel.Controls.Add(this.AffixValueTypeRangeMaxLabel);
             this.AffixValueTypeRangePanel.Controls.Add(this.AffixValueTypeRangeMinMinTextBox);
             this.AffixValueTypeRangePanel.Controls.Add(this.AffixValueTypeRangeMinLabel);
-            this.AffixValueTypeRangePanel.Location = new System.Drawing.Point(6, 237);
+            this.AffixValueTypeRangePanel.Location = new System.Drawing.Point(3, 329);
             this.AffixValueTypeRangePanel.Name = "AffixValueTypeRangePanel";
             this.AffixValueTypeRangePanel.Size = new System.Drawing.Size(528, 86);
             this.AffixValueTypeRangePanel.TabIndex = 2;
@@ -151,6 +151,7 @@
             this.AffixValueTypeRangeMaxMaxTextBox.Name = "AffixValueTypeRangeMaxMaxTextBox";
             this.AffixValueTypeRangeMaxMaxTextBox.Size = new System.Drawing.Size(217, 20);
             this.AffixValueTypeRangeMaxMaxTextBox.TabIndex = 7;
+            this.AffixValueTypeRangeMaxMaxTextBox.TextChanged += new System.EventHandler(this.AffixValueTypeRangeMaxMaxTextBox_TextChanged);
             // 
             // label3
             // 
@@ -167,6 +168,7 @@
             this.AffixValueTypeRangeMinMaxTextBox.Name = "AffixValueTypeRangeMinMaxTextBox";
             this.AffixValueTypeRangeMinMaxTextBox.Size = new System.Drawing.Size(217, 20);
             this.AffixValueTypeRangeMinMaxTextBox.TabIndex = 5;
+            this.AffixValueTypeRangeMinMaxTextBox.TextChanged += new System.EventHandler(this.AffixValueTypeRangeMinMaxTextBox_TextChanged);
             // 
             // label2
             // 
@@ -183,6 +185,7 @@
             this.AffixValueTypeRangeMaxMinTextBox.Name = "AffixValueTypeRangeMaxMinTextBox";
             this.AffixValueTypeRangeMaxMinTextBox.Size = new System.Drawing.Size(217, 20);
             this.AffixValueTypeRangeMaxMinTextBox.TabIndex = 3;
+            this.AffixValueTypeRangeMaxMinTextBox.TextChanged += new System.EventHandler(this.AffixValueTypeRangeMaxMinTextBox_TextChanged);
             this.AffixValueTypeRangeMaxMinTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.CheckAffixValueTextBoxInput);
             // 
             // AffixValueTypeRangeMaxLabel
@@ -218,7 +221,7 @@
             this.AffixValueTypeSinglePanel.Controls.Add(this.label1);
             this.AffixValueTypeSinglePanel.Controls.Add(this.AffixValueTypeSingleMinTextBox);
             this.AffixValueTypeSinglePanel.Controls.Add(this.AffixValueTypeSingleLabel);
-            this.AffixValueTypeSinglePanel.Location = new System.Drawing.Point(6, 237);
+            this.AffixValueTypeSinglePanel.Location = new System.Drawing.Point(3, 237);
             this.AffixValueTypeSinglePanel.Name = "AffixValueTypeSinglePanel";
             this.AffixValueTypeSinglePanel.Size = new System.Drawing.Size(528, 86);
             this.AffixValueTypeSinglePanel.TabIndex = 0;
@@ -230,6 +233,7 @@
             this.AffixValueTypeSingleMaxTextBox.Name = "AffixValueTypeSingleMaxTextBox";
             this.AffixValueTypeSingleMaxTextBox.Size = new System.Drawing.Size(217, 20);
             this.AffixValueTypeSingleMaxTextBox.TabIndex = 3;
+            this.AffixValueTypeSingleMaxTextBox.TextChanged += new System.EventHandler(this.AffixValueTypeSingleMaxTextBox_TextChanged);
             this.AffixValueTypeSingleMaxTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.CheckAffixValueTextBoxInput);
             // 
             // label1
@@ -247,6 +251,7 @@
             this.AffixValueTypeSingleMinTextBox.Name = "AffixValueTypeSingleMinTextBox";
             this.AffixValueTypeSingleMinTextBox.Size = new System.Drawing.Size(217, 20);
             this.AffixValueTypeSingleMinTextBox.TabIndex = 1;
+            this.AffixValueTypeSingleMinTextBox.TextChanged += new System.EventHandler(this.AffixValueTypeSingleMinTextBox_TextChanged);
             this.AffixValueTypeSingleMinTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.CheckAffixValueTextBoxInput);
             // 
             // AffixValueTypeSingleLabel

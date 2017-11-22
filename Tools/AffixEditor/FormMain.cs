@@ -19,11 +19,63 @@ namespace AffixEditor
         private List<AffixType> affixTypes;        
         private AffixInfo currentInfo; // A reference to the AffixInfo object we're currently looking at
 
-        // Some variables to check for changes
-        private bool nameChanged;
-        private bool descriptionChanged;
-        private bool progressionChanged;
-        private bool valueTypeChanged;
+        #region Properties
+        // Some properties to check for changes
+        private bool _nameChanged;
+        private bool nameChanged {
+            get
+            {
+                return _nameChanged;
+            }
+            set
+            {
+                _nameChanged = value;
+                if (_nameChanged)
+                    AffixNameLabel.Text = "Name*";
+                else
+                    AffixNameLabel.Text = "Name";
+            }
+        }
+        private bool _descriptionChanged;
+        private bool descriptionChanged
+        {
+            get { return _descriptionChanged; }
+            set
+            {
+                _descriptionChanged = value;
+                if (_descriptionChanged)
+                    AffixDescriptionLabel.Text = "Description*";
+                else
+                    AffixDescriptionLabel.Text = "Description";
+            }
+        }
+        private bool _progressionChanged;
+        private bool progressionChanged
+        {
+            get { return _progressionChanged; }
+            set
+            {
+                _progressionChanged = value;
+                if (_progressionChanged)
+                    AffixProgressionLabel.Text = "Progression*";
+                else
+                    AffixProgressionLabel.Text = "Progression";
+            }
+        }
+        private bool _valueTypeChanged;
+        private bool valueTypeChanged
+        {
+            get { return _valueTypeChanged; }
+            set
+            {
+                _valueTypeChanged = value;
+                if (_valueTypeChanged)
+                    AffixValueTypeLabel.Text = "Type*";
+                else
+                    AffixValueTypeLabel.Text = "Type";
+            }
+        }
+        #endregion
 
         private string dataPath;
 
@@ -71,6 +123,8 @@ namespace AffixEditor
         #endregion
 
         #region UI Events
+
+        #region Main
         private void AffixInfosSearchTextBox_TextChanged(object sender, EventArgs e)
         {
             AffixInfosListBox.Items.Clear();
@@ -103,64 +157,117 @@ namespace AffixEditor
                 Serializer.LoadAllAffixInfosFromDisk(dataPath + "Affix\\AffixInfo\\");
             }
         }
+        #endregion
 
+        #region Affix Info
+
+        #region Name, Description, ValueType, Progression
         private void AffixValueTypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            SwitchAffixValuePanel((AffixValueType)AffixValueTypeComboBox.Items[AffixValueTypeComboBox.SelectedIndex]);
+            SwitchAffixValuePanel();
 
             if (currentInfo.ValueType.ToString() == AffixValueTypeComboBox.Text)
-            {
-                AffixValueTypeLabel.Text = "Type";
                 valueTypeChanged = false;
-            }
             else
-            {
-                AffixValueTypeLabel.Text = "Type*";
                 valueTypeChanged = true;
-            }
         }
 
         private void AffixNameTextBox_TextChanged(object sender, EventArgs e)
         {
             if (currentInfo.Name == AffixNameTextBox.Text)
-            {
-                AffixNameLabel.Text = "Name";
                 nameChanged = false;
-            }
             else
-            {
-                AffixNameLabel.Text = "Name*";
                 nameChanged = true;
-            }
         }
 
         private void AffixDescriptionTextBox_TextChanged(object sender, EventArgs e)
         {
             if (currentInfo.Description == AffixDescriptionTextBox.Text)
-            {
-                AffixDescriptionLabel.Text = "Description";
                 descriptionChanged = false;
-            }
             else
-            {
-                AffixDescriptionLabel.Text = "Description*";
                 descriptionChanged = true;
-            }
         }
 
         private void AffixProgressionComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (currentInfo.ValueInfo.Progression.GetName() == AffixProgressionComboBox.Text)
-            {
-                AffixProgressionLabel.Text = "Progression";
                 progressionChanged = false;
-            }
             else
-            {
-                AffixProgressionLabel.Text = "Progression*";
                 progressionChanged = true;
-            }
         }
+        #endregion
+
+        #region ValueType Range Panel
+        // TODO: Make this prettier
+        private void AffixValueTypeRangeMinMinTextBox_TextChanged(object sender, EventArgs e)
+        {
+            // If the original type wasn't range we don't need to check for changes here
+            if (valueTypeChanged)
+                return;
+
+            ValidateFloatTextBoxText(sender as TextBox, (currentInfo.ValueInfo.BaseValueMin as AffixValueRange).Value.MinValue.ToString());
+
+            CheckAffixValueTypeRangeMinChanged();
+        }
+
+        private void AffixValueTypeRangeMinMaxTextBox_TextChanged(object sender, EventArgs e)
+        {
+            // If the original type wasn't range we don't need to check for changes here
+            if (valueTypeChanged)
+                return;
+
+            ValidateFloatTextBoxText(sender as TextBox, (currentInfo.ValueInfo.BaseValueMin as AffixValueRange).Value.MaxValue.ToString());
+
+            CheckAffixValueTypeRangeMinChanged();
+        }
+
+        private void AffixValueTypeRangeMaxMinTextBox_TextChanged(object sender, EventArgs e)
+        {
+            // If the original type wasn't range we don't need to check for changes here
+            if (valueTypeChanged)
+                return;
+            
+            ValidateFloatTextBoxText(sender as TextBox, (currentInfo.ValueInfo.BaseValueMax as AffixValueRange).Value.MinValue.ToString());
+
+            CheckAffixValueTypeRangeMaxChanged();
+        }
+
+        private void AffixValueTypeRangeMaxMaxTextBox_TextChanged(object sender, EventArgs e)
+        {
+            // If the original type wasn't range we don't need to check for changes here
+            if (valueTypeChanged)
+                return;
+
+            ValidateFloatTextBoxText(sender as TextBox, (currentInfo.ValueInfo.BaseValueMax as AffixValueRange).Value.MaxValue.ToString());
+
+            CheckAffixValueTypeRangeMaxChanged();
+        }
+        #endregion
+
+        #region ValueType Single Panel
+        private void AffixValueTypeSingleMinTextBox_TextChanged(object sender, EventArgs e)
+        {
+            // If the original type wasn't single we don't need to check for changes here
+            if (valueTypeChanged)
+                return;
+
+            ValidateFloatTextBoxText(sender as TextBox, (currentInfo.ValueInfo.BaseValueMin as AffixValueSingle).ToString());
+            CheckAffixValueTypeSingleChanged();
+        }
+
+        private void AffixValueTypeSingleMaxTextBox_TextChanged(object sender, EventArgs e)
+        {
+            // If the original type wasn't single we don't need to check for changes here
+            if (valueTypeChanged)
+                return;
+
+            ValidateFloatTextBoxText(sender as TextBox, (currentInfo.ValueInfo.BaseValueMax as AffixValueSingle).ToString());
+            CheckAffixValueTypeSingleChanged();
+        }
+        #endregion
+
+        #endregion
+
         #endregion // UI Events
 
         /// <summary>
@@ -222,15 +329,19 @@ namespace AffixEditor
             }
         }
 
-        private void SwitchAffixValuePanel(AffixValueType type)
+        private void SwitchAffixValuePanel()
         {
+            AffixValueType type = (AffixValueType)Enum.Parse(typeof(AffixValueType), AffixValueTypeComboBox.Text);
+
             if (type == AffixValueType.SingleValue)
             {
+                AffixValueTypeSinglePanel.Location = new Point(6, 237);
                 AffixValueTypeSinglePanel.Visible = true;
                 AffixValueTypeRangePanel.Visible = false;
             }
             else if (type == AffixValueType.Range)
             {
+                AffixValueTypeRangePanel.Location = new Point(6, 237);
                 AffixValueTypeRangePanel.Visible = true;
                 AffixValueTypeSinglePanel.Visible = false;
             }
@@ -266,14 +377,83 @@ namespace AffixEditor
         {
             MessageBox.Show(currentInfo.GenerateAffix(1).ToString());
         }
-
-        private void AffixValueTypeRangeMinMinTextBox_TextChanged(object sender, EventArgs e)
+        
+        private void CheckAffixValueTypeRangeMinChanged()
         {
-            // If the original type wasn't range we don't need to check for changes here
-            if (valueTypeChanged)
+            string labelText = "Minimum Value";
+            if (currentInfo.ValueType != AffixValueType.Range)
+            {
+                AffixValueTypeRangeMinLabel.Text = labelText + "*";
                 return;
+            }
 
-            AffixValueRange actualValue = currentInfo.ValueInfo.BaseValueMin as AffixValueRange;
+            // Check if both textboxes are already filled
+            if (AffixValueTypeRangeMinMinTextBox.Text == "" || AffixValueTypeRangeMinMaxTextBox.Text == "")
+            {
+                AffixValueTypeRangeMinLabel.Text = labelText;
+                return;
+            }
+
+            Range original = (currentInfo.ValueInfo.BaseValueMin as AffixValueRange).Value;
+            Range current = new Range(float.Parse(AffixValueTypeRangeMinMinTextBox.Text), float.Parse(AffixValueTypeRangeMinMaxTextBox.Text));
+            UpdateAffixValueLabel(AffixValueTypeRangeMinLabel, original, current, labelText);
+        }
+
+        private void CheckAffixValueTypeRangeMaxChanged()
+        {
+            string labelText = "Maximum Value";
+            if (currentInfo.ValueType != AffixValueType.Range)
+            {
+                AffixValueTypeRangeMaxLabel.Text = labelText + "*";
+                return;
+            }
+
+            // Check if both textboxes are already filled
+            if (AffixValueTypeRangeMaxMinTextBox.Text == "" || AffixValueTypeRangeMaxMaxTextBox.Text == "")
+            {
+                AffixValueTypeRangeMaxLabel.Text = labelText;
+                return;
+            }
+
+            Range original = (currentInfo.ValueInfo.BaseValueMax as AffixValueRange).Value;
+            Range current = new Range(float.Parse(AffixValueTypeRangeMaxMinTextBox.Text), float.Parse(AffixValueTypeRangeMaxMaxTextBox.Text));
+            UpdateAffixValueLabel(AffixValueTypeRangeMaxLabel, original, current, labelText);
+        }
+
+        private void CheckAffixValueTypeSingleChanged()
+        {
+            string labelText = "Value";
+            if (currentInfo.ValueType != AffixValueType.SingleValue)
+            {
+                AffixValueTypeSingleLabel.Text = labelText + "*";
+            }
+
+            // Check if both textboxes are already filled
+            if (AffixValueTypeSingleMinTextBox.Text == "" || AffixValueTypeSingleMaxTextBox.Text == "")
+            {
+                AffixValueTypeSingleLabel.Text = labelText;
+                return;
+            }
+
+            Range original = new Range(currentInfo.ValueInfo.BaseValueMin as AffixValueSingle, currentInfo.ValueInfo.BaseValueMax as AffixValueSingle);
+            Range current = new Range(float.Parse(AffixValueTypeSingleMinTextBox.Text), float.Parse(AffixValueTypeSingleMaxTextBox.Text));
+            UpdateAffixValueLabel(AffixValueTypeSingleLabel, original, current, labelText);
+        }
+
+        private void UpdateAffixValueLabel(Label label, Range original, Range current, string labelText)
+        {
+            if (original == current)
+                label.Text = labelText;
+            else
+                label.Text = labelText + "*";
+        }
+
+        private void ValidateFloatTextBoxText(TextBox textBox, string defaultText)
+        {
+            if (!float.TryParse(textBox.Text, out _))
+            {
+                textBox.Text = defaultText;
+            }
         }
     }
 }
