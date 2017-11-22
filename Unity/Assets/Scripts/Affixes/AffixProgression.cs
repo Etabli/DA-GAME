@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Runtime.Serialization;
 using System.Reflection;
+using System.Linq;
 
 /// <summary>
 /// Represents a progression function that can be applied to an AffixValue
@@ -25,6 +26,35 @@ public class AffixProgression
 
         AttachProgressionFunction();
     }
+
+    #region Comparison
+    public override bool Equals(object obj)
+    {
+        if (obj is AffixProgression)
+            return this == (AffixProgression)obj;
+        return base.Equals(obj);
+    }
+
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
+    }
+
+    public static bool operator==(AffixProgression lhs, AffixProgression rhs)
+    {
+        if (lhs.ProgressionFunctionName != rhs.ProgressionFunctionName ||
+            !lhs.Parameters.SequenceEqual(rhs.Parameters))
+        {
+            return false;
+        }
+        return true;
+    }
+
+    public static bool operator!=(AffixProgression lhs, AffixProgression rhs)
+    {
+        return !(lhs == rhs);
+    }
+    #endregion
 
     /// <summary>
     /// Tries to find a function of this class through name and store a reference to its MethodInfo
