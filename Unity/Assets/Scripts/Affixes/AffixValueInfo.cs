@@ -32,6 +32,36 @@ public class AffixValueInfo
         Progression = new AffixProgression(progression);
     }
 
+    #region Comparison
+    public override bool Equals(object obj)
+    {
+        if (obj is AffixValueInfo)
+            return this == (AffixValueInfo)obj;
+        return base.Equals(obj);
+    }
+
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
+    }
+
+    public static bool operator==(AffixValueInfo lhs, AffixValueInfo rhs)
+    {
+        if (lhs.BaseValueMin != rhs.BaseValueMin ||
+            lhs.BaseValueMax != rhs.BaseValueMax ||
+            lhs.Progression != rhs.Progression)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    public static bool operator!=(AffixValueInfo lhs, AffixValueInfo rhs)
+    {
+        return !(lhs == rhs);
+    }
+    #endregion
+
     /// <summary>
     /// Generates an AffixValue of this type given a tier.
     /// </summary>
