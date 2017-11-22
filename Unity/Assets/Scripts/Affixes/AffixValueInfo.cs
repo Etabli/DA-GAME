@@ -57,8 +57,6 @@ public class AffixValueInfo
         AffixValue progressedMin = prog.Apply(BaseValueMin, tier);
         AffixValue progressedMax = prog.Apply(BaseValueMax, tier);
 
-        //Debug.Log(string.Format("Progressed minimum: {0}, Progressed maximum: {1}, frac: {2}", progressedMin, progressedMax, frac));
-
         return progressedMin + (progressedMax - progressedMin) * frac;
     }
 

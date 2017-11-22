@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
 
 /// <summary>
@@ -41,8 +40,7 @@ public class AffixContainer
         {
             if (affixTypeMap[affix.Type].Contains(affix))
             {
-                Debug.LogError($"Container already contains this affix! {affix}");
-                return;
+                throw new ArgumentException($"Container already contains this affix! {affix}", nameof(affix));
             }
             affixTypeMap[affix.Type].Add(affix);
         }
@@ -61,15 +59,13 @@ public class AffixContainer
     {
         if (!affixTypeMap.ContainsKey(affix.Type))
         {
-            Debug.LogError($"Could not find affix of type {affix.Type}");
-            return;
+            throw new ArgumentException($"Could not find affix of type {affix.Type}", nameof(affix));
         }
 
         // This tries to remove and returns whether or not it was successful
         if (!affixTypeMap[affix.Type].Remove(affix))
         {
-            Debug.LogError($"Could not find affix \"{affix}\"");
-            return;
+            throw new ArgumentException($"Could not find affix \"{affix}\"", nameof(affix));
         }
 
         PropagateRemove(affix);
@@ -94,20 +90,17 @@ public class AffixContainer
     {
         if (child.parent != null)
         {
-            Debug.LogError("Child already has a parent!");
-            return;
+            throw new InvalidOperationException("Child already has a parent!");
         }
 
         if (child == this)
         {
-            Debug.LogError("Can't append self as child!");
-            return;
+            throw new InvalidOperationException("Can't append self as child!");
         }
 
         if (CheckChildProducesLoop(child))
         {
-            Debug.LogError("Adding this child would produce a loop!");
-            return;
+            throw new InvalidOperationException("Adding this child would produce a loop!");
         }
 
         children.Add(child);

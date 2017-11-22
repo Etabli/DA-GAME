@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Runtime.Serialization;
 using System.IO;
 using System;
@@ -160,7 +159,6 @@ public class AffixPool
             if (type == AffixType.None)
             {
                 // We've run out of AffixTypes to draw from
-                Debug.Log("Ran out of affix types while drawing from pool");
                 break;
             }
 
@@ -188,11 +186,6 @@ public class AffixPool
 
     public static void RegisterPresetPool(AffixPoolPreset preset, AffixPool pool)
     {
-        if (PresetPools.ContainsKey(preset))
-        {
-            Debug.LogError(string.Format("AffixPool for slot {0} is already assigned!", preset));
-            return;
-        }
         PresetPools[preset] = pool;
     }
 
@@ -207,7 +200,6 @@ public class AffixPool
         {
             return PresetPools[preset];
         }
-        Debug.LogError(string.Format("No AffixPool registered for slot {0}!", preset));
         return null;
     }
 
