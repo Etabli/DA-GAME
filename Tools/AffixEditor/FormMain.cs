@@ -19,6 +19,8 @@ namespace AffixEditor
         private List<AffixType> affixTypes;        
         private AffixInfo currentInfo; // A reference to the AffixInfo object we're currently looking at
 
+        private float[] changedParameters;
+
         #region Properties
         // Some properties to check for changes
         private bool _nameChanged;
@@ -218,12 +220,9 @@ namespace AffixEditor
 
         private void AffixProgressionComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (currentInfo.ValueInfo.Progression.GetName() == AffixProgressionComboBox.Text)
-                progressionChanged = false;
-            else
-                progressionChanged = true;
+            CheckAffixProgressionChanged();
         }
-        #endregion
+        #endregion // Name, Description, ValueType, Progression
 
         private void EditProgressionParametersButton_Click(object sender, EventArgs e)
         {
@@ -235,11 +234,12 @@ namespace AffixEditor
 
             if (paramEditor.ShowDialog() == DialogResult.OK)
             {
-                MessageBox.Show(paramEditor.Parameters.Aggregate("", (output, val) => output + ", " + val.ToString()).Trim(',', ' '));                
+                changedParameters = paramEditor.Parameters;
+                CheckAffixProgressionChanged();
             }
         }
 
-        #endregion
+        #endregion // Affix Info
 
         private void SaveAffixInfoButton_Click(object sender, EventArgs e)
         {
@@ -343,7 +343,8 @@ namespace AffixEditor
         {
             MessageBox.Show(currentInfo.GenerateAffix(1).ToString());
         }
-        
+
+        #region Change Checking
         private void CheckAffixValueTypeRangeMinChanged()
         {
             Range original = (currentInfo.ValueInfo.BaseValueMin as AffixValueRange).Value;
@@ -378,5 +379,11 @@ namespace AffixEditor
             else
                 label.Text = labelText + "*";
         }
+
+        private void CheckAffixProgressionChanged()
+        {
+            progressionChanged = currentInfo.ValueInfo.Progression != new AffixProgression(AffixProgressionComboBox.Text, changedParameters);
+        }
+        #endregion
     }
 }
