@@ -9,23 +9,24 @@ using System;
 /// Represents a progression function that can be applied to an AffixValue
 /// </summary>
 [DataContract]
-public class AffixProgression
+public struct AffixProgression
 {
     [DataMember]
     public float[] Parameters;
     [DataMember]
     public string ProgressionFunctionName;
 
-    protected MethodInfo progressionFunction;
+    private MethodInfo progressionFunction;
 
     public AffixProgression(AffixProgression src) : this(src.ProgressionFunctionName, src.Parameters)
     { }
 
     public AffixProgression(string name, params float[] parameters)
-    {
+    { 
         Parameters = new float[parameters.Length];
         parameters.CopyTo(Parameters, 0);
         ProgressionFunctionName = name;
+        progressionFunction = null;
 
         AttachProgressionFunction();
     }
@@ -100,6 +101,11 @@ public class AffixProgression
         }
 
         return (AffixValue)progressionFunction.Invoke(null, new object[] { value, tier, Parameters });
+    }
+
+    public override string ToString()
+    {
+        return Parameters.Aggregate(ProgressionFunctionName, (output, value) => output + ", " + value.ToString());
     }
 
     #region Static Progression Functions
