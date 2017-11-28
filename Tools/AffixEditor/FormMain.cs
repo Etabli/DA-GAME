@@ -19,7 +19,7 @@ namespace AffixEditor
         private List<AffixType> affixTypes;        
         private AffixInfo currentInfo; // A reference to the AffixInfo object we're currently looking at
 
-        private float[] changedParameters;
+        private float[] progressionParameters = new float[0];
 
         #region Properties
         // Some properties to check for changes
@@ -234,7 +234,7 @@ namespace AffixEditor
 
             if (paramEditor.ShowDialog() == DialogResult.OK)
             {
-                changedParameters = paramEditor.Parameters;
+                progressionParameters = paramEditor.Parameters;
                 CheckAffixProgressionChanged();
             }
         }
@@ -288,6 +288,10 @@ namespace AffixEditor
                 AffixValueTypeComboBox.SelectedIndex = AffixValueTypeComboBox.Items.IndexOf(currentInfo.ValueType);
                 AffixValueTypeComboBox.Enabled = true;
 
+                // Copy parameters first since changing the combobox index calls the SelectedIndexChanged event
+                // at which point we already compare the original values to our local copy
+                progressionParameters = new float[currentInfo.ValueInfo.Progression.Parameters.Length];
+                currentInfo.ValueInfo.Progression.Parameters.CopyTo(progressionParameters, 0);
                 AffixProgressionComboBox.SelectedIndex = AffixProgressionComboBox.Items.IndexOf(currentInfo.ValueInfo.Progression.GetName());
                 AffixProgressionComboBox.Enabled = true;
 
@@ -382,7 +386,7 @@ namespace AffixEditor
 
         private void CheckAffixProgressionChanged()
         {
-            progressionChanged = currentInfo.ValueInfo.Progression != new AffixProgression(AffixProgressionComboBox.Text, changedParameters);
+            progressionChanged = currentInfo.ValueInfo.Progression != new AffixProgression(AffixProgressionComboBox.Text, progressionParameters);
         }
         #endregion
     }
