@@ -51,6 +51,7 @@
             this.AffixDescriptionTextBox = new System.Windows.Forms.TextBox();
             this.AffixDescriptionLabel = new System.Windows.Forms.Label();
             this.AffixNameTextBox = new System.Windows.Forms.TextBox();
+            this.EditProgressionParametersButton = new System.Windows.Forms.Button();
             this.AffixProgressionComboBox = new System.Windows.Forms.ComboBox();
             this.AffixProgressionLabel = new System.Windows.Forms.Label();
             this.AffixValueTypeComboBox = new System.Windows.Forms.ComboBox();
@@ -60,7 +61,6 @@
             this.openDataFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.testToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.generateSampleAffixToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.EditProgressionParametersButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.MainSplitContainer)).BeginInit();
             this.MainSplitContainer.Panel1.SuspendLayout();
             this.MainSplitContainer.Panel2.SuspendLayout();
@@ -322,6 +322,16 @@
             this.AffixNameTextBox.TabIndex = 1;
             this.AffixNameTextBox.TextChanged += new System.EventHandler(this.AffixNameTextBox_TextChanged);
             // 
+            // EditProgressionParametersButton
+            // 
+            this.EditProgressionParametersButton.Location = new System.Drawing.Point(245, 43);
+            this.EditProgressionParametersButton.Name = "EditProgressionParametersButton";
+            this.EditProgressionParametersButton.Size = new System.Drawing.Size(108, 23);
+            this.EditProgressionParametersButton.TabIndex = 4;
+            this.EditProgressionParametersButton.Text = "Edit Parameters";
+            this.EditProgressionParametersButton.UseVisualStyleBackColor = true;
+            this.EditProgressionParametersButton.Click += new System.EventHandler(this.EditProgressionParametersButton_Click);
+            // 
             // AffixProgressionComboBox
             // 
             this.AffixProgressionComboBox.Enabled = false;
@@ -400,15 +410,6 @@
             this.generateSampleAffixToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
             this.generateSampleAffixToolStripMenuItem.Text = "Generate Sample Affix";
             this.generateSampleAffixToolStripMenuItem.Click += new System.EventHandler(this.generateSampleAffixToolStripMenuItem_Click);
-            // 
-            // EditProgressionParametersButton
-            // 
-            this.EditProgressionParametersButton.Location = new System.Drawing.Point(245, 43);
-            this.EditProgressionParametersButton.Name = "EditProgressionParametersButton";
-            this.EditProgressionParametersButton.Size = new System.Drawing.Size(108, 23);
-            this.EditProgressionParametersButton.TabIndex = 4;
-            this.EditProgressionParametersButton.Text = "Edit Parameters";
-            this.EditProgressionParametersButton.UseVisualStyleBackColor = true;
             // 
             // FormMain
             // 

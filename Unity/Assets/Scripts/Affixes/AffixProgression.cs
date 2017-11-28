@@ -103,6 +103,9 @@ public class AffixProgression
     }
 
     #region Static Progression Functions
+    /// <summary>
+    /// Defines how many parameters each progression function expects
+    /// </summary>
     public static Dictionary<string, int> ParameterRequirements = new Dictionary<string, int>
     {
         {nameof(Constant), 1},

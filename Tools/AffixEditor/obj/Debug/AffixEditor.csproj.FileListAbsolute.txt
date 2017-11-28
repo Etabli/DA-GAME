@@ -12,3 +12,4 @@ E:\Daten von Dominik\Git Repos\DA_GAME\Tools\AffixEditor\obj\Debug\AffixEditor.c
 E:\Daten von Dominik\Git Repos\DA_GAME\Tools\AffixEditor\obj\Debug\AffixEditor.exe
 E:\Daten von Dominik\Git Repos\DA_GAME\Tools\AffixEditor\obj\Debug\AffixEditor.pdb
 E:\Daten von Dominik\Git Repos\DA_GAME\Tools\AffixEditor\obj\Debug\AffixEditor.FormMain.resources
+E:\Daten von Dominik\Git Repos\DA_GAME\Tools\AffixEditor\obj\Debug\AffixEditor.EditProgressionParametersForm.resources

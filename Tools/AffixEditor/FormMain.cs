@@ -224,14 +224,27 @@ namespace AffixEditor
                 progressionChanged = true;
         }
         #endregion
-        
+
+        private void EditProgressionParametersButton_Click(object sender, EventArgs e)
+        {
+            EditProgressionParametersForm paramEditor;
+            if (progressionChanged)
+                paramEditor = new EditProgressionParametersForm(AffixProgression.ParameterRequirements[AffixProgressionComboBox.Text]);
+            else
+                paramEditor = new EditProgressionParametersForm(currentInfo.ValueInfo.Progression.Parameters);
+
+            if (paramEditor.ShowDialog() == DialogResult.OK)
+            {
+                MessageBox.Show("Good job");
+            }
+        }
+
         #endregion
 
         private void SaveAffixInfoButton_Click(object sender, EventArgs e)
         {
             //TODO: Implement Saving
         }
-
         #endregion // UI Events
 
         /// <summary>
