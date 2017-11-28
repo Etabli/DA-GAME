@@ -12,9 +12,9 @@ using System;
 public struct AffixProgression
 {
     [DataMember]
-    public float[] Parameters;
+    public readonly float[] Parameters;
     [DataMember]
-    public string ProgressionFunctionName;
+    public readonly string ProgressionFunctionName;
 
     private MethodInfo progressionFunction;
 
