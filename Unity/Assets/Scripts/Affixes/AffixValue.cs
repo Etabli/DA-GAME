@@ -194,7 +194,20 @@ public class AffixValueSingle : AffixValue
 public class AffixValueRange : AffixValue
 {
     [DataMember]
-    public Range Value { get; protected set; }
+    public Range Value;
+
+    public float MinValue
+    {
+        get { return Value.MinValue; }
+        set { Value.MinValue = value; }
+    }
+
+    public float MaxValue
+    {
+        get { return Value.MaxValue; }
+        set { Value.MaxValue = value; }
+
+    }
 
     public AffixValueRange()
     {}
@@ -286,6 +299,18 @@ public class AffixValueRange : AffixValue
     public static AffixValueRange operator+(AffixValueRange lhs, Range rhs)
     {
         return new AffixValueRange() { Value = lhs.Value + rhs };
+    }
+    #endregion
+
+    #region Converions
+    public static implicit operator Range(AffixValueRange value)
+    {
+        return value.Value;
+    }
+
+    public static implicit operator AffixValueRange(Range value)
+    {
+        return new AffixValueRange(value);
     }
     #endregion
 
