@@ -103,32 +103,38 @@ public class AffixProgression
     }
 
     #region Static Progression Functions
+    public static Dictionary<string, int> ParameterRequirements = new Dictionary<string, int>
+    {
+        {nameof(Constant), 1},
+        {nameof(Linear), 2}
+    };
+
     // Valid progression functions should follow the signature
     // public static Affixvalue <name>(AffixValue, int, float[])
     // and throw an exception if parameters are invalid
-
-    /// <summary>
-    /// Simple linear progression of the form y = kx + d
-    /// </summary>
-    public static AffixValue Linear(AffixValue value, int tier, float[] parameters)
-    {
-        if (parameters.Length != 2)
-        {
-            throw new ArgumentException("Linear progression requires exactly 2 parameters!", nameof(parameters));
-        }
-        return (parameters[0] + parameters[1] * tier) * value;
-    }
 
     /// <summary>
     /// Always returns the single parameter as result
     /// </summary>
     public static AffixValue Constant(AffixValue value, int tier, float[] parameters)
     {
-        if (parameters.Length != 1)
+        if (parameters.Length != ParameterRequirements[nameof(Constant)])
         {
             throw new ArgumentException("Constant progression requires exactly 1 parameter!", nameof(parameters));
         }
         return (value * 0) + parameters[0];
+    }
+
+    /// <summary>
+    /// Simple linear progression of the form y = kx + d
+    /// </summary>
+    public static AffixValue Linear(AffixValue value, int tier, float[] parameters)
+    {
+        if (parameters.Length != ParameterRequirements[nameof(Linear)])
+        {
+            throw new ArgumentException("Linear progression requires exactly 2 parameters!", nameof(parameters));
+        }
+        return (parameters[0] + parameters[1] * tier) * value;
     }
     #endregion
 
