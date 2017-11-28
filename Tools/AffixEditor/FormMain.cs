@@ -84,11 +84,39 @@ namespace AffixEditor
         {
             InitializeComponent();
 
+            WrapFloatTextBoxes();
+
             Serializer.LoadAllAffixInfosFromDisk();
             InitializeAffixTypeList();
             PopulateAffixInfoListBox();
             PopulateAffixValueTypeComboBox();
             PopulateAffixProgressionComboBox();
+        }
+
+        /// <summary>
+        /// Wraps all text boxes for floats in a validator and registers the proper events
+        /// </summary>
+        private void WrapFloatTextBoxes()
+        {
+            // Value type single
+            var validator = FloatTextBoxValidator.Create(AffixValueTypeSingleMinTextBox, "0");
+            validator.TextChanged += textbox => CheckAffixValueTypeSingleChanged();
+
+            validator = FloatTextBoxValidator.Create(AffixValueTypeSingleMaxTextBox, "0");
+            validator.TextChanged += textbox => CheckAffixValueTypeSingleChanged();
+
+            // Value type range
+            validator = FloatTextBoxValidator.Create(AffixValueTypeRangeMinMinTextBox, "0");
+            validator.TextChanged += textbox => CheckAffixValueTypeRangeMinChanged();
+
+            validator = FloatTextBoxValidator.Create(AffixValueTypeRangeMinMaxTextBox, "0");
+            validator.TextChanged += textbox => CheckAffixValueTypeRangeMinChanged();
+
+            validator = FloatTextBoxValidator.Create(AffixValueTypeRangeMaxMinTextBox, "0");
+            validator.TextChanged += textbox => CheckAffixValueTypeRangeMaxChanged();
+
+            validator = FloatTextBoxValidator.Create(AffixValueTypeRangeMaxMaxTextBox, "0");
+            validator.TextChanged += textbox => CheckAffixValueTypeRangeMaxChanged();
         }
 
         private void InitializeAffixTypeList()
@@ -196,75 +224,7 @@ namespace AffixEditor
                 progressionChanged = true;
         }
         #endregion
-
-        #region ValueType Range Panel
-        private void AffixValueTypeRangeMinMinTextBox_TextChanged(object sender, EventArgs e)
-        {
-            // If the original type wasn't range we don't need to check for changes here
-            if (valueTypeChanged)
-                return;
-
-            ValidateFloatTextBoxText(sender as TextBox, (currentInfo.ValueInfo.BaseValueMin as AffixValueRange).Value.MinValue.ToString());
-
-            CheckAffixValueTypeRangeMinChanged();
-        }
-
-        private void AffixValueTypeRangeMinMaxTextBox_TextChanged(object sender, EventArgs e)
-        {
-            // If the original type wasn't range we don't need to check for changes here
-            if (valueTypeChanged)
-                return;
-
-            ValidateFloatTextBoxText(sender as TextBox, (currentInfo.ValueInfo.BaseValueMin as AffixValueRange).Value.MaxValue.ToString());
-
-            CheckAffixValueTypeRangeMinChanged();
-        }
-
-        private void AffixValueTypeRangeMaxMinTextBox_TextChanged(object sender, EventArgs e)
-        {
-            // If the original type wasn't range we don't need to check for changes here
-            if (valueTypeChanged)
-                return;
-            
-            ValidateFloatTextBoxText(sender as TextBox, (currentInfo.ValueInfo.BaseValueMax as AffixValueRange).Value.MinValue.ToString());
-
-            CheckAffixValueTypeRangeMaxChanged();
-        }
-
-        private void AffixValueTypeRangeMaxMaxTextBox_TextChanged(object sender, EventArgs e)
-        {
-            // If the original type wasn't range we don't need to check for changes here
-            if (valueTypeChanged)
-                return;
-
-            ValidateFloatTextBoxText(sender as TextBox, (currentInfo.ValueInfo.BaseValueMax as AffixValueRange).Value.MaxValue.ToString());
-
-            CheckAffixValueTypeRangeMaxChanged();
-        }
-        #endregion
-
-        #region ValueType Single Panel
-        private void AffixValueTypeSingleMinTextBox_TextChanged(object sender, EventArgs e)
-        {
-            // If the original type wasn't single we don't need to check for changes here
-            if (valueTypeChanged)
-                return;
-
-            ValidateFloatTextBoxText(sender as TextBox, (currentInfo.ValueInfo.BaseValueMin as AffixValueSingle).ToString());
-            CheckAffixValueTypeSingleChanged();
-        }
-
-        private void AffixValueTypeSingleMaxTextBox_TextChanged(object sender, EventArgs e)
-        {
-            // If the original type wasn't single we don't need to check for changes here
-            if (valueTypeChanged)
-                return;
-
-            ValidateFloatTextBoxText(sender as TextBox, (currentInfo.ValueInfo.BaseValueMax as AffixValueSingle).ToString());
-            CheckAffixValueTypeSingleChanged();
-        }
-        #endregion
-
+        
         #endregion
 
         private void SaveAffixInfoButton_Click(object sender, EventArgs e)
@@ -321,14 +281,24 @@ namespace AffixEditor
                 if (currentInfo.ValueType == AffixValueType.SingleValue)
                 {
                     AffixValueTypeSingleMinTextBox.Text = currentInfo.ValueInfo.BaseValueMin.ToString();
+                    FloatTextBoxValidator.CaptureContentsAsDefault(AffixValueTypeSingleMinTextBox);
+
                     AffixValueTypeSingleMaxTextBox.Text = currentInfo.ValueInfo.BaseValueMax.ToString();
+                    FloatTextBoxValidator.CaptureContentsAsDefault(AffixValueTypeSingleMaxTextBox);
                 }
                 else if (currentInfo.ValueType == AffixValueType.Range)
                 {
                     AffixValueTypeRangeMinMinTextBox.Text = (currentInfo.ValueInfo.BaseValueMin as AffixValueRange).Value.MinValue.ToString();
+                    FloatTextBoxValidator.CaptureContentsAsDefault(AffixValueTypeRangeMinMinTextBox);
+
                     AffixValueTypeRangeMinMaxTextBox.Text = (currentInfo.ValueInfo.BaseValueMin as AffixValueRange).Value.MaxValue.ToString();
+                    FloatTextBoxValidator.CaptureContentsAsDefault(AffixValueTypeRangeMinMaxTextBox);
+
                     AffixValueTypeRangeMaxMinTextBox.Text = (currentInfo.ValueInfo.BaseValueMax as AffixValueRange).Value.MinValue.ToString();
+                    FloatTextBoxValidator.CaptureContentsAsDefault(AffixValueTypeRangeMaxMinTextBox);
+
                     AffixValueTypeRangeMaxMaxTextBox.Text = (currentInfo.ValueInfo.BaseValueMax as AffixValueRange).Value.MaxValue.ToString();
+                    FloatTextBoxValidator.CaptureContentsAsDefault(AffixValueTypeRangeMaxMaxTextBox);
                 }
             }
         }
@@ -356,27 +326,6 @@ namespace AffixEditor
             }
         }
 
-        // Checks keypresses to only allow number inputs
-        private void CheckAffixValueTextBoxInput(object sender, KeyPressEventArgs e)
-        {
-            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) &&
-            (e.KeyChar != '.') && (e.KeyChar != '-'))
-            {
-                e.Handled = true;
-            }
-
-            // only allow one decimal point
-            if ((e.KeyChar == '.') && ((sender as TextBox).Text.IndexOf('.') > -1))
-            {
-                e.Handled = true;
-            }
-
-            if ((e.KeyChar == '-') && (((sender as TextBox).Text.IndexOf('-') > -1) || ((sender as TextBox).SelectionStart > 0)))
-            {
-                e.Handled = true;
-            }
-        }
-
         private void generateSampleAffixToolStripMenuItem_Click(object sender, EventArgs e)
         {
             MessageBox.Show(currentInfo.GenerateAffix(1).ToString());
@@ -384,6 +333,9 @@ namespace AffixEditor
         
         private void CheckAffixValueTypeRangeMinChanged()
         {
+            if (valueTypeChanged)
+                return;
+
             string labelText = "Minimum Value";
             if (currentInfo.ValueType != AffixValueType.Range)
             {
@@ -405,6 +357,9 @@ namespace AffixEditor
 
         private void CheckAffixValueTypeRangeMaxChanged()
         {
+            if (valueTypeChanged)
+                return;
+
             string labelText = "Maximum Value";
             if (currentInfo.ValueType != AffixValueType.Range)
             {
@@ -426,6 +381,9 @@ namespace AffixEditor
 
         private void CheckAffixValueTypeSingleChanged()
         {
+            if (valueTypeChanged)
+                return;
+
             string labelText = "Value";
             if (currentInfo.ValueType != AffixValueType.SingleValue)
             {
@@ -450,14 +408,6 @@ namespace AffixEditor
                 label.Text = labelText;
             else
                 label.Text = labelText + "*";
-        }
-
-        private void ValidateFloatTextBoxText(TextBox textBox, string defaultText)
-        {
-            if (!float.TryParse(textBox.Text, out _))
-            {
-                textBox.Text = defaultText;
-            }
         }
     }
 }

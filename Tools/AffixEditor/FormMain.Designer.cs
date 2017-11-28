@@ -60,6 +60,7 @@
             this.openDataFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.testToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.generateSampleAffixToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.EditProgressionParametersButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.MainSplitContainer)).BeginInit();
             this.MainSplitContainer.Panel1.SuspendLayout();
             this.MainSplitContainer.Panel2.SuspendLayout();
@@ -152,7 +153,6 @@
             this.AffixValueTypeRangeMaxMaxTextBox.Name = "AffixValueTypeRangeMaxMaxTextBox";
             this.AffixValueTypeRangeMaxMaxTextBox.Size = new System.Drawing.Size(217, 20);
             this.AffixValueTypeRangeMaxMaxTextBox.TabIndex = 7;
-            this.AffixValueTypeRangeMaxMaxTextBox.TextChanged += new System.EventHandler(this.AffixValueTypeRangeMaxMaxTextBox_TextChanged);
             // 
             // label3
             // 
@@ -169,7 +169,6 @@
             this.AffixValueTypeRangeMinMaxTextBox.Name = "AffixValueTypeRangeMinMaxTextBox";
             this.AffixValueTypeRangeMinMaxTextBox.Size = new System.Drawing.Size(217, 20);
             this.AffixValueTypeRangeMinMaxTextBox.TabIndex = 5;
-            this.AffixValueTypeRangeMinMaxTextBox.TextChanged += new System.EventHandler(this.AffixValueTypeRangeMinMaxTextBox_TextChanged);
             // 
             // label2
             // 
@@ -186,8 +185,6 @@
             this.AffixValueTypeRangeMaxMinTextBox.Name = "AffixValueTypeRangeMaxMinTextBox";
             this.AffixValueTypeRangeMaxMinTextBox.Size = new System.Drawing.Size(217, 20);
             this.AffixValueTypeRangeMaxMinTextBox.TabIndex = 3;
-            this.AffixValueTypeRangeMaxMinTextBox.TextChanged += new System.EventHandler(this.AffixValueTypeRangeMaxMinTextBox_TextChanged);
-            this.AffixValueTypeRangeMaxMinTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.CheckAffixValueTextBoxInput);
             // 
             // AffixValueTypeRangeMaxLabel
             // 
@@ -204,8 +201,6 @@
             this.AffixValueTypeRangeMinMinTextBox.Name = "AffixValueTypeRangeMinMinTextBox";
             this.AffixValueTypeRangeMinMinTextBox.Size = new System.Drawing.Size(217, 20);
             this.AffixValueTypeRangeMinMinTextBox.TabIndex = 1;
-            this.AffixValueTypeRangeMinMinTextBox.TextChanged += new System.EventHandler(this.AffixValueTypeRangeMinMinTextBox_TextChanged);
-            this.AffixValueTypeRangeMinMinTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.CheckAffixValueTextBoxInput);
             // 
             // AffixValueTypeRangeMinLabel
             // 
@@ -234,8 +229,6 @@
             this.AffixValueTypeSingleMaxTextBox.Name = "AffixValueTypeSingleMaxTextBox";
             this.AffixValueTypeSingleMaxTextBox.Size = new System.Drawing.Size(217, 20);
             this.AffixValueTypeSingleMaxTextBox.TabIndex = 3;
-            this.AffixValueTypeSingleMaxTextBox.TextChanged += new System.EventHandler(this.AffixValueTypeSingleMaxTextBox_TextChanged);
-            this.AffixValueTypeSingleMaxTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.CheckAffixValueTextBoxInput);
             // 
             // label1
             // 
@@ -252,8 +245,6 @@
             this.AffixValueTypeSingleMinTextBox.Name = "AffixValueTypeSingleMinTextBox";
             this.AffixValueTypeSingleMinTextBox.Size = new System.Drawing.Size(217, 20);
             this.AffixValueTypeSingleMinTextBox.TabIndex = 1;
-            this.AffixValueTypeSingleMinTextBox.TextChanged += new System.EventHandler(this.AffixValueTypeSingleMinTextBox_TextChanged);
-            this.AffixValueTypeSingleMinTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.CheckAffixValueTextBoxInput);
             // 
             // AffixValueTypeSingleLabel
             // 
@@ -281,6 +272,7 @@
             // 
             // AffixInfoDisplaySplitContainer.Panel2
             // 
+            this.AffixInfoDisplaySplitContainer.Panel2.Controls.Add(this.EditProgressionParametersButton);
             this.AffixInfoDisplaySplitContainer.Panel2.Controls.Add(this.AffixProgressionComboBox);
             this.AffixInfoDisplaySplitContainer.Panel2.Controls.Add(this.AffixProgressionLabel);
             this.AffixInfoDisplaySplitContainer.Panel2.Controls.Add(this.AffixValueTypeComboBox);
@@ -409,6 +401,15 @@
             this.generateSampleAffixToolStripMenuItem.Text = "Generate Sample Affix";
             this.generateSampleAffixToolStripMenuItem.Click += new System.EventHandler(this.generateSampleAffixToolStripMenuItem_Click);
             // 
+            // EditProgressionParametersButton
+            // 
+            this.EditProgressionParametersButton.Location = new System.Drawing.Point(245, 43);
+            this.EditProgressionParametersButton.Name = "EditProgressionParametersButton";
+            this.EditProgressionParametersButton.Size = new System.Drawing.Size(108, 23);
+            this.EditProgressionParametersButton.TabIndex = 4;
+            this.EditProgressionParametersButton.Text = "Edit Parameters";
+            this.EditProgressionParametersButton.UseVisualStyleBackColor = true;
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -475,6 +476,7 @@
         private System.Windows.Forms.ComboBox AffixProgressionComboBox;
         private System.Windows.Forms.Label AffixProgressionLabel;
         private System.Windows.Forms.Button SaveAffixInfoButton;
+        private System.Windows.Forms.Button EditProgressionParametersButton;
     }
 }
 
