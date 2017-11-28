@@ -195,8 +195,21 @@ namespace AffixEditor
                 AffixInfosListBox.Items.Add(type);
         }
 
+        int _last_index = -1;
         private void AffixInfosListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (_last_index != -1 && AffixInfosListBox.SelectedIndex == _last_index)
+                return;
+
+            if (HasUnsavedChanges())
+            {
+                if (MessageBox.Show("Unsaved changes will be lost. Proceed?", "Unsaved Changes", MessageBoxButtons.OKCancel) == DialogResult.Cancel)
+                {
+                    AffixInfosListBox.SelectedIndex = _last_index;
+                    return;
+                }
+            }
+
             if (AffixInfosListBox.SelectedIndex == -1)
             {
                 currentInfo = null;
@@ -204,10 +217,13 @@ namespace AffixEditor
             else
             {
                 currentInfo = AffixInfo.GetAffixInfo((AffixType)AffixInfosListBox.Items[AffixInfosListBox.SelectedIndex]);
+
+                if (localType != currentInfo.Type)
+                    UpdateCurrentAffixInfoDisplay();
+
                 localType = currentInfo.Type;
             }
-
-            UpdateCurrentAffixInfoDisplay();
+            _last_index = AffixInfosListBox.SelectedIndex;
         }
 
         private void openDataFolderToolStripMenuItem_Click(object sender, EventArgs e)
@@ -473,6 +489,13 @@ namespace AffixEditor
             CheckNamechanged();
             CheckDescriptionChanged();
             CheckValueTypeChanged();
+        }
+
+        private bool HasUnsavedChanges()
+        {
+            return !(!nameChanged && !descriptionChanged && !progressionChanged && !valueTypeChanged &&
+                !AffixValueTypeSingleLabel.Text.EndsWith("*") && !AffixValueTypeRangeMaxLabel.Text.EndsWith("*") &&
+                !AffixValueTypeRangeMinLabel.Text.EndsWith("*"));
         }
         #endregion
     }
