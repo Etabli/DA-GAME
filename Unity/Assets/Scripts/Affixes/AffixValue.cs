@@ -21,16 +21,12 @@ public enum AffixValueType
 [DataContract]
 public abstract class AffixValue
 {
+    // Not an interface because interfaces can't contain operators
     #region Operators
     public abstract AffixValue Invert();
     public abstract AffixValue Add(float val);
     public abstract AffixValue Add(AffixValue val);
     public abstract AffixValue Multiply(float val);
-    
-    public static implicit operator AffixValue(float value)
-    {
-        return new AffixValueSingle(value);
-    }
 
     public static AffixValue operator+(AffixValue lhs, float rhs)
     {
@@ -175,6 +171,11 @@ public class AffixValueSingle : AffixValue
     public static implicit operator float(AffixValueSingle value)
     {
         return value.Value;
+    }
+
+    public static implicit operator AffixValueSingle(float value)
+    {
+        return new AffixValueSingle(value);
     }
     #endregion
 
