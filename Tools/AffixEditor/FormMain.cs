@@ -19,7 +19,17 @@ namespace AffixEditor
         private List<AffixType> affixTypes;        
         private AffixInfo currentInfo; // A reference to the AffixInfo object we're currently looking at
 
-        private float[] progressionParameters = new float[0];
+        // Variables to hold our changes
+        private AffixType localType;
+        private AffixValueType localValueType;
+        private string localName;
+        private string localDescription;
+        private AffixValueSingle localBaseValueMinSingle = new AffixValueSingle();
+        private AffixValueSingle localBaseValueMaxSingle = new AffixValueSingle();
+        private AffixValueRange localBaseValueMinRange = new AffixValueRange();
+        private AffixValueRange localBaseValueMaxRange = new AffixValueRange();
+        private float[] localProgressionParameters;
+        private string localProgressionFunctionName;
 
         #region Properties
         // Some properties to check for changes
@@ -102,23 +112,47 @@ namespace AffixEditor
         {
             // Value type single
             var validator = FloatTextBoxValidator.Create(AffixValueTypeSingleMinTextBox, "0");
-            validator.TextChanged += textbox => CheckAffixValueTypeSingleChanged();
+            validator.TextChanged += textbox =>
+            {
+                localBaseValueMinSingle = FloatTextBoxValidator.GetValue(textbox);
+                CheckAffixValueTypeSingleChanged();
+            };
 
             validator = FloatTextBoxValidator.Create(AffixValueTypeSingleMaxTextBox, "0");
-            validator.TextChanged += textbox => CheckAffixValueTypeSingleChanged();
+            validator.TextChanged += textbox =>
+            {
+                localBaseValueMaxSingle = FloatTextBoxValidator.GetValue(textbox);
+                CheckAffixValueTypeSingleChanged();
+            };
 
             // Value type range
             validator = FloatTextBoxValidator.Create(AffixValueTypeRangeMinMinTextBox, "0");
-            validator.TextChanged += textbox => CheckAffixValueTypeRangeMinChanged();
+            validator.TextChanged += textbox =>
+            {
+                localBaseValueMinRange.MinValue = FloatTextBoxValidator.GetValue(textbox);
+                CheckAffixValueTypeRangeMinChanged();
+            };
 
             validator = FloatTextBoxValidator.Create(AffixValueTypeRangeMinMaxTextBox, "0");
-            validator.TextChanged += textbox => CheckAffixValueTypeRangeMinChanged();
+            validator.TextChanged += textbox =>
+            {
+                localBaseValueMinRange.MaxValue = FloatTextBoxValidator.GetValue(textbox);
+                CheckAffixValueTypeRangeMinChanged();
+            };
 
             validator = FloatTextBoxValidator.Create(AffixValueTypeRangeMaxMinTextBox, "0");
-            validator.TextChanged += textbox => CheckAffixValueTypeRangeMaxChanged();
+            validator.TextChanged += textbox =>
+            {
+                localBaseValueMaxRange.MinValue = FloatTextBoxValidator.GetValue(textbox);
+                CheckAffixValueTypeRangeMaxChanged();
+            };
 
             validator = FloatTextBoxValidator.Create(AffixValueTypeRangeMaxMaxTextBox, "0");
-            validator.TextChanged += textbox => CheckAffixValueTypeRangeMaxChanged();
+            validator.TextChanged += textbox =>
+            {
+                localBaseValueMaxRange.MaxValue = FloatTextBoxValidator.GetValue(textbox);
+                CheckAffixValueTypeRangeMaxChanged();
+            };
         }
 
         private void InitializeAffixTypeList()
@@ -194,9 +228,10 @@ namespace AffixEditor
         #region Name, Description, ValueType, Progression
         private void AffixValueTypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
+            localValueType = (AffixValueType)Enum.Parse(typeof(AffixValueType), AffixValueTypeComboBox.Text);
             SwitchAffixValuePanel();
 
-            if (currentInfo.ValueType.ToString() == AffixValueTypeComboBox.Text)
+            if (currentInfo.ValueType == localValueType)
                 valueTypeChanged = false;
             else
                 valueTypeChanged = true;
@@ -204,7 +239,9 @@ namespace AffixEditor
 
         private void AffixNameTextBox_TextChanged(object sender, EventArgs e)
         {
-            if (currentInfo.Name == AffixNameTextBox.Text)
+            localName = AffixNameTextBox.Text;
+
+            if (currentInfo.Name == localName)
                 nameChanged = false;
             else
                 nameChanged = true;
@@ -212,7 +249,9 @@ namespace AffixEditor
 
         private void AffixDescriptionTextBox_TextChanged(object sender, EventArgs e)
         {
-            if (currentInfo.Description == AffixDescriptionTextBox.Text)
+            localDescription = AffixDescriptionTextBox.Text;
+
+            if (currentInfo.Description == localDescription)
                 descriptionChanged = false;
             else
                 descriptionChanged = true;
@@ -220,9 +259,10 @@ namespace AffixEditor
 
         private void AffixProgressionComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
+            localProgressionFunctionName = AffixProgressionComboBox.Text;
+
             CheckAffixProgressionChanged();
         }
-        #endregion // Name, Description, ValueType, Progression
 
         private void EditProgressionParametersButton_Click(object sender, EventArgs e)
         {
@@ -234,10 +274,14 @@ namespace AffixEditor
 
             if (paramEditor.ShowDialog() == DialogResult.OK)
             {
-                progressionParameters = paramEditor.Parameters;
+                localProgressionParameters = paramEditor.Parameters;
                 CheckAffixProgressionChanged();
             }
         }
+        #endregion // Name, Description, ValueType, Progression
+
+        #region ValueType Single
+        #endregion
 
         #endregion // Affix Info
 
@@ -290,8 +334,8 @@ namespace AffixEditor
 
                 // Copy parameters first since changing the combobox index calls the SelectedIndexChanged event
                 // at which point we already compare the original values to our local copy
-                progressionParameters = new float[currentInfo.ValueInfo.Progression.Parameters.Length];
-                currentInfo.ValueInfo.Progression.Parameters.CopyTo(progressionParameters, 0);
+                localProgressionParameters = new float[currentInfo.ValueInfo.Progression.Parameters.Length];
+                currentInfo.ValueInfo.Progression.Parameters.CopyTo(localProgressionParameters, 0);
                 AffixProgressionComboBox.SelectedIndex = AffixProgressionComboBox.Items.IndexOf(currentInfo.ValueInfo.Progression.GetName());
                 AffixProgressionComboBox.Enabled = true;
 
@@ -345,34 +389,33 @@ namespace AffixEditor
 
         private void generateSampleAffixToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(currentInfo.GenerateAffix(1).ToString());
+            MessageBox.Show(AffixInfo.GenerateAffix(currentInfo.Type, 1).ToString());
         }
 
         #region Change Checking
         private void CheckAffixValueTypeRangeMinChanged()
         {
             Range original = (currentInfo.ValueInfo.BaseValueMin as AffixValueRange).Value;
-            CheckAffixValueChanged(AffixValueTypeRangeMinMinTextBox, AffixValueTypeRangeMinMaxTextBox, original, AffixValueTypeRangeMinLabel, "Minimum Value");
+            CheckAffixValueChanged(localBaseValueMinRange, original, AffixValueTypeRangeMinLabel, "Minimum Value");
         }
 
         private void CheckAffixValueTypeRangeMaxChanged()
         {
             Range original = (currentInfo.ValueInfo.BaseValueMax as AffixValueRange).Value;
-            CheckAffixValueChanged(AffixValueTypeRangeMaxMinTextBox, AffixValueTypeRangeMaxMaxTextBox, original, AffixValueTypeRangeMaxLabel, "Maximum Value");
+            CheckAffixValueChanged(localBaseValueMaxRange, original, AffixValueTypeRangeMaxLabel, "Maximum Value");
         }
 
         private void CheckAffixValueTypeSingleChanged()
         {
             Range original = new Range(currentInfo.ValueInfo.BaseValueMin as AffixValueSingle, currentInfo.ValueInfo.BaseValueMax as AffixValueSingle);
-            CheckAffixValueChanged(AffixValueTypeSingleMinTextBox, AffixValueTypeSingleMaxTextBox, original, AffixValueTypeSingleLabel, "Value");
+            CheckAffixValueChanged(new Range(localBaseValueMinSingle, localBaseValueMaxSingle), original, AffixValueTypeSingleLabel, "Value");
         }
 
-        private void CheckAffixValueChanged(TextBox minBox, TextBox maxBox, Range original, Label label, string labelText)
+        private void CheckAffixValueChanged(Range current, Range original, Label label, string labelText)
         {
             if (valueTypeChanged)
                 label.Text = labelText + "*";
-
-            Range current = new Range(FloatTextBoxValidator.GetValue(minBox), FloatTextBoxValidator.GetValue(maxBox));
+            
             UpdateAffixValueLabel(label, current, original, labelText);
         }
 
@@ -386,7 +429,7 @@ namespace AffixEditor
 
         private void CheckAffixProgressionChanged()
         {
-            progressionChanged = currentInfo.ValueInfo.Progression != new AffixProgression(AffixProgressionComboBox.Text, progressionParameters);
+            progressionChanged = currentInfo.ValueInfo.Progression != new AffixProgression(localProgressionFunctionName, localProgressionParameters);
         }
         #endregion
     }
