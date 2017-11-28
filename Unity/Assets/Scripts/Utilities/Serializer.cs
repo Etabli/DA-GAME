@@ -61,6 +61,7 @@ public abstract class Serializer
     /// <summary>
     /// Saves an AffixInfo to disk at a specified location.
     /// </summary>
+    /// <param name="path">The full path, including filename</param>
     public static void SaveAffixInfoToDisk(AffixInfo info, string path)
     {
         string data = SerializeAffixInfo(info);

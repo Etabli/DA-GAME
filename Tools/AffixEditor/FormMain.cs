@@ -31,14 +31,13 @@ namespace AffixEditor
         private float[] localProgressionParameters;
         private string localProgressionFunctionName;
 
+        private string dataPath = ""; // String holding the path to the data directory
+
         #region Properties
         // Some properties to check for changes
         private bool _nameChanged;
         private bool nameChanged {
-            get
-            {
-                return _nameChanged;
-            }
+            get { return _nameChanged; }
             set
             {
                 _nameChanged = value;
@@ -88,8 +87,6 @@ namespace AffixEditor
             }
         }
         #endregion
-
-        private string dataPath;
 
         #region Initialization
         public FormMain()
@@ -207,6 +204,7 @@ namespace AffixEditor
             else
             {
                 currentInfo = AffixInfo.GetAffixInfo((AffixType)AffixInfosListBox.Items[AffixInfosListBox.SelectedIndex]);
+                localType = currentInfo.Type;
             }
 
             UpdateCurrentAffixInfoDisplay();
@@ -221,6 +219,24 @@ namespace AffixEditor
                 Serializer.LoadAllAffixInfosFromDisk(dataPath + "Affix\\AffixInfo\\");
             }
         }
+
+        private void SaveAffixInfoButton_Click(object sender, EventArgs e)
+        {
+            AffixProgression newProgression = new AffixProgression(localProgressionFunctionName, localProgressionParameters);
+
+            AffixValueInfo newValueInfo = null;
+            if (localValueType == AffixValueType.SingleValue)
+                newValueInfo = new AffixValueInfo(localBaseValueMinSingle, localBaseValueMaxSingle, newProgression);
+            else if (localValueType == AffixValueType.Range)
+                newValueInfo = new AffixValueInfo(localBaseValueMinRange, localBaseValueMaxRange, newProgression);
+
+            AffixInfo newInfo = new AffixInfo(localType, localValueType, localName, newValueInfo, localDescription);
+
+            Serializer.SaveAffixInfoToDisk(newInfo);
+            AffixInfo.Register(newInfo);
+            currentInfo = newInfo;
+            UpdateAllLabels();
+        }
         #endregion
 
         #region Affix Info
@@ -230,37 +246,24 @@ namespace AffixEditor
         {
             localValueType = (AffixValueType)Enum.Parse(typeof(AffixValueType), AffixValueTypeComboBox.Text);
             SwitchAffixValuePanel();
-
-            if (currentInfo.ValueType == localValueType)
-                valueTypeChanged = false;
-            else
-                valueTypeChanged = true;
+            CheckValueTypeChanged();
         }
 
         private void AffixNameTextBox_TextChanged(object sender, EventArgs e)
         {
             localName = AffixNameTextBox.Text;
-
-            if (currentInfo.Name == localName)
-                nameChanged = false;
-            else
-                nameChanged = true;
+            CheckNamechanged();
         }
 
         private void AffixDescriptionTextBox_TextChanged(object sender, EventArgs e)
         {
             localDescription = AffixDescriptionTextBox.Text;
-
-            if (currentInfo.Description == localDescription)
-                descriptionChanged = false;
-            else
-                descriptionChanged = true;
+            CheckDescriptionChanged();
         }
 
         private void AffixProgressionComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             localProgressionFunctionName = AffixProgressionComboBox.Text;
-
             CheckAffixProgressionChanged();
         }
 
@@ -280,15 +283,7 @@ namespace AffixEditor
         }
         #endregion // Name, Description, ValueType, Progression
 
-        #region ValueType Single
-        #endregion
-
         #endregion // Affix Info
-
-        private void SaveAffixInfoButton_Click(object sender, EventArgs e)
-        {
-            //TODO: Implement Saving
-        }
         #endregion // UI Events
 
         /// <summary>
@@ -393,21 +388,62 @@ namespace AffixEditor
         }
 
         #region Change Checking
+
+        #region Name, Description, ValueType, Progression
+        private void CheckNamechanged()
+        {
+            if (currentInfo.Name == localName)
+                nameChanged = false;
+            else
+                nameChanged = true;
+        }
+
+        private void CheckDescriptionChanged()
+        {
+            if (currentInfo.Description == localDescription)
+                descriptionChanged = false;
+            else
+                descriptionChanged = true;
+        }
+
+        private void CheckValueTypeChanged()
+        {
+            if (currentInfo.ValueType == localValueType)
+                valueTypeChanged = false;
+            else
+                valueTypeChanged = true;
+        }
+
+        private void CheckAffixProgressionChanged()
+        {
+            progressionChanged = currentInfo.ValueInfo.Progression != new AffixProgression(localProgressionFunctionName, localProgressionParameters);
+        }
+        #endregion
+
+        #region Affix Values
         private void CheckAffixValueTypeRangeMinChanged()
         {
-            Range original = (currentInfo.ValueInfo.BaseValueMin as AffixValueRange).Value;
+            if (localValueType != AffixValueType.Range)
+                return;
+
+            Range original = currentInfo.ValueType == AffixValueType.Range ? (currentInfo.ValueInfo.BaseValueMin as AffixValueRange).Value : new Range();
             CheckAffixValueChanged(localBaseValueMinRange, original, AffixValueTypeRangeMinLabel, "Minimum Value");
         }
 
         private void CheckAffixValueTypeRangeMaxChanged()
         {
-            Range original = (currentInfo.ValueInfo.BaseValueMax as AffixValueRange).Value;
+            Range original = currentInfo.ValueType == AffixValueType.Range ? (currentInfo.ValueInfo.BaseValueMax as AffixValueRange).Value : new Range();
             CheckAffixValueChanged(localBaseValueMaxRange, original, AffixValueTypeRangeMaxLabel, "Maximum Value");
         }
 
         private void CheckAffixValueTypeSingleChanged()
         {
-            Range original = new Range(currentInfo.ValueInfo.BaseValueMin as AffixValueSingle, currentInfo.ValueInfo.BaseValueMax as AffixValueSingle);
+            if (localValueType != AffixValueType.SingleValue)
+                return;
+
+            Range original = currentInfo.ValueType == AffixValueType.SingleValue
+                ? new Range(currentInfo.ValueInfo.BaseValueMin as AffixValueSingle, currentInfo.ValueInfo.BaseValueMax as AffixValueSingle)
+                : new Range();
             CheckAffixValueChanged(new Range(localBaseValueMinSingle, localBaseValueMaxSingle), original, AffixValueTypeSingleLabel, "Value");
         }
 
@@ -426,10 +462,17 @@ namespace AffixEditor
             else
                 label.Text = labelText + "*";
         }
+        #endregion
 
-        private void CheckAffixProgressionChanged()
+        private void UpdateAllLabels()
         {
-            progressionChanged = currentInfo.ValueInfo.Progression != new AffixProgression(localProgressionFunctionName, localProgressionParameters);
+            CheckAffixProgressionChanged();
+            CheckAffixValueTypeRangeMaxChanged();
+            CheckAffixValueTypeRangeMinChanged();
+            CheckAffixValueTypeSingleChanged();
+            CheckNamechanged();
+            CheckDescriptionChanged();
+            CheckValueTypeChanged();
         }
         #endregion
     }
