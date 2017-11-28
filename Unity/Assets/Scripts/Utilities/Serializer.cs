@@ -16,7 +16,7 @@ public abstract class Serializer
 
     #region AffixInfo
     /// <summary>
-    /// Takes an AffixInfo object and returns a string containing formatted XML describing it
+    /// Takes an AffixInfo object and returns a string containing formatted XML describing it.
     /// </summary>
     /// <param name="info">The AffixInfo object to be serialized</param>
     /// <returns>A strong containing formatted XML</returns>
@@ -37,7 +37,7 @@ public abstract class Serializer
     }
 
     /// <summary>
-    /// Deserializes an Affix Info object from a string
+    /// Deserializes an Affix Info object from a string. Automatically calls its constructor to perform setup work.
     /// </summary>
     /// <param name="data">The XML string describing the AffixInfo object</param>
     /// <returns>The usable AffixInfo object</returns>
@@ -47,7 +47,7 @@ public abstract class Serializer
         DataContractSerializer serializer = new DataContractSerializer(typeof(AffixInfo));
         AffixInfo info = serializer.ReadObject(stream) as AffixInfo;
         stream.Close();
-        return info;
+        return new AffixInfo(info);
     }
 
     /// <summary>
@@ -73,7 +73,7 @@ public abstract class Serializer
     }
 
     /// <summary>
-    /// Loads info about a certain affix type at disk and automatically calls its constructor so that it is added to the AffixInfoDictionary.
+    /// Loads info about a certain affix type at disk
     /// </summary>
     /// <returns>The newly constructed AffixInfo object.</returns>
     public static AffixInfo LoadAffixInfoFromDisk(AffixType type)
@@ -106,17 +106,21 @@ public abstract class Serializer
         reader.Close();
         file.Close();
 
-        return new AffixInfo(DeserializeAffixInfo(data));
+        return DeserializeAffixInfo(data);
     }
 
     /// <summary>
-    /// Loads all affix infos from a predefined location
+    /// Loads all affix infos from a predefined location and registers them in the affix info dictionary
     /// </summary>
     public static void LoadAllAffixInfosFromDisk()
     {
         LoadAllAffixInfosFromDisk(AFFIX_INFO_FOLDER_PATH);
     }
 
+    /// <summary>
+    /// Loads all affix infos from disk and registers them in the affix info dictionary
+    /// </summary>
+    /// <param name="folder"></param>
     public static void LoadAllAffixInfosFromDisk(string folder)
     {
         try
@@ -125,7 +129,7 @@ public abstract class Serializer
             {
                 if (type == AffixType.None || type == AffixType.Random)
                     continue;
-                LoadAffixInfoFromDisk(folder + GetFileNameFromAffixType(type));
+                AffixInfo.Register(LoadAffixInfoFromDisk(folder + GetFileNameFromAffixType(type)));
             }
         }
         catch (Exception e)

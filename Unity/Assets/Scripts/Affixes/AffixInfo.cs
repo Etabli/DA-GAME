@@ -28,7 +28,7 @@ public class AffixInfo
     { }
 
     /// <summary>
-    /// Creates a new AffixInfo object and adds it to the AffixInfoDictionary
+    /// Creates a new AffixInfo object
     /// </summary>
     public AffixInfo(AffixType type, AffixValueType valueType, string name, AffixValueInfo valueInfo, string description)
     {
@@ -37,8 +37,6 @@ public class AffixInfo
         Name = name;
         Description = description;
         ValueInfo = new AffixValueInfo(valueInfo);
-        
-        affixInfoDictionary[type] = this;
     }
 
     /// <summary>
@@ -64,6 +62,15 @@ public class AffixInfo
 
     #region Static Functionality
     private static Dictionary<AffixType, AffixInfo> affixInfoDictionary = new Dictionary<AffixType, AffixInfo>();
+
+    /// <summary>
+    /// Registers an AffixInfo object in the affix info dictionary
+    /// </summary>
+    /// <param name="info"></param>
+    public static void Register(AffixInfo info)
+    {
+        affixInfoDictionary[info.Type] = info;
+    }
 
     /// <summary>
     /// Returns the AffixInfo object for a certain AffixType, provided it exists
