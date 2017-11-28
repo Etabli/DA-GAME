@@ -20,7 +20,8 @@ namespace AffixEditor
         public EditProgressionParametersForm(float[] parameters)
         {
             originalParameters = parameters;
-            Parameters = (float[])originalParameters.Clone();
+            Parameters = new float[parameters.Length];
+            parameters.CopyTo(Parameters, 0);
 
             for (int i = 0; i < parameters.Length; i++)
             {
