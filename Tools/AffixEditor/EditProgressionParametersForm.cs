@@ -15,18 +15,26 @@ namespace AffixEditor
         private const int TEXTBOX_SPACING = 25;
 
         private readonly float[] originalParameters;
+        public float[] Parameters;
 
         public EditProgressionParametersForm(float[] parameters)
         {
             originalParameters = parameters;
+            Parameters = (float[])originalParameters.Clone();
 
             for (int i = 0; i < parameters.Length; i++)
             {
-                Controls.Add(new TextBox
+                TextBox textbox = new TextBox
                 {
                     Location = new Point(10, 10 + (i * TEXTBOX_SPACING)),
                     Text = parameters[i].ToString()
-                });
+                };
+                FloatTextBoxValidator validator = FloatTextBoxValidator.Create(textbox);
+
+                int index = i;
+                validator.TextChanged += (_) => { Parameters[index] = FloatTextBoxValidator.GetValue(textbox); };
+
+                Controls.Add(textbox);
             }
 
             InitializeComponent();
@@ -34,8 +42,6 @@ namespace AffixEditor
         }
 
         public EditProgressionParametersForm(int nParams) : this(new float[nParams])
-        {
-            
-        }
+        { }
     }
 }

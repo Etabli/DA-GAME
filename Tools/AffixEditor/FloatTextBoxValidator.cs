@@ -33,6 +33,9 @@ namespace AffixEditor
             textBox.TextChanged += ValidateContents;
         }
 
+        public FloatTextBoxValidator(TextBox textBox) : this(textBox, textBox.Text)
+        { }
+
         ~FloatTextBoxValidator()
         {
             textBoxDictionary.Remove(textBox);
@@ -44,6 +47,14 @@ namespace AffixEditor
         public void CaptureContentsAsDefault()
         {
             DefaultText = textBox.Text;
+        }
+
+        /// <summary>
+        /// Returns the content of the text box as a float
+        /// </summary>
+        public float GetValue()
+        {
+            return textBox.Text == "" ? 0 : float.Parse(textBox.Text);
         }
 
         /// <summary>
@@ -71,11 +82,11 @@ namespace AffixEditor
 
         private void ValidateContents(object sender, EventArgs e)
         {
-            if (!float.TryParse(textBox.Text, out _))
+            if (!float.TryParse(textBox.Text, out _) && textBox.Text != "")
             {
                 textBox.Text = DefaultText;
             }
-            TextChanged(textBox);
+            TextChanged?.Invoke(textBox);
         }
 
         #region Static Functionality
@@ -90,6 +101,8 @@ namespace AffixEditor
             textBoxDictionary.Add(textBox, validator);
             return validator;
         }
+
+        public static FloatTextBoxValidator Create(TextBox textBox) => Create(textBox, textBox.Text);
 
         /// <summary>
         /// Retrieves the corresponding validator for a TextBox
@@ -106,6 +119,18 @@ namespace AffixEditor
         public static void CaptureContentsAsDefault(TextBox textBox)
         {
             GetValidatorForTextBox(textBox)?.CaptureContentsAsDefault();
+        }
+
+        /// <summary>
+        /// Gets the float value through the validator corresponding to the passed text box.
+        /// Throws an exception if there is no validator
+        /// </summary>
+        /// <param name="textBox"></param>
+        /// <returns></returns>
+        public static float GetValue(TextBox textBox)
+        {
+            // Note that this throws an exception if there is no validator for this text box
+            return (float)GetValidatorForTextBox(textBox)?.GetValue();
         }
         #endregion
     }

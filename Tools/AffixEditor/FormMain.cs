@@ -235,7 +235,7 @@ namespace AffixEditor
 
             if (paramEditor.ShowDialog() == DialogResult.OK)
             {
-                MessageBox.Show("Good job");
+                MessageBox.Show(paramEditor.Parameters.Aggregate("", (output, val) => output + ", " + val.ToString()).Trim(',', ' '));                
             }
         }
 
@@ -346,73 +346,29 @@ namespace AffixEditor
         
         private void CheckAffixValueTypeRangeMinChanged()
         {
-            if (valueTypeChanged)
-                return;
-
-            string labelText = "Minimum Value";
-            if (currentInfo.ValueType != AffixValueType.Range)
-            {
-                AffixValueTypeRangeMinLabel.Text = labelText + "*";
-                return;
-            }
-
-            // Check if both textboxes are already filled
-            if (AffixValueTypeRangeMinMinTextBox.Text == "" || AffixValueTypeRangeMinMaxTextBox.Text == "")
-            {
-                AffixValueTypeRangeMinLabel.Text = labelText;
-                return;
-            }
-
             Range original = (currentInfo.ValueInfo.BaseValueMin as AffixValueRange).Value;
-            Range current = new Range(float.Parse(AffixValueTypeRangeMinMinTextBox.Text), float.Parse(AffixValueTypeRangeMinMaxTextBox.Text));
-            UpdateAffixValueLabel(AffixValueTypeRangeMinLabel, original, current, labelText);
+            CheckAffixValueChanged(AffixValueTypeRangeMinMinTextBox, AffixValueTypeRangeMinMaxTextBox, original, AffixValueTypeRangeMinLabel, "Minimum Value");
         }
 
         private void CheckAffixValueTypeRangeMaxChanged()
         {
-            if (valueTypeChanged)
-                return;
-
-            string labelText = "Maximum Value";
-            if (currentInfo.ValueType != AffixValueType.Range)
-            {
-                AffixValueTypeRangeMaxLabel.Text = labelText + "*";
-                return;
-            }
-
-            // Check if both textboxes are already filled
-            if (AffixValueTypeRangeMaxMinTextBox.Text == "" || AffixValueTypeRangeMaxMaxTextBox.Text == "")
-            {
-                AffixValueTypeRangeMaxLabel.Text = labelText;
-                return;
-            }
-
             Range original = (currentInfo.ValueInfo.BaseValueMax as AffixValueRange).Value;
-            Range current = new Range(float.Parse(AffixValueTypeRangeMaxMinTextBox.Text), float.Parse(AffixValueTypeRangeMaxMaxTextBox.Text));
-            UpdateAffixValueLabel(AffixValueTypeRangeMaxLabel, original, current, labelText);
+            CheckAffixValueChanged(AffixValueTypeRangeMaxMinTextBox, AffixValueTypeRangeMaxMaxTextBox, original, AffixValueTypeRangeMaxLabel, "Maximum Value");
         }
 
         private void CheckAffixValueTypeSingleChanged()
         {
-            if (valueTypeChanged)
-                return;
-
-            string labelText = "Value";
-            if (currentInfo.ValueType != AffixValueType.SingleValue)
-            {
-                AffixValueTypeSingleLabel.Text = labelText + "*";
-            }
-
-            // Check if both textboxes are already filled
-            if (AffixValueTypeSingleMinTextBox.Text == "" || AffixValueTypeSingleMaxTextBox.Text == "")
-            {
-                AffixValueTypeSingleLabel.Text = labelText;
-                return;
-            }
-
             Range original = new Range(currentInfo.ValueInfo.BaseValueMin as AffixValueSingle, currentInfo.ValueInfo.BaseValueMax as AffixValueSingle);
-            Range current = new Range(float.Parse(AffixValueTypeSingleMinTextBox.Text), float.Parse(AffixValueTypeSingleMaxTextBox.Text));
-            UpdateAffixValueLabel(AffixValueTypeSingleLabel, original, current, labelText);
+            CheckAffixValueChanged(AffixValueTypeSingleMinTextBox, AffixValueTypeSingleMaxTextBox, original, AffixValueTypeSingleLabel, "Value");
+        }
+
+        private void CheckAffixValueChanged(TextBox minBox, TextBox maxBox, Range original, Label label, string labelText)
+        {
+            if (valueTypeChanged)
+                label.Text = labelText + "*";
+
+            Range current = new Range(FloatTextBoxValidator.GetValue(minBox), FloatTextBoxValidator.GetValue(maxBox));
+            UpdateAffixValueLabel(label, current, original, labelText);
         }
 
         private void UpdateAffixValueLabel(Label label, Range original, Range current, string labelText)
