@@ -2,7 +2,9 @@
 <AffixInfo xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.datacontract.org/2004/07/">
   <Description>Increases your health by {0}</Description>
   <Name>Health</Name>
-  <Type>Health</Type>
+  <Type>
+    <type>Health</type>
+  </Type>
   <ValueInfo>
     <BaseValueMax i:type="AffixValueSingle">
       <Value>5</Value>

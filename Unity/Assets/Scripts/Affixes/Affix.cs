@@ -2,18 +2,6 @@
 using System.Collections.Generic;
 
 /// <summary>
-/// The different affix types there are in the game.
-/// </summary>
-public enum AffixType
-{
-    None,
-    Health,
-    PhysDmgFlat,
-    FireRate,
-    Random
-}
-
-/// <summary>
 /// Represents a single instance of an Affix.
 /// </summary>
 public class Affix

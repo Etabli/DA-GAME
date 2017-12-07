@@ -126,16 +126,18 @@ public abstract class Serializer
     {
         try
         {
-            foreach (AffixType type in Enum.GetValues(typeof(AffixType)))
+            foreach (AffixType type in AffixType.Types)
             {
-                if (type == AffixType.None || type == AffixType.Random)
-                    continue;
                 AffixInfo.Register(LoadAffixInfoFromDisk(folder + GetFileNameFromAffixType(type)));
             }
         }
-        catch (Exception e)
+        catch (FileNotFoundException e)
         {
             throw new ArgumentException($"{folder} is not a valid affix info folder path!", nameof(folder), e);
+        }
+        catch (SerializationException e)
+        {
+            throw new SerializationException("Encountered invalid affix info file while loading all from disk!", e);
         }
     }
 

@@ -155,10 +155,9 @@ namespace AffixEditor
         private void InitializeAffixTypeList()
         {
             affixTypes = new List<AffixType>();
-            foreach (AffixType type in Enum.GetValues(typeof(AffixType)))
+            foreach (AffixType type in AffixType.Types)
             {
-                if (type != AffixType.None && type != AffixType.Random)
-                    affixTypes.Add(type);
+                affixTypes.Add(type);
             }
         }
 
@@ -300,6 +299,7 @@ namespace AffixEditor
         #endregion // Name, Description, ValueType, Progression
 
         #endregion // Affix Info
+
         #endregion // UI Events
 
         /// <summary>
