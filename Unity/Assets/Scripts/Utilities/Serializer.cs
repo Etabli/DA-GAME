@@ -12,6 +12,7 @@ public abstract class Serializer
     const string AFFIX_FOLDER_PATH = DATA_FOLDER_PATH + "Affix\\";
     const string AFFIX_INFO_FOLDER_PATH = AFFIX_FOLDER_PATH + "AffixInfo\\";
     const string AFFIX_POOL_FILE_PATH = AFFIX_FOLDER_PATH + "AffixPools";
+    const string AFFIX_TYPE_FILE_PATH = AFFIX_FOLDER_PATH + "AffixTypes";
     const string BIOME_FOLDER_PATH = DATA_FOLDER_PATH + "Biome\\";
 
     #region AffixInfo
@@ -212,6 +213,38 @@ public abstract class Serializer
         }
 
         return pools;
+    }
+    #endregion
+
+    #region AffixType
+    public static void SaveAffixTypesToDisk(IEnumerable<AffixType> types)
+    {
+        using (FileStream file = new FileStream(AFFIX_TYPE_FILE_PATH, FileMode.Create))
+        {
+            using (StreamWriter writer = new StreamWriter(file))
+            {
+                foreach (string type in types)
+                {
+                    writer.WriteLine(type);
+                }
+            }
+        }
+    }
+
+    public static HashSet<AffixType> LoadAffixTypesFromDisk()
+    {
+        HashSet<AffixType> result = new HashSet<AffixType>();
+        using (FileStream file = new FileStream(AFFIX_TYPE_FILE_PATH, FileMode.Open))
+        {
+            using (StreamReader reader = new StreamReader(file))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                    result.Add(line);
+            }
+        }
+
+        return result;
     }
     #endregion
 

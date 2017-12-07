@@ -13,8 +13,8 @@ using System.Runtime.Serialization;
 public struct AffixType
 {
 
-    private static HashSet<string> _Types;
-    public static HashSet<string> Types
+    private static HashSet<AffixType> _Types;
+    public static HashSet<AffixType> Types
     {
         get
         {
@@ -62,16 +62,7 @@ public struct AffixType
 
     private static void LoadTypesSet()
     {
-        // TODO: Load these from a file instead
-        _Types = new HashSet<string>();
-        foreach (string type in (typeof(AffixType))
-            .GetFields(BindingFlags.Static | BindingFlags.Public)
-            .Select(fieldInfo => fieldInfo.GetValue(null))
-            .Cast<string>()
-            .Where(type => type != Random && type != None))
-        {
-            _Types.Add(type);
-        }
+        _Types = Serializer.LoadAffixTypesFromDisk();
     }
 
     public override string ToString()
@@ -80,7 +71,8 @@ public struct AffixType
     }
 
     // Defininitions for all the affix types
-    // Note that these automatically get aggregated into the Types set at runtime
+    // Note that these are only relevant for writing code.
+    // At runtime only the contents of the affix type file matter
     #region Static Types
     public const string Random = "Random";
     public const string None = "None";

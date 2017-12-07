@@ -154,11 +154,7 @@ namespace AffixEditor
 
         private void InitializeAffixTypeList()
         {
-            affixTypes = new List<AffixType>();
-            foreach (AffixType type in AffixType.Types)
-            {
-                affixTypes.Add(type);
-            }
+            affixTypes = new List<AffixType>(AffixType.Types);
         }
 
         private void PopulateAffixInfoListBox()
