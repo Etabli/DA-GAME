@@ -18,12 +18,10 @@ public class Area
 
     #region ctors
 
-    public Area(int tier,int size)
+    public Area(int size)
     {
         AreaID = AreaIDGen++;
-        this.Cells = new List<HexCell>(size);
-        this.Tier = tier;
-        //GetBiomeForArea(tier);
+        Cells = new List<HexCell>(size);
     }
 
     #endregion
@@ -48,16 +46,18 @@ public class Area
     /// when successfully added to area sets cells parent area to this area
     /// otherwise it does not
     /// </summary>
-    public void EstablishAreaCellRelationship(HexCell cell)
+    /// <returns>True if succesfully esablied relation</returns>
+    public bool TryEstablishRelationWithCell(HexCell cell)
     {
         if(cell.ParentArea == null)
         {
             if (AddToCellList(cell))
             {
                 cell.ParentArea = this;
+                return true;
             }
         }
-
+        return false;
     }
 
     /// <summary>
@@ -69,6 +69,11 @@ public class Area
         return Cells.Capacity == Cells.Count;
     }
 
+    public void  SetTier(int tier)
+    {
+        Tier = tier;
+    }
+
     #region BiomeRelaedStuff
 
     /// <summary>
@@ -78,16 +83,6 @@ public class Area
     public void GenerateBiomeForArea(BiomeType type)
     {
         AreaBiome = new Biome(BiomeInfo.GetBiomeInfo(type), Tier);
-        // not sure if this is the correct place
-        UpdateHexCellTextures();
-    }
-
-    void UpdateHexCellTextures()
-    {
-        foreach (HexCell cell in Cells)
-        {
-            WorldController.Instance.UpdateCellTexture(cell);
-        }
     }
 
     #endregion

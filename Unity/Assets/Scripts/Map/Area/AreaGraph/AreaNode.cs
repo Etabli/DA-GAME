@@ -5,32 +5,43 @@ using System;
 using System.Linq;
 
 
-public class GraphNode
+public class AreaNode
 {
+    List<BiomeType> possibleBiomes;
     public uint NodeID { get; protected set; }
     public HashSet<uint> Edges { get; protected set; }
     int color;
 #region Ctors
-    public GraphNode(uint id, List<uint> edges = null, int color = -1)
+    public AreaNode(uint id, HashSet<uint> edges, int color = -1)
     {
-        Edges = new HashSet<uint>();
         NodeID = id;
-        if(edges != null)
-        {
-            foreach (uint edge in edges)
-            {
-                Edges.Add(edge);
-            }
-        }
+        if (edges != null)
+            Edges = edges;
+        else
+            Edges = new HashSet<uint>();
+
         this.color = color;
+        if (color != -1)
+            possibleBiomes = new List<BiomeType>() { (BiomeType)color };
     }
 
-    public GraphNode(uint id, int color)
+    public AreaNode(uint id, int color)
     {
         Edges = new HashSet<uint>();
         NodeID = id;
         this.color = color;
+        possibleBiomes = new List<BiomeType>() { (BiomeType)color };
     }
+
+    public AreaNode(Area area)
+    {
+        NodeID = area.AreaID;
+        Edges = new HashSet<uint>();
+        color = -1;
+        possibleBiomes = BiomeInfo.GetPossibleBiomesForTier(area.Tier);
+
+    }
+
 #endregion
 
     /// <summary>
@@ -41,6 +52,7 @@ public class GraphNode
     {
         Edges.Add(edgeID);
     }
+
     /// <summary>
     /// Adds multiple edges to this node
     /// </summary>
@@ -87,35 +99,12 @@ public class GraphNode
     }
 
     /// <summary>
-    /// get the color of a node
+    /// Returns the color of the node as an integer value
     /// </summary>
-    /// <returns>the color of the node</returns>
-    public virtual int GetColor()
+    /// <returns></returns>
+    public int GetColorAsInt()
     {
         return color;
-    }
-}
-
-public class AreaNode : GraphNode {
-
-    List<BiomeType> possibleBiomes;
-
-    public AreaNode(uint nodeID, int nodeTier)
-        : base(nodeID)
-    {
-        possibleBiomes = BiomeInfo.GetPossibleBiomesForTier(nodeTier);
-    }
-
-    public AreaNode(Area area)
-        :base(area.AreaID)
-    {
-        possibleBiomes = BiomeInfo.GetPossibleBiomesForTier(area.Tier);
-    }
-
-    public AreaNode(uint id, List<uint>edges, int color)
-        :base(id,edges,color)
-    {
-        possibleBiomes = new List<BiomeType>(){ (BiomeType)color};
     }
 
     /// <summary>
@@ -144,12 +133,12 @@ public class AreaNode : GraphNode {
             // if so color node
             if (possibleBiomes.Count == 1)
             {
-                ColorNode(possibleBiomes[0]);
+                color = (int)possibleBiomes[0];
             }// end if count == 1
         }// end if node colored
         else if(!IsColored() && possibleBiomes.Count == 1)
         {
-            ColorNode(possibleBiomes[0]);
+            color = (int)possibleBiomes[0];
         }
     }
 
@@ -172,26 +161,16 @@ public class AreaNode : GraphNode {
     {
         System.Random rng = new System.Random((int)System.DateTime.Now.Ticks);
         BiomeType type = possibleBiomes[rng.Next(possibleBiomes.Count)];
-        possibleBiomes = new List<BiomeType>() { type };
         // set bases color
-        ColorNode(type);
-    }
-
-    /// <summary>
-    /// Colors node by making the param the only possible biometype
-    /// </summary>
-    /// <param name="type"></param>
-    public void ColorNode(BiomeType type)
-    {
-        base.ColorNode((int)type);
+        color = (int)type;
     }
 
     /// <summary>
     /// returns the color of this node
     /// </summary>
     /// <returns></returns>
-    public new BiomeType GetColor()
+    public  BiomeType GetColor()
     {
-        return possibleBiomes[0];
+        return (BiomeType)color;
     }
 }
