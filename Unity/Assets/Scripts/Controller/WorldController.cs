@@ -50,10 +50,7 @@ public class WorldController : MonoBehaviour {
         hexCellToGameObjectDictionary = new Dictionary<HexCell, GameObject>();
         LoadBiomeInfo();
         map = new Map(radius);
-        if (Instance == null)
-        {
-            Instance = this;
-        }
+        UpdateCellTextures();
     }
 
     //bool temp_once = false;
@@ -144,13 +141,14 @@ public class WorldController : MonoBehaviour {
     public void OnHexCellCreated(HexCell cell)
     {
         //GameObject hexGO = Instantiate(hexCellPrefab);
-        GameObject hexGO = new GameObject();
-
+        GameObject hexGO = new GameObject
+        {
+            name = "HexCell : " + cell.Coords.ToString()
+        };
         //set parent to mabye not clogg hirachy view
         //set name for identification
         //set center to hex cell Center
 
-        hexGO.name = "HexCell : " + cell.Coords.ToString();
         hexGO.transform.position = Map.HexCellToWorldPosition(cell);
         hexGO.transform.SetParent(transform, true);
         hexGO.layer = LayerMask.NameToLayer("Map");
@@ -171,33 +169,58 @@ public class WorldController : MonoBehaviour {
     }
 
     /// <summary>
-    /// updates the material of a hexcell depending on biome type
+    /// updates the material of all
     /// </summary>
     /// <param name="cell"></param>
-    public void UpdateCellTexture(HexCell cell)
+    public void UpdateCellTextures()
     {
-        if(hexCellToGameObjectDictionary.ContainsKey(cell))
+        foreach(HexCell cell in map.WorldMap.Values)
         {
-           if(cell.ParentArea.AreaBiome != null)
-           {
-               if(biomeTypeToMaterialDictionary.ContainsKey(cell.ParentArea.AreaBiome.Type))
+            if(hexCellToGameObjectDictionary.ContainsKey(cell))
+            {
+               if(cell.ParentArea.AreaBiome != null)
                {
-                    hexCellToGameObjectDictionary[cell].GetComponent<MeshRenderer>().material = biomeTypeToMaterialDictionary[cell.ParentArea.AreaBiome.Type];
+                   if(biomeTypeToMaterialDictionary.ContainsKey(cell.ParentArea.AreaBiome.Type))
+                   {
+                        hexCellToGameObjectDictionary[cell].GetComponent<MeshRenderer>().material = biomeTypeToMaterialDictionary[cell.ParentArea.AreaBiome.Type];
+                   }// end if biome material map contains key
+                   else
+                        Debug.Log("WorldController::UpdateCellTexture - There is no material for this biome type " + cell.ParentArea.AreaBiome.Type);
                }
                else
                {
-                    Debug.Log("WorldController::UpdateCellTexture - There is no material for this biome type " + cell.ParentArea.AreaBiome.Type);
-               }
-           }
-           else
-           {
-                hexCellToGameObjectDictionary[cell].GetComponent<MeshRenderer>().material = default(Material);
-           }
-        }
-        else
+                    hexCellToGameObjectDictionary[cell].GetComponent<MeshRenderer>().material = default(Material);
+               }// end parent area has no biome
+            }// end if contains key
+            else
+                Debug.Log("WorldController::UpdateCellTexture - This HexCell does not exist in the HexCell dictionary");
+        }// ned foreach
+    }
+
+    /// <summary>
+    /// Updates texture for single cell
+    /// </summary>
+    public void UpdateCellTexture(HexCell cell)
+    {
+        if (hexCellToGameObjectDictionary.ContainsKey(cell))
         {
+            if (cell.ParentArea.AreaBiome != null)
+            {
+                if (biomeTypeToMaterialDictionary.ContainsKey(cell.ParentArea.AreaBiome.Type))
+                {
+                    hexCellToGameObjectDictionary[cell].GetComponent<MeshRenderer>().material = biomeTypeToMaterialDictionary[cell.ParentArea.AreaBiome.Type];
+                }// end if biome material map contains key
+                else
+                    Debug.Log("WorldController::UpdateCellTexture - There is no material for this biome type " + cell.ParentArea.AreaBiome.Type);
+            }
+            else
+            {
+                hexCellToGameObjectDictionary[cell].GetComponent<MeshRenderer>().material = default(Material);
+            }// end parent area has no biome
+        }// end if contains key
+        else
             Debug.Log("WorldController::UpdateCellTexture - This HexCell does not exist in the HexCell dictionary");
-        }
+
     }
 
     /// <summary>
@@ -235,14 +258,14 @@ public class WorldController : MonoBehaviour {
         foreach (AreaNode node in g.GetNodes())
         {
             Gizmos.color = biomeTypeToMaterialDictionary[node.GetColor()].color;
-            HexCell centerCell = map.getAreaByID(node.NodeID).Cells[0];
+            HexCell centerCell = map.GetAreaByID(node.NodeID).Cells[0];
             Vector3 nodePos = Converter.V2ToV3(Map.HexCellToWorldPosition(centerCell));
             Gizmos.DrawSphere(nodePos, 1);
 
             Gizmos.color = Color.cyan;
             foreach (uint node2 in node.Edges)
             {
-                HexCell  edgeNode =  map.getAreaByID(node2).Cells[0];
+                HexCell  edgeNode =  map.GetAreaByID(node2).Cells[0];
                 Vector3 nodePos2 = Converter.V2ToV3(Map.HexCellToWorldPosition(edgeNode));
                 Gizmos.DrawLine(nodePos, nodePos2);
             }

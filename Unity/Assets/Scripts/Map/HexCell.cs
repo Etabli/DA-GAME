@@ -172,6 +172,17 @@ public class HexCell
         return new Coords((int)roundedX, (int)roundedZ);
     }
 
+    /// <summary>
+    /// Returns the manhaten distance between two cells
+    /// </summary>
+    /// <param name="a">the first cell</param>
+    /// <param name="b">the second cell</param>
+    /// <returns>the distance between tem</returns>
+    public static int DistanceBetweenCells(HexCell a, HexCell b)
+    {
+        return Coords.Distance(a.Coords, b.Coords);
+    }
+
     #endregion
 
     #region overrides
