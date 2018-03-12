@@ -494,5 +494,10 @@ namespace AffixEditor
                 !AffixValueTypeRangeMinLabel.Text.EndsWith("*"));
         }
         #endregion
+
+        private void addAffixTestToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AffixTypeManager.AddAffixType("Test");
+        }
     }
 }

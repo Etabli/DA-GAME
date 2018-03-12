@@ -61,6 +61,7 @@
             this.openDataFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.testToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.generateSampleAffixToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addAffixTestToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.MainSplitContainer)).BeginInit();
             this.MainSplitContainer.Panel1.SuspendLayout();
             this.MainSplitContainer.Panel2.SuspendLayout();
@@ -399,7 +400,8 @@
             // testToolStripMenuItem
             // 
             this.testToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.generateSampleAffixToolStripMenuItem});
+            this.generateSampleAffixToolStripMenuItem,
+            this.addAffixTestToolStripMenuItem});
             this.testToolStripMenuItem.Name = "testToolStripMenuItem";
             this.testToolStripMenuItem.Size = new System.Drawing.Size(40, 20);
             this.testToolStripMenuItem.Text = "Test";
@@ -410,6 +412,13 @@
             this.generateSampleAffixToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
             this.generateSampleAffixToolStripMenuItem.Text = "Generate Sample Affix";
             this.generateSampleAffixToolStripMenuItem.Click += new System.EventHandler(this.generateSampleAffixToolStripMenuItem_Click);
+            // 
+            // addAffixTestToolStripMenuItem
+            // 
+            this.addAffixTestToolStripMenuItem.Name = "addAffixTestToolStripMenuItem";
+            this.addAffixTestToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+            this.addAffixTestToolStripMenuItem.Text = "Add Affix Test";
+            this.addAffixTestToolStripMenuItem.Click += new System.EventHandler(this.addAffixTestToolStripMenuItem_Click);
             // 
             // FormMain
             // 
@@ -478,6 +487,7 @@
         private System.Windows.Forms.Label AffixProgressionLabel;
         private System.Windows.Forms.Button SaveAffixInfoButton;
         private System.Windows.Forms.Button EditProgressionParametersButton;
+        private System.Windows.Forms.ToolStripMenuItem addAffixTestToolStripMenuItem;
     }
 }
 
