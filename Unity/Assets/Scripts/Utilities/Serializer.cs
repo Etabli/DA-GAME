@@ -5,6 +5,7 @@ using System.Text;
 using System.IO;
 using System.Xml;
 using System.Runtime.Serialization;
+using UnityEngine;
 
 public abstract class Serializer
 {
@@ -89,6 +90,7 @@ public abstract class Serializer
     /// <returns>The newly constructed AffixInfo object.</returns>
     public static AffixInfo LoadAffixInfoFromDisk(string path)
     {
+        Debug.Log(path);
         FileStream file;
         try
         {

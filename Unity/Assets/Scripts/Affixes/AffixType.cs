@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 using System.Reflection;
 using System.Runtime.Serialization;
 
+// TODO: Improve design so that dynamically adding types is a thing but also no confusion with strings
 /// <summary>
 /// Represents a single affix type, encoded by a string
 /// </summary>
 [DataContract]
 public struct AffixType
 {
-
     private static HashSet<AffixType> _Types;
     public static HashSet<AffixType> Types
     {
@@ -39,12 +39,34 @@ public struct AffixType
     {
         if (obj is AffixType)
             return ((AffixType)obj).type == type;
+        if (obj is string)
+            return type == (obj as string);
         return base.Equals(obj);
     }
 
     public override int GetHashCode()
     {
         return type.GetHashCode();
+    }
+
+    public static bool operator ==(AffixType lhs, string rhs)
+    {
+        return lhs.type == rhs;
+    }
+
+    public static bool operator !=(AffixType lhs, string rhs)
+    {
+        return !(lhs == rhs);
+    }
+
+    public static bool operator ==(string lhs, AffixType rhs)
+    {
+        return rhs == lhs;
+    }
+
+    public static bool operator !=(string lhs, AffixType rhs)
+    {
+        return !(rhs == lhs);
     }
     #endregion
 
@@ -54,7 +76,7 @@ public struct AffixType
         return new AffixType(value);
     }
 
-    public static implicit operator string(AffixType affixType)
+    public static explicit operator string(AffixType affixType)
     {
         return affixType.type;
     }

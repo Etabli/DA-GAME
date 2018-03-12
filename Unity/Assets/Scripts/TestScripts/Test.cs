@@ -16,9 +16,9 @@ public class Test : MonoBehaviour
         //Serializer.SaveAffixInfoToDisk(physDmgFlatInfo);
         //Serializer.SaveAffixInfoToDisk(fireRateInfo);
 
-        Serializer.LoadAffixInfoFromDisk(AffixType.Health);
-        Serializer.LoadAffixInfoFromDisk(AffixType.PhysDmgFlat);
-        Serializer.LoadAffixInfoFromDisk(AffixType.FireRate);
+        Serializer.LoadAffixInfoFromDisk((AffixType)AffixType.Health);
+        Serializer.LoadAffixInfoFromDisk((AffixType)AffixType.PhysDmgFlat);
+        Serializer.LoadAffixInfoFromDisk((AffixType)AffixType.FireRate);
 
         CreateTestPools();
         //AffixPool.LoadPresets();
