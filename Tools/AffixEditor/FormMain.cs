@@ -497,7 +497,7 @@ namespace AffixEditor
 
         private void addAffixTestToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            AffixTypeManager.AddAffixType("Test");
+            //AffixTypeManager.AddAffixType("Test");
         }
     }
 }

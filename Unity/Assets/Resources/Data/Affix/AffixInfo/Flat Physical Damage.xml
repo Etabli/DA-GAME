@@ -1,16 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AffixInfo xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.datacontract.org/2004/07/">
-  <Description>Increases your health by {0}</Description>
-  <Name>Health</Name>
+  <Description>Increases your physical damage by {0}</Description>
+  <Name>Flat Physical Damage</Name>
   <Type>
-    <ID>1</ID>
+    <ID>2</ID>
   </Type>
   <ValueInfo>
-    <BaseValueMax i:type="AffixValueSingle">
-      <Value>5</Value>
+    <BaseValueMax i:type="AffixValueRange">
+      <Value>
+        <MaxValue>2</MaxValue>
+        <MinValue>1.5</MinValue>
+      </Value>
     </BaseValueMax>
-    <BaseValueMin i:type="AffixValueSingle">
-      <Value>3</Value>
+    <BaseValueMin i:type="AffixValueRange">
+      <Value>
+        <MaxValue>1.3</MaxValue>
+        <MinValue>1</MinValue>
+      </Value>
     </BaseValueMin>
     <Progression>
       <Parameters xmlns:d4p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
@@ -20,5 +26,5 @@
       <ProgressionFunctionName>Linear</ProgressionFunctionName>
     </Progression>
   </ValueInfo>
-  <ValueType>SingleValue</ValueType>
+  <ValueType>Range</ValueType>
 </AffixInfo>

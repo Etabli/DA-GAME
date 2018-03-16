@@ -3,7 +3,7 @@
   <Description>Increases your physical damage by {0}</Description>
   <Name>Flat Physical Damage</Name>
   <Type>
-    <type>PhysDmgFlat</type>
+    <type>2</type>
   </Type>
   <ValueInfo>
     <BaseValueMax i:type="AffixValueRange">

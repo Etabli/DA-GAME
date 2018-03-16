@@ -11,106 +11,93 @@ using System.Runtime.Serialization;
 /// Represents a single affix type, encoded by a string
 /// </summary>
 [DataContract]
-public struct AffixType
+public sealed class AffixType
 {
-    private static HashSet<AffixType> _Types;
-    public static HashSet<AffixType> Types
+    #region Static
+    private static int nextID = 0;
+    // Some dicionaries to keep track of existing types
+    private static Dictionary<int, string> names = new Dictionary<int, string>();
+    private static Dictionary<int, AffixType> idDict = new Dictionary<int, AffixType>();
+    private static Dictionary<string, AffixType> nameDict = new Dictionary<string, AffixType>();
+
+    public static HashSet<AffixType> Types { get; private set; } = new HashSet<AffixType>();
+
+    public static AffixType Get(int id)
     {
-        get
-        {
-            if (_Types == null)
-            {
-                LoadTypesSet();
-            }
-            return _Types;
-        }
+        if (!idDict.ContainsKey(id))
+            throw new ArgumentException($"No affix type with ID {id}!");
+
+        return idDict[id];
     }
 
-    [DataMember]
-    private readonly string type;
-
-    public AffixType(string type)
+    public static AffixType GetByName(string name)
     {
-        this.type = type;
-    }
+        if (!nameDict.ContainsKey(name))
+            throw new ArgumentException($"No affix type with name '{name}'");
 
-    #region Comparison
-    public override bool Equals(object obj)
-    {
-        if (obj is AffixType)
-            return ((AffixType)obj).type == type;
-        if (obj is string)
-            return type == (obj as string);
-        return base.Equals(obj);
-    }
-
-    public override int GetHashCode()
-    {
-        return type.GetHashCode();
+        return nameDict[name];
     }
 
     public static bool operator ==(AffixType lhs, AffixType rhs)
     {
-        return lhs.type == rhs.type;
+        return lhs.ID == rhs.ID;
     }
 
     public static bool operator !=(AffixType lhs, AffixType rhs)
     {
         return !(lhs == rhs);
     }
+    #region Predefined Values
+    // Except for random and none, these shouldn't actually be used outside of testing
+    public static AffixType Random = new AffixType(-2, "Random");
+    public static AffixType None = new AffixType(-1, "None");
 
-    public static bool operator ==(AffixType lhs, string rhs)
-    {
-        return lhs.type == rhs;
-    }
-
-    public static bool operator !=(AffixType lhs, string rhs)
-    {
-        return !(lhs == rhs);
-    }
-
-    public static bool operator ==(string lhs, AffixType rhs)
-    {
-        return rhs == lhs;
-    }
-
-    public static bool operator !=(string lhs, AffixType rhs)
-    {
-        return !(rhs == lhs);
-    }
+    public static AffixType FireRate = new AffixType(0, "Fire Rate");
+    public static AffixType Health = new AffixType(1, "Health");
+    public static AffixType PhysDmgFlat = new AffixType(2, "Flat Physical Damage");
+    #endregion
     #endregion
 
-    #region Conversion
-    public static implicit operator AffixType(string value)
+    [DataMember]
+    public int ID { get; private set; }
+
+    private AffixType(int id, string name)
     {
-        return new AffixType(value);
+        if (idDict.ContainsKey(id))
+            throw new ArgumentException($"An affix type with ID {id} already exists! Existing name: {names[id]}, new name: {name}");
+        if (nameDict.ContainsKey(name))
+            throw new ArgumentException($"An affix type with name '{name}' already exists! Existing ID: {nameDict[name].ID}, new ID: {id}");
+
+        if (nextID <= id)
+            nextID = id + 1;
+
+        ID = id;
+        names[id] = name;
+
+        idDict[id] = this;
+        nameDict[name] = this;
+
+        if (ID >= 0)
+            Types.Add(this);
     }
 
-    public static implicit operator string(AffixType affixType)
-    {
-        return affixType.type;
-    }
-    #endregion
-
-    private static void LoadTypesSet()
-    {
-        _Types = Serializer.LoadAffixTypesFromDisk();
-    }
+    private AffixType(string name) : this(nextID++, name)
+    { }
 
     public override string ToString()
     {
-        return type;
+        return names[ID];
     }
 
-    // Defininitions for all the affix types
-    // Note that these are only relevant for writing code.
-    // At runtime only the contents of the affix type file matter
-    #region Static Types
-    public const string Random = "Random";
-    public const string None = "None";
+    public override bool Equals(object obj)
+    {
+        if (obj is AffixType)
+            return (obj as AffixType) == this;
+        return base.Equals(obj);
+    }
 
-    public const string Health = "Health";
-    public const string PhysDmgFlat = "PhysDmgFlat";
-    public const string FireRate = "FireRate";    
-    #endregion
+    public override int GetHashCode()
+    {
+        return ID.GetHashCode();
+    }
 }

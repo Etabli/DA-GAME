@@ -3,7 +3,7 @@
   <Description>Increases your fire rate by {0}</Description>
   <Name>Fire Rate</Name>
   <Type>
-    <type>FireRate</type>
+    <ID>0</ID>
   </Type>
   <ValueInfo>
     <BaseValueMax i:type="AffixValueSingle">

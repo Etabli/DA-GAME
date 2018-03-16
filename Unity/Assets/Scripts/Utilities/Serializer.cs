@@ -197,42 +197,6 @@ public abstract class Serializer
     }
     #endregion
 
-    #region AffixType
-    public static void SaveAffixTypesToDisk(IEnumerable<AffixType> types)
-    {
-        using (FileStream file = new FileStream("Assets/Resources/" + AFFIX_TYPE_FILE_PATH + ".xml", FileMode.Create))
-        {
-            using (StreamWriter writer = new StreamWriter(file))
-            {
-                foreach (string type in types)
-                {
-                    writer.WriteLine(type);
-                }
-            }
-        }
-    }
-
-    public static HashSet<AffixType> LoadAffixTypesFromDisk()
-    {
-        TextAsset text = Resources.Load<TextAsset>(AFFIX_TYPE_FILE_PATH);
-        if (text == null)
-            throw new FileNotFoundException("Couldn't find affix type info file!");
-
-        HashSet<AffixType> result = new HashSet<AffixType>();
-        using (MemoryStream stream = new MemoryStream(text.bytes))
-        {
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                string line;
-                while ((line = reader.ReadLine()) != null)
-                    result.Add(line);
-            }
-        }
-
-        return result;
-    }
-    #endregion
-
     #region BiomeInfo
     public static string SerializeBiomeInfo(BiomeInfo info)
     {
