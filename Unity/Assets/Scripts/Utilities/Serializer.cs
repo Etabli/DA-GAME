@@ -7,6 +7,7 @@ using System.Xml;
 using System.Runtime.Serialization;
 using UnityEngine;
 
+// TODO: Change saving
 public abstract class Serializer
 {
     const string DATA_FOLDER_PATH = "Data/";
@@ -57,7 +58,7 @@ public abstract class Serializer
     /// </summary>
     public static void SaveAffixInfoToDisk(AffixInfo info)
     {
-        SaveAffixInfoToDisk(info, GetPathFromAffixType(info.Type));
+        SaveAffixInfoToDisk(info, "Assets/Resources/" + GetPathFromAffixType(info.Type) + ".xml");
     }
 
     /// <summary>
@@ -147,7 +148,7 @@ public abstract class Serializer
     #region AffixPool
     public static void SaveAffixPoolsToDisk(Dictionary<AffixPoolPreset, AffixPool> pools)
     {
-        FileStream file = new FileStream(AFFIX_POOL_FILE_PATH, FileMode.Create);
+        FileStream file = new FileStream("Assets/Resources/" + AFFIX_POOL_FILE_PATH + ".xml", FileMode.Create);
 
         DataContractSerializer serializer = new DataContractSerializer(typeof(Dictionary<AffixPoolPreset, AffixPool>));
         XmlWriterSettings settings = new XmlWriterSettings() { Indent = true };
@@ -199,7 +200,7 @@ public abstract class Serializer
     #region AffixType
     public static void SaveAffixTypesToDisk(IEnumerable<AffixType> types)
     {
-        using (FileStream file = new FileStream(AFFIX_TYPE_FILE_PATH, FileMode.Create))
+        using (FileStream file = new FileStream("Assets/Resources/" + AFFIX_TYPE_FILE_PATH + ".xml", FileMode.Create))
         {
             using (StreamWriter writer = new StreamWriter(file))
             {
@@ -273,7 +274,7 @@ public abstract class Serializer
 
         //Debug.Log(data);
 
-        FileStream file = new FileStream(GetBiomePathFromType(info.Type), FileMode.Create);
+        FileStream file = new FileStream("Assets/Resources/" + GetBiomePathFromType(info.Type) + ".xml", FileMode.Create);
         StreamWriter writer = new StreamWriter(file);
         writer.Write(data);
         writer.Close();

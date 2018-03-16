@@ -73,6 +73,13 @@ public abstract class AffixValue
         throw new ArgumentException(string.Format("Cannot add object of type {0} to object of type {1}", val.GetType(), this.GetType()), "val");
     }
     #endregion
+
+    #region Conversions
+    public static implicit operator AffixValue(float value)
+    {
+        return new AffixValueSingle(value);
+    }
+    #endregion
 }
 #endregion
 

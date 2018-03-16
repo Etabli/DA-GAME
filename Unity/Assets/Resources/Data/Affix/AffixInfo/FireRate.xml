@@ -2,7 +2,9 @@
 <AffixInfo xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.datacontract.org/2004/07/">
   <Description>Increases your fire rate by {0}</Description>
   <Name>Fire Rate</Name>
-  <Type><type>FireRate</type></Type>
+  <Type>
+    <type>FireRate</type>
+  </Type>
   <ValueInfo>
     <BaseValueMax i:type="AffixValueSingle">
       <Value>0.8</Value>

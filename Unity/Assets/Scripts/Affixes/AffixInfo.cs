@@ -78,7 +78,6 @@ public class AffixInfo
     /// </summary>
     public static AffixInfo GetAffixInfo(AffixType type)
     {
-        Debug.Log(affixInfoDictionary.Count);
         // If the requested type is random, select a random affix
         if (type == AffixType.Random)
         {
