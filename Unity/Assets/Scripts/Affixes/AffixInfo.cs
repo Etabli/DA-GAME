@@ -16,26 +16,37 @@ public class AffixInfo
     [DataMember]
     public readonly AffixValueType ValueType;
     [DataMember]
-    public readonly string Name;
-    [DataMember]
     public readonly string Description;
     [DataMember]
     public readonly AffixValueInfo ValueInfo;
 
-    public AffixInfo(AffixInfo src) : this(src.Type, src.ValueType, src.Name, src.ValueInfo, src.Description)
+    public int ID { get { return Type.ID; } }
+    public string Name { get { return Type.Name; } }
+
+    public AffixInfo(AffixInfo src) : this(src.ID, src.Name, src.ValueType, src.ValueInfo, src.Description)
     { }
 
-    public AffixInfo(AffixType type, AffixValueType valueType, string name, AffixValueInfo valueInfo) : this(type, valueType, name, valueInfo, "")
+    public AffixInfo(string name, AffixValueType valueType, AffixValueInfo valueInfo) : this(name, valueType, valueInfo, "")
     { }
 
     /// <summary>
     /// Creates a new AffixInfo object
     /// </summary>
-    public AffixInfo(AffixType type, AffixValueType valueType, string name, AffixValueInfo valueInfo, string description)
+    public AffixInfo(string name, AffixValueType valueType, AffixValueInfo valueInfo, string description)
+        : this(valueType, valueInfo, description)
     {
-        Type = type;
+        Type = AffixType.CreateNew(name);
+    }
+
+    public AffixInfo(int id, string name, AffixValueType valueType, AffixValueInfo valueInfo, string description)
+        : this(valueType, valueInfo, description)
+    {
+        Type = AffixType.Replace(id, name);
+    }
+
+    private AffixInfo(AffixValueType valueType, AffixValueInfo valueInfo, string description)
+    {
         ValueType = valueType;
-        Name = name;
         Description = description;
         ValueInfo = new AffixValueInfo(valueInfo);
     }

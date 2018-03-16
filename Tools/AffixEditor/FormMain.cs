@@ -241,7 +241,7 @@ namespace AffixEditor
             else if (localValueType == AffixValueType.Range)
                 newValueInfo = new AffixValueInfo(localBaseValueMinRange, localBaseValueMaxRange, newProgression);
 
-            AffixInfo newInfo = new AffixInfo(localType, localValueType, localName, newValueInfo, localDescription);
+            AffixInfo newInfo = new AffixInfo(localValueType, localName, newValueInfo, localDescription);
 
             Serializer.SaveAffixInfoToDisk(newInfo);
             AffixInfo.Register(newInfo);

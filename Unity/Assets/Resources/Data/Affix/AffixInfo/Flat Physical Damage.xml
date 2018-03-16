@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AffixInfo xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.datacontract.org/2004/07/">
   <Description>Increases your physical damage by {0}</Description>
-  <Name>Flat Physical Damage</Name>
   <Type>
-    <ID>2</ID>
+    <ID>1</ID>
+    <Name>Flat Physical Damage</Name>
   </Type>
   <ValueInfo>
     <BaseValueMax i:type="AffixValueRange">

@@ -97,8 +97,8 @@ public abstract class Serializer
 
         string data;
         using (MemoryStream stream = new MemoryStream(text.bytes))
-            using (StreamReader reader = new StreamReader(stream))
-                data = reader.ReadToEnd();
+        using (StreamReader reader = new StreamReader(stream))
+            data = reader.ReadToEnd();
 
         return DeserializeAffixInfo(data);
     }
@@ -114,23 +114,15 @@ public abstract class Serializer
     /// <summary>
     /// Loads all affix infos from disk and registers them in the affix info dictionary
     /// </summary>
-    /// <param name="folder"></param>
+    /// <param name="folder">The path to the root data folder</param>
     public static void LoadAllAffixInfosFromDisk(string folder)
     {
-        try
+        var texts = Resources.LoadAll<TextAsset>(folder);
+        foreach (var text in texts)
         {
-            foreach (AffixType type in AffixType.Types)
-            {
-                AffixInfo.Register(LoadAffixInfoFromDisk(folder + GetFileNameFromAffixType(type)));
-            }
-        }
-        catch (FileNotFoundException e)
-        {
-            throw new ArgumentException($"{folder} is not a valid affix info folder path!", nameof(folder), e);
-        }
-        catch (SerializationException e)
-        {
-            throw new SerializationException($"Encountered invalid affix info file while loading all from '{folder}'!", e);
+            using (MemoryStream stream = new MemoryStream(text.bytes))
+            using (StreamReader reader = new StreamReader(stream))
+                AffixInfo.Register(DeserializeAffixInfo(reader.ReadToEnd()));
         }
     }
 
