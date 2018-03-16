@@ -100,7 +100,7 @@ public class Test : MonoBehaviour
 
     void TestAffixGeneration()
     {
-        print(AffixInfo.GenerateAffix(AffixType.Health, 1).ToString());
+        print(AffixInfo.GenerateAffix(3, 1).ToString());
     }
 
     // Update is called once per frame

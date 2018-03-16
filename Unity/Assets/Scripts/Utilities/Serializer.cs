@@ -46,7 +46,17 @@ public abstract class Serializer
     /// <returns>The usable AffixInfo object</returns>
     public static AffixInfo DeserializeAffixInfo(string data)
     {
-        MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(data));
+        return DeserializeAffixInfo(Encoding.UTF8.GetBytes(data));
+    }
+
+    /// <summary>
+    /// Deserializes an Affix Info object from a string. Automatically calls its constructor to perform setup work.
+    /// </summary>
+    /// <param name="data">A byte array containing the xml data describing the AffixInfo object</param>
+    /// <returns>The loaded AffixInfo object</returns>
+    public static AffixInfo DeserializeAffixInfo(byte[] data)
+    {
+        MemoryStream stream = new MemoryStream(data);
         DataContractSerializer serializer = new DataContractSerializer(typeof(AffixInfo));
         AffixInfo info = serializer.ReadObject(stream) as AffixInfo;
         stream.Close();
@@ -95,12 +105,7 @@ public abstract class Serializer
         if (text == null)
             throw new ArgumentException($"'{path}' is not a valid text asset!");
 
-        string data;
-        using (MemoryStream stream = new MemoryStream(text.bytes))
-        using (StreamReader reader = new StreamReader(stream))
-            data = reader.ReadToEnd();
-
-        return DeserializeAffixInfo(data);
+        return DeserializeAffixInfo(text.bytes);
     }
 
     /// <summary>
@@ -120,9 +125,7 @@ public abstract class Serializer
         var texts = Resources.LoadAll<TextAsset>(folder);
         foreach (var text in texts)
         {
-            using (MemoryStream stream = new MemoryStream(text.bytes))
-            using (StreamReader reader = new StreamReader(stream))
-                AffixInfo.Register(DeserializeAffixInfo(reader.ReadToEnd()));
+            AffixInfo.Register(DeserializeAffixInfo(text.bytes));
         }
     }
 
