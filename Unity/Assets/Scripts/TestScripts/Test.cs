@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class Test : MonoBehaviour
 {
-
-    // Use this for initialization
     void Start()
     {
         //AffixInfo healthInfo = new AffixInfo(AffixType.Health, AffixValueType.SingleValue, "Health", new AffixValueInfo(3.0f, 5.0f, new AffixProgression("Linear", 0, 1)), "Increases your health by {0}");
@@ -16,12 +14,10 @@ public class Test : MonoBehaviour
         //Serializer.SaveAffixInfoToDisk(physDmgFlatInfo);
         //Serializer.SaveAffixInfoToDisk(fireRateInfo);
 
-        Serializer.LoadAffixInfoFromDisk((AffixType)AffixType.Health);
-        Serializer.LoadAffixInfoFromDisk((AffixType)AffixType.PhysDmgFlat);
-        Serializer.LoadAffixInfoFromDisk((AffixType)AffixType.FireRate);
+        Serializer.LoadAllAffixInfosFromDisk();
 
-        CreateTestPools();
-        //AffixPool.LoadPresets();
+        //CreateTestPools();
+        AffixPool.LoadPresets();
     }
 
     void CreateTestPools()

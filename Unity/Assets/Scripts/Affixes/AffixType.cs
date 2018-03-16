@@ -76,7 +76,7 @@ public struct AffixType
         return new AffixType(value);
     }
 
-    public static explicit operator string(AffixType affixType)
+    public static implicit operator string(AffixType affixType)
     {
         return affixType.type;
     }

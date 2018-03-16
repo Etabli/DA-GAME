@@ -9,12 +9,12 @@ using UnityEngine;
 
 public abstract class Serializer
 {
-    const string DATA_FOLDER_PATH = "Data\\";
-    const string AFFIX_FOLDER_PATH = DATA_FOLDER_PATH + "Affix\\";
-    const string AFFIX_INFO_FOLDER_PATH = AFFIX_FOLDER_PATH + "AffixInfo\\";
+    const string DATA_FOLDER_PATH = "Data/";
+    const string AFFIX_FOLDER_PATH = DATA_FOLDER_PATH + "Affix/";
+    const string AFFIX_INFO_FOLDER_PATH = AFFIX_FOLDER_PATH + "AffixInfo/";
     const string AFFIX_POOL_FILE_PATH = AFFIX_FOLDER_PATH + "AffixPools";
     const string AFFIX_TYPE_FILE_PATH = AFFIX_FOLDER_PATH + "AffixTypes";
-    const string BIOME_FOLDER_PATH = DATA_FOLDER_PATH + "Biome\\";
+    const string BIOME_FOLDER_PATH = DATA_FOLDER_PATH + "Biome/";
 
     #region AffixInfo
     /// <summary>
@@ -85,36 +85,25 @@ public abstract class Serializer
     }
 
     /// <summary>
-    /// Loads the affix info file at the specified location
+    /// Loads the affix info file at the specified location in the resources folder
     /// </summary>
     /// <returns>The newly constructed AffixInfo object.</returns>
     public static AffixInfo LoadAffixInfoFromDisk(string path)
     {
-        Debug.Log(path);
-        FileStream file;
-        try
-        {
-            file = new FileStream(path, FileMode.Open);
-        }
-        catch (FileNotFoundException e)
-        {
-            throw new FileNotFoundException("Could not find affix info file!", path, e);
-        }
-        catch (Exception e)
-        {
-            throw new Exception($"Exception while trying to load affix info file at \"{path}\"", e);
-        }
+        TextAsset text = Resources.Load<TextAsset>(path);
+        if (text == null)
+            throw new ArgumentException($"'{path}' is not a valid text asset!");
 
-        StreamReader reader = new StreamReader(file);
-        string data = reader.ReadToEnd();
-        reader.Close();
-        file.Close();
+        string data;
+        using (MemoryStream stream = new MemoryStream(text.bytes))
+            using (StreamReader reader = new StreamReader(stream))
+                data = reader.ReadToEnd();
 
         return DeserializeAffixInfo(data);
     }
 
     /// <summary>
-    /// Loads all affix infos from a predefined location and registers them in the affix info dictionary
+    /// Loads all affix infos from disk
     /// </summary>
     public static void LoadAllAffixInfosFromDisk()
     {
@@ -140,7 +129,7 @@ public abstract class Serializer
         }
         catch (SerializationException e)
         {
-            throw new SerializationException("Encountered invalid affix info file while loading all from disk!", e);
+            throw new SerializationException($"Encountered invalid affix info file while loading all from '{folder}'!", e);
         }
     }
 
@@ -170,22 +159,14 @@ public abstract class Serializer
 
     public static Dictionary<AffixPoolPreset, AffixPool> LoadAffixPoolsFromDisk()
     {
-        FileStream file;
-        try
-        {
-            file = new FileStream(AFFIX_POOL_FILE_PATH, FileMode.Open);
-        }
-        catch (FileNotFoundException e)
-        {
-            throw new FileNotFoundException("Could not find affix pool file!", AFFIX_POOL_FILE_PATH, e);
-        }
-        catch (Exception e)
-        {
-            throw new Exception("Exception while trying to open affix pool file!", e);
-        }
+        TextAsset text = Resources.Load<TextAsset>(AFFIX_POOL_FILE_PATH);
+        if (text == null)
+            throw new ArgumentException($"{AFFIX_POOL_FILE_PATH} is not a valid text asset!");
 
-        StreamReader reader = new StreamReader(file);
-        string data = reader.ReadToEnd();
+        string data;
+        using (MemoryStream stream = new MemoryStream(text.bytes))
+            using (StreamReader reader = new StreamReader(stream))
+                data = reader.ReadToEnd();
 
         // Remove all newlines and spaces between individual tags because apparently this serializer doesn't like them
         int index;
@@ -198,23 +179,20 @@ public abstract class Serializer
             data = data.Remove(index + 1, 1);
         }
 
-        reader.Close();
-        file.Close();
-
-        MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(data));
-
-        Dictionary<AffixPoolPreset, AffixPool> pools = new Dictionary<AffixPoolPreset, AffixPool>();
-        DataContractSerializer serializer = new DataContractSerializer(pools.GetType());
-        pools = serializer.ReadObject(stream) as Dictionary<AffixPoolPreset, AffixPool>;
-        stream.Close();
-
-        // Create new random objects
-        foreach (var pool in pools)
+        using (MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(data)))
         {
-            pool.Value.ChangeSeed();
-        }
+            Dictionary<AffixPoolPreset, AffixPool> pools = new Dictionary<AffixPoolPreset, AffixPool>();
+            DataContractSerializer serializer = new DataContractSerializer(pools.GetType());
+            pools = serializer.ReadObject(stream) as Dictionary<AffixPoolPreset, AffixPool>;
 
-        return pools;
+            // Create new random objects
+            foreach (var pool in pools)
+            {
+                pool.Value.ChangeSeed();
+            }
+
+            return pools;
+        }
     }
     #endregion
 
@@ -235,10 +213,14 @@ public abstract class Serializer
 
     public static HashSet<AffixType> LoadAffixTypesFromDisk()
     {
+        TextAsset text = Resources.Load<TextAsset>(AFFIX_TYPE_FILE_PATH);
+        if (text == null)
+            throw new FileNotFoundException("Couldn't find affix type info file!");
+
         HashSet<AffixType> result = new HashSet<AffixType>();
-        using (FileStream file = new FileStream(AFFIX_TYPE_FILE_PATH, FileMode.Open))
+        using (MemoryStream stream = new MemoryStream(text.bytes))
         {
-            using (StreamReader reader = new StreamReader(file))
+            using (StreamReader reader = new StreamReader(stream))
             {
                 string line;
                 while ((line = reader.ReadLine()) != null)

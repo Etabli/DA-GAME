@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System;
 using System.Linq;
+using UnityEngine;
 
 /// <summary>
 /// Represents information on a single AffixType. Serializable via a DataContract.
@@ -77,6 +78,7 @@ public class AffixInfo
     /// </summary>
     public static AffixInfo GetAffixInfo(AffixType type)
     {
+        Debug.Log(affixInfoDictionary.Count);
         // If the requested type is random, select a random affix
         if (type == AffixType.Random)
         {
