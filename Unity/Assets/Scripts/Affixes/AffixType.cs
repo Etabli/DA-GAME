@@ -49,6 +49,16 @@ public struct AffixType
         return type.GetHashCode();
     }
 
+    public static bool operator ==(AffixType lhs, AffixType rhs)
+    {
+        return lhs.type == rhs.type;
+    }
+
+    public static bool operator !=(AffixType lhs, AffixType rhs)
+    {
+        return !(lhs == rhs);
+    }
+
     public static bool operator ==(AffixType lhs, string rhs)
     {
         return lhs.type == rhs;

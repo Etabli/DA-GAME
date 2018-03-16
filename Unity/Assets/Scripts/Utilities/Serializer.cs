@@ -287,24 +287,15 @@ public abstract class Serializer
     /// <returns></returns>
     public static BiomeInfo LoadBiomeInfoFromDisk(BiomeType type)
     {
-        FileStream file;
-        try
-        {
-            file = new FileStream(GetBiomePathFromType(type), FileMode.Open);
-        }
-        catch (FileNotFoundException e)
-        {
-            throw new FileNotFoundException("Could not finde biome info file!", GetBiomePathFromType(type), e);
-        }
-        catch (Exception e)
-        {
-            throw new Exception($"Exception while trying to load biome info from disk for type {type}", e);
-        }
+        TextAsset text = Resources.Load<TextAsset>(GetBiomePathFromType(type));
+        if (text == null)
+            throw new ArgumentException($"Couldn't find info file for biome type {type}");
 
-        StreamReader reader = new StreamReader(file);
-        string data = reader.ReadToEnd();
-        reader.Close();
-        file.Close();
+        string data;
+        using (MemoryStream stream = new MemoryStream(text.bytes))
+            using (StreamReader reader = new StreamReader(stream))
+                data = reader.ReadToEnd();
+
         return new BiomeInfo(DeserializeBiomeInfo(data));
     }
 
