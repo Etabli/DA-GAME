@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Test : MonoBehaviour
 {
-    void Start()
+    void Awake()
     {
         //AffixInfo healthInfo = new AffixInfo(AffixValueType.SingleValue, "Health", new AffixValueInfo(3.0f, 5.0f, new AffixProgression("Linear", 0, 1)), "Increases your health by {0}");
         //AffixInfo physDmgFlatInfo = new AffixInfo(AffixValueType.Range, "Flat Physical Damage", new AffixValueInfo(new AffixValueRange(1, 1.3f), new AffixValueRange(1.5f, 2f)), "Increases your physical damage by {0}");
