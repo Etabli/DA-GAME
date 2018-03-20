@@ -27,6 +27,9 @@ public class AffixValueInfo
 
     public AffixValueInfo(AffixValue baseValueMin, AffixValue baseValueMax, AffixProgression progression)
     {
+        if (!baseValueMin.IsSameType(baseValueMax))
+            throw new ArgumentException($"Mininum and maximum value have to be of the same type!");
+
         BaseValueMin = baseValueMin;
         BaseValueMax = baseValueMax;
         Progression = new AffixProgression(progression);
@@ -47,6 +50,11 @@ public class AffixValueInfo
 
     public static bool operator==(AffixValueInfo lhs, AffixValueInfo rhs)
     {
+        if (ReferenceEquals(lhs, null) && ReferenceEquals(rhs, null))
+            return true;
+        if (ReferenceEquals(lhs, null) || ReferenceEquals(rhs, null))
+            return false;
+
         if (lhs.BaseValueMin != rhs.BaseValueMin ||
             lhs.BaseValueMax != rhs.BaseValueMax ||
             lhs.Progression != rhs.Progression)

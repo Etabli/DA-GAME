@@ -14,8 +14,6 @@ public class AffixInfo
     [DataMember]
     public readonly AffixType Type;
     [DataMember]
-    public readonly AffixValueType ValueType;
-    [DataMember]
     public readonly string Description;
     [DataMember]
     public readonly AffixValueInfo ValueInfo;
@@ -23,30 +21,29 @@ public class AffixInfo
     public int ID { get { return Type.ID; } }
     public string Name { get { return Type.Name; } }
 
-    public AffixInfo(AffixInfo src) : this(src.ID, src.Name, src.ValueType, src.ValueInfo, src.Description)
+    public AffixInfo(AffixInfo src) : this(src.ID, src.Name, src.ValueInfo, src.Description)
     { }
 
-    public AffixInfo(string name, AffixValueType valueType, AffixValueInfo valueInfo) : this(name, valueType, valueInfo, "")
+    public AffixInfo(string name, AffixValueInfo valueInfo) : this(name, valueInfo, "")
     { }
 
     /// <summary>
     /// Creates a new AffixInfo object
     /// </summary>
-    public AffixInfo(string name, AffixValueType valueType, AffixValueInfo valueInfo, string description)
-        : this(valueType, valueInfo, description)
+    public AffixInfo(string name, AffixValueInfo valueInfo, string description)
+        : this(valueInfo, description)
     {
         Type = AffixType.CreateNew(name);
     }
 
-    public AffixInfo(int id, string name, AffixValueType valueType, AffixValueInfo valueInfo, string description)
-        : this(valueType, valueInfo, description)
+    public AffixInfo(int id, string name, AffixValueInfo valueInfo, string description)
+        : this(valueInfo, description)
     {
         Type = AffixType.Replace(id, name);
     }
 
-    private AffixInfo(AffixValueType valueType, AffixValueInfo valueInfo, string description)
+    private AffixInfo(AffixValueInfo valueInfo, string description)
     {
-        ValueType = valueType;
         Description = description;
         ValueInfo = new AffixValueInfo(valueInfo);
     }
@@ -56,7 +53,7 @@ public class AffixInfo
     /// </summary>
     public Affix GenerateAffix(int tier)
     {
-        return new Affix(Type, ValueType, ValueInfo.GetValueForTier(tier), tier);
+        return new Affix(Type, ValueInfo.GetValueForTier(tier), tier);
     }
 
     /// <summary>
@@ -64,12 +61,12 @@ public class AffixInfo
     /// </summary>
     public Affix GenerateAffix(int tier, AffixProgression progression)
     {
-        return new Affix(Type, ValueType, ValueInfo.GetValueForTier(tier, progression), tier);
+        return new Affix(Type, ValueInfo.GetValueForTier(tier, progression), tier);
     }
 
     public override string ToString()
     {
-        return string.Format("{0}: " + string.Format(Description, ValueInfo) + " (Type {1}, ValueType {2})", Name, Type, ValueType);
+        return string.Format("{0}: " + string.Format(Description, ValueInfo) + " (Type {1})", Name, Type);
     }
 
     #region Static Functionality
@@ -82,6 +79,15 @@ public class AffixInfo
     public static void Register(AffixInfo info)
     {
         affixInfoDictionary[info.Type] = info;
+    }
+
+    /// <summary>
+    /// Deregisters an affix type from the affix info dictionary
+    /// </summary>
+    /// <param name="type"></param>
+    public static void Deregister(AffixType type)
+    {
+        affixInfoDictionary.Remove(type);
     }
 
     /// <summary>

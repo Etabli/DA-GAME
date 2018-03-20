@@ -80,6 +80,10 @@ public abstract class AffixValue
         return new AffixValueSingle(value);
     }
     #endregion
+
+    #region Type Comparison
+    public abstract bool IsSameType(AffixValue affixValue);
+    #endregion
 }
 #endregion
 
@@ -102,6 +106,11 @@ public class AffixValueSingle : AffixValue
     }
 
     #region Comparison
+    public override bool IsSameType(AffixValue affixValue)
+    {
+        return affixValue is AffixValueSingle;
+    }
+
     public override bool Equals(object obj)
     {
         if (obj is AffixValueSingle)
@@ -228,6 +237,11 @@ public class AffixValueRange : AffixValue
     }
 
     #region Comparison
+    public override bool IsSameType(AffixValue affixValue)
+    {
+        return affixValue is AffixValueRange;
+    }
+
     public override bool Equals(object obj)
     {
         if (obj is AffixValueRange)
@@ -348,6 +362,25 @@ public class AffixValueMultiple : AffixValue
     }
 
     #region Comparison
+    public override bool IsSameType(AffixValue affixValue)
+    {
+        if (!(affixValue is AffixValueMultiple))
+        {
+            return false;
+        }
+
+        var affixValueMultiple = affixValue as AffixValueMultiple;
+        if (affixValueMultiple.Values.Length != Values.Length)
+            return false;
+
+        for (int i = 0; i < Values.Length; i++)
+        {
+            if (!affixValueMultiple.Values[i].IsSameType(Values[i]))
+                return false;
+        }
+        return true; ;
+    }
+
     public override bool Equals(object obj)
     {
         if (obj is AffixValueMultiple)

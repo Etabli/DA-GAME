@@ -4,10 +4,13 @@ using UnityEngine;
 
 public class AffixListDisplay : MonoBehaviour
 {
-    const int HEIGHT_PER_AFFIX = 30;
+    const int HEIGHT_PER_AFFIX = 20;
 
     public GameObject AffixTypeDisplay;
     public RectTransform RectTransform;
+    public AffixInfoDisplay AffixInfoDisplay;
+
+    AffixType selectedType = AffixType.None;
 
     private void Start()
     {
@@ -16,9 +19,18 @@ public class AffixListDisplay : MonoBehaviour
             var display_go = Instantiate(AffixTypeDisplay, transform);
             AffixTypeDisplay display = display_go.GetComponent<AffixTypeDisplay>();
             display.SetAffixType(type);
-            display.OnClick += (t) => Debug.Log(t.Name);
+            display.OnClick += SelectType;
         }
 
         RectTransform.sizeDelta = new Vector2(RectTransform.sizeDelta.x, AffixType.Types.Count * HEIGHT_PER_AFFIX);
+    }
+
+    void SelectType(AffixType type)
+    {
+        if (type == selectedType)
+            return;
+
+        selectedType = type;
+        AffixInfoDisplay.SetType(selectedType);
     }
 }

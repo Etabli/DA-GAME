@@ -4,6 +4,7 @@ using System.Runtime.Serialization;
 using System.Reflection;
 using System.Linq;
 using System;
+using UnityEngine;
 
 /// <summary>
 /// Represents a progression function that can be applied to an AffixValue
@@ -115,7 +116,8 @@ public struct AffixProgression
     public static Dictionary<string, int> ParameterRequirements = new Dictionary<string, int>
     {
         {nameof(Constant), 1},
-        {nameof(Linear), 2}
+        {nameof(Linear), 2},
+        {nameof(Exponential), 1}
     };
 
     // Valid progression functions should follow the signature
@@ -144,6 +146,18 @@ public struct AffixProgression
             throw new ArgumentException("Linear progression requires exactly 2 parameters!", nameof(parameters));
         }
         return (parameters[0] + parameters[1] * tier) * value;
+    }
+
+    /// <summary>
+    /// Exponential progression with the parameter as the base
+    /// </summary>
+    public static AffixValue Exponential(AffixValue value, int tier, float[] parameters)
+    {
+        if (parameters.Length != ParameterRequirements[nameof(Exponential)])
+        {
+            throw new ArgumentException("Exponential progression requires exactly 1 parameter!", nameof(parameters));
+        }
+        return Mathf.Pow(parameters[0], tier) * value;
     }
     #endregion
 
