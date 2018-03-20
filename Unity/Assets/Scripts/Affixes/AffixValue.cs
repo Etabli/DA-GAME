@@ -336,14 +336,14 @@ public class AffixValueRange : AffixValue
 public class AffixValueMultiple : AffixValue
 {
     [DataMember]
-    public float[] Values { get; protected set; }
+    public AffixValue[] Values { get; protected set; }
 
     public AffixValueMultiple()
     { }
 
-    public AffixValueMultiple(params float[] values)
+    public AffixValueMultiple(params AffixValue[] values)
     {
-        Values = new float[values.Length];
+        Values = new AffixValue[values.Length];
         values.CopyTo(Values, 0);
     }
 
@@ -352,8 +352,6 @@ public class AffixValueMultiple : AffixValue
     {
         if (obj is AffixValueMultiple)
             return this == (AffixValueMultiple)obj;
-        if (obj is float[])
-            return this == (float[])obj;
         return base.Equals(obj);
     }
 
@@ -364,32 +362,12 @@ public class AffixValueMultiple : AffixValue
 
     public static bool operator ==(AffixValueMultiple lhs, AffixValueMultiple rhs)
     {
-        return lhs == rhs.Values;
+        return lhs.Values.SequenceEqual(rhs.Values);
     }
 
     public static bool operator !=(AffixValueMultiple lhs, AffixValueMultiple rhs)
     {
         return !(lhs == rhs);
-    }
-
-    public static bool operator ==(AffixValueMultiple lhs, float[] rhs)
-    {
-        return lhs.Values.SequenceEqual(rhs);
-    }
-
-    public static bool operator !=(AffixValueMultiple lhs, float[] rhs)
-    {
-        return !(lhs == rhs);
-    }
-
-    public static bool operator ==(float[] lhs, AffixValueMultiple rhs)
-    {
-        return rhs == lhs;
-    }
-
-    public static bool operator !=(float[] lhs, AffixValueMultiple rhs)
-    {
-        return rhs != lhs;
     }
     #endregion
 
@@ -409,7 +387,7 @@ public class AffixValueMultiple : AffixValue
         if (val is AffixValueMultiple)
         {
             AffixValueMultiple valMultiple = val as AffixValueMultiple;
-            float[] vals = new float[Values.Length];
+            AffixValue[] vals = new AffixValue[Values.Length];
             Values.CopyTo(vals, 0);
             for (int i = 0; i < Values.Length; i++)
             {
@@ -433,7 +411,7 @@ public class AffixValueMultiple : AffixValue
     public override string ToString()
     {
         string result = "";
-        foreach(float v in Values)
+        foreach(var v in Values)
         {
             result += v + ", ";
         }

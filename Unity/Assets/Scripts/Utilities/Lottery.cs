@@ -323,7 +323,7 @@ public class Lottery<T>
 
     public override string ToString()
     {
-        string result = string.Format("Lottery of type '{0}' with {1} entrants:\n", typeof(T));
+        string result = string.Format("Lottery of type '{0}' with {1} entrants:\n", typeof(T), entrants.Count);
         foreach(Tuple<T, int> e in entrants)
         {
             result += string.Format("{0}: {1}\n", e.Item1, e.Item2);
