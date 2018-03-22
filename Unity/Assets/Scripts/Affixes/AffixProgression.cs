@@ -15,18 +15,18 @@ public struct AffixProgression
     [DataMember]
     public readonly float[] Parameters;
     [DataMember]
-    public readonly string ProgressionFunctionName;
+    public readonly string Name;
 
     private MethodInfo progressionFunction;
 
-    public AffixProgression(AffixProgression src) : this(src.ProgressionFunctionName, src.Parameters)
+    public AffixProgression(AffixProgression src) : this(src.Name, src.Parameters)
     { }
 
     public AffixProgression(string name, params float[] parameters)
     { 
         Parameters = new float[parameters.Length];
         parameters.CopyTo(Parameters, 0);
-        ProgressionFunctionName = name;
+        Name = name;
         progressionFunction = null;
 
         AttachProgressionFunction();
@@ -47,7 +47,7 @@ public struct AffixProgression
 
     public static bool operator==(AffixProgression lhs, AffixProgression rhs)
     {
-        if (lhs.ProgressionFunctionName != rhs.ProgressionFunctionName ||
+        if (lhs.Name != rhs.Name ||
             !lhs.Parameters.SequenceEqual(rhs.Parameters))
         {
             return false;
@@ -68,11 +68,11 @@ public struct AffixProgression
     /// <returns>true if the function was found, false otherwise</returns>
     public void AttachProgressionFunction()
     {
-        MethodInfo method = GetType().GetMethod(ProgressionFunctionName);
+        MethodInfo method = GetType().GetMethod(Name);
 
         if (method == null)
         {
-            throw new InvalidProgressionFunctionException($"Could not find progression function with name {ProgressionFunctionName}!");
+            throw new InvalidProgressionFunctionException($"Could not find progression function with name {Name}!");
         }
 
         progressionFunction = method;
@@ -85,7 +85,7 @@ public struct AffixProgression
 
     public string GetName()
     {
-        return ProgressionFunctionName;
+        return Name;
     }
 
     /// <summary>
@@ -106,7 +106,7 @@ public struct AffixProgression
 
     public override string ToString()
     {
-        return Parameters.Aggregate(ProgressionFunctionName, (output, value) => output + ", " + value.ToString());
+        return Parameters.Aggregate(Name, (output, value) => output + ", " + value.ToString());
     }
 
     #region Static Progression Functions

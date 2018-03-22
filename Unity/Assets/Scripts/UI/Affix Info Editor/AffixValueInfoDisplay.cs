@@ -19,8 +19,38 @@ public class AffixValueInfoDisplay : MonoBehaviour
     public GameObject SingleValueInputPrefab;
     public GameObject RangeInputPrefab;
 
+    public bool IsChanged
+    {
+        get
+        {
+            if (input != null)
+                return input.IsChanged;
+            return false;
+        }
+    }
+
+    public bool IsValid
+    {
+        get
+        {
+            if (input != null)
+                return input.IsValid;
+            return true;
+        }
+    }
+
+    public AffixValueInfo Info
+    {
+        get
+        {
+            if (input != null)
+                return input.Info;
+            return null;
+        }
+    }
+
     AffixValueInfo currentInfo;
-    GameObject input_go;
+    GameObject inputGO;
     AffixValueInfoInput input;
 
     private void Start()
@@ -53,21 +83,26 @@ public class AffixValueInfoDisplay : MonoBehaviour
     {
         if (type == typeof(AffixValueSingle) && !(input is AffixValueInfoSingleInput))
         {
-            Destroy(input_go);
+            Destroy(inputGO);
 
-            input_go = Instantiate(SingleValueInputPrefab, InputContainer);
+            inputGO = Instantiate(SingleValueInputPrefab, InputContainer);
             UpdateHeights();
         }
         else if (type == typeof(AffixValueRange) && !(input is AffixValueInfoRangeInput))
         {
-            Destroy(input_go);
+            Destroy(inputGO);
 
-            input_go = Instantiate(RangeInputPrefab, InputContainer);
+            inputGO = Instantiate(RangeInputPrefab, InputContainer);
             UpdateHeights();
         }
 
-        input = input_go.GetComponent<AffixValueInfoInput>();
-        input.OnChangedStatusUpdated += UpdateLabel;
+        var newInput = inputGO.GetComponent<AffixValueInfoInput>();
+        if (!ReferenceEquals(input, newInput))
+        {
+            input = newInput;
+            input.Initialize();
+            input.OnChangedStatusUpdated += UpdateLabel;
+        }
     }
 
     void ChangeType(int typeIndex)
@@ -94,7 +129,7 @@ public class AffixValueInfoDisplay : MonoBehaviour
 
     void UpdateHeights()
     {
-        float content_height = input_go.GetComponent<LayoutElement>().minHeight;
+        float content_height = inputGO.GetComponent<LayoutElement>().minHeight;
         Layout.minHeight = Label.GetComponent<LayoutElement>().minHeight
             + TypeDropdown.GetComponent<LayoutElement>().minHeight
             + content_height

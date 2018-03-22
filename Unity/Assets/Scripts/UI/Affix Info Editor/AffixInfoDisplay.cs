@@ -11,11 +11,6 @@ public class AffixInfoDisplay : MonoBehaviour
 
     AffixInfo currentInfo;
 
-    AffixValue minValue;
-    AffixValue maxValue;
-    string progressionFunction;
-    float[] progressionParameters;
-
 	// Use this for initialization
 	void Start () {
 		

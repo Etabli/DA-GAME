@@ -17,7 +17,8 @@ public class AffixValueInfoRangeInput : AffixValueInfoInput
                 return null;
             return new AffixValueInfo(
                 new AffixValueRange(MinimumInput.Minimum, MinimumInput.Maximum),
-                new AffixValueRange(MaximumInput.Minimum, MaximumInput.Maximum));
+                new AffixValueRange(MaximumInput.Minimum, MaximumInput.Maximum),
+                MinimumInput.Progression);
         }
     }
 
@@ -62,5 +63,13 @@ public class AffixValueInfoRangeInput : AffixValueInfoInput
 
         MinimumInput.SetValueInfo(info.BaseValueMin as AffixValueRange);
         MaximumInput.SetValueInfo(info.BaseValueMax as AffixValueRange);
+
+        MinimumInput.Progression = info.Progression;
+    }
+
+    public override void Initialize()
+    {
+        MinimumInput.Initialize();
+        MaximumInput.Initialize();
     }
 }

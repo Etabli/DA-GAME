@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Reflection;
 using System.Runtime.Serialization;
 
-// TODO: Improve design so that dynamically adding types is a thing but also no confusion with strings
 /// <summary>
 /// Represents a single affix type, encoded by a string
 /// </summary>

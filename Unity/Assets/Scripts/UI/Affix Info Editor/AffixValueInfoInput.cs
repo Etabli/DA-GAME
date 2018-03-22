@@ -1,10 +1,26 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Linq;
 using UnityEngine;
 
 public abstract class AffixValueInfoInput : MonoBehaviour
 {
+    #region Static
+    protected static List<string> progressionFunctions;
+
+    protected void InitializeProgressionFunctions()
+    {
+        if (progressionFunctions == null)
+        {
+            progressionFunctions = typeof(AffixProgression).GetMethods(BindingFlags.Static | BindingFlags.Public)
+                .Select(method => method.Name).ToList()
+                .Where(name => !name.StartsWith("op")).ToList();
+        }
+    }
+    #endregion
+
     public event Action<bool> OnChangedStatusUpdated;
 
     public abstract AffixValueInfo Info { get; }
@@ -26,4 +42,6 @@ public abstract class AffixValueInfoInput : MonoBehaviour
     public abstract bool IsValid { get; }
 
     public abstract void SetValueInfo(AffixValueInfo info);
+
+    public abstract void Initialize();
 }
