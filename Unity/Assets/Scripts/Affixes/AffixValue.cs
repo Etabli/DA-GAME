@@ -342,7 +342,7 @@ public class AffixValueMultiple : AffixValue
     [DataMember]
     public AffixValue[] Values { get; protected set; }
     [DataMember]
-    protected Dictionary<string, int> valueNames = new Dictionary<string, int>();
+    protected readonly Dictionary<string, int> valueNames = new Dictionary<string, int>();
 
     public AffixValueMultiple()
     { }

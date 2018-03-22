@@ -9,7 +9,8 @@ public class AffixValueInfoRangeInput : AffixValueInfoInput
     const string MINIMUM_LABEL_TEXT = "Minimum";
     const string MAXIMUM_LABEL_TEXT = "Maximum";
 
-    public override AffixValueInfo Info {
+    public override AffixValueInfo Info
+    {
         get
         {
             if (!IsValid)
