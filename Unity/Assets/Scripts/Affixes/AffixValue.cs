@@ -4,16 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 
-/// <summary>
-/// Value types for affixes. Used to decide on the proper AffixValue child class upon deserialization.
-/// </summary>
-public enum AffixValueType
-{
-    SingleValue,
-    Range,
-    Multiple
-}
-
 #region AffixValue
 /// <summary>
 /// Represents a general AffixValue and the operations it should support.
@@ -351,6 +341,8 @@ public class AffixValueMultiple : AffixValue
 {
     [DataMember]
     public AffixValue[] Values { get; protected set; }
+    [DataMember]
+    protected Dictionary<string, int> valueNames = new Dictionary<string, int>();
 
     public AffixValueMultiple()
     { }
@@ -359,6 +351,53 @@ public class AffixValueMultiple : AffixValue
     {
         Values = new AffixValue[values.Length];
         values.CopyTo(Values, 0);
+    }
+
+    public AffixValueMultiple(Tuple<string, AffixValue>[] values)
+    {
+        Values = new AffixValue[values.Length];
+        for (int i = 0; i < values.Length; i++)
+        {
+            var tuple = values[i];
+            Values[i] = tuple.Item2;
+            valueNames.Add(tuple.Item1, i);
+        }
+    }
+
+    public AffixValueMultiple(AffixValue[] values, string[] names)
+        : this(values)
+    {
+        if (values.Length != names.Length)
+            throw new ArgumentException("Value and name arrays have to have same length!");
+
+        for (int i = 0; i < values.Length; i++)
+        {
+            if (valueNames.ContainsKey(names[i]))
+                throw new ArgumentException("Name array must not contain duplicates!", nameof(names));
+            valueNames.Add(names[i], i);
+        }
+    }
+
+    public AffixValue this[int index]
+    {
+        get
+        {
+            if (index < 0 || index >= Values.Length)
+                throw new IndexOutOfRangeException();
+
+            return Values[index];
+        }
+    }
+
+    public AffixValue this[string name]
+    {
+        get
+        {
+            if (!valueNames.ContainsKey(name))
+                throw new KeyNotFoundException($"No value with name {name} exists!");
+
+            return Values[valueNames[name]];
+        }
     }
 
     #region Comparison
