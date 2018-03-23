@@ -24,7 +24,7 @@ public class UserDialogController : MonoBehaviour
 
     public static UserDialogController Instance { get; private set; }
 
-	void Awake ()
+    void Awake()
     {
         if (Instance != null)
         {
@@ -41,12 +41,13 @@ public class UserDialogController : MonoBehaviour
 
         // Should always be last so input blocking works
         transform.SetAsLastSibling();
-	}
+    }
 
+    #region Show
     /// <summary>
     /// Shows a dialog with the specified message.
     /// </summary>
-    public static UserDialog Show(string message)
+    public static UserDialogBasic Show(string message)
     {
         if (message == null)
             message = "";
@@ -57,7 +58,7 @@ public class UserDialogController : MonoBehaviour
     /// <summary>
     /// Shows a dialog with the specified message and calls the callback when it is closed
     /// </summary>
-    public static UserDialog Show(string message, Action callback)
+    public static UserDialogBasic Show(string message, Action callback)
     {
         if (callback == null)
             throw new ArgumentException("Close callback can't be null!", nameof(callback));
@@ -74,7 +75,7 @@ public class UserDialogController : MonoBehaviour
     /// <param name="cancelCallback">The function to be called when the user hits Cancel.
     /// Leave null if nothing should happen.</param>
     /// <returns></returns>
-    public static UserDialog Show(string message, Action acceptCallback, Action cancelCallback)
+    public static UserDialogCancellable Show(string message, Action acceptCallback, Action cancelCallback)
     {
         if (acceptCallback == null)
             throw new ArgumentException("Accept callback can't be null!", nameof(acceptCallback));
@@ -89,9 +90,70 @@ public class UserDialogController : MonoBehaviour
     }
 
     /// <summary>
+    /// Shows a prompt for the user to enter a string with no option to cancel.
+    /// </summary>
+    public static UserDialogStringInput Show(string message, Action<string> submitCallback)
+    {
+        if (submitCallback == null)
+            throw new ArgumentException("Submit callback can't be null!", nameof(submitCallback));
+
+        var dialog = CreateDialog<UserDialogStringInput>(message);
+        dialog.OnSubmit += submitCallback;
+        dialog.DisableCancelling();
+
+        return dialog;
+    }
+
+    /// <summary>
+    /// Shows a prompt for the user to enter a string with no option to cancel.
+    /// </summary>
+    public static UserDialogStringInput Show(string message, Action<string> submitCallback, InputField.ContentType contentType)
+    {
+        if (!Enum.IsDefined(typeof(InputField.ContentType), contentType))
+            throw new ArgumentException("Contenty type argument has to be a valid InputField.ContentType!", nameof(contentType));
+
+        var dialog = Show(message, submitCallback) as UserDialogStringInput;
+        dialog.SetContentType(contentType);
+        return dialog;
+    }
+
+    /// <summary>
+    /// Shows a prompt for the user to enter a string with an option to cancel.
+    /// </summary>
+    /// <param name="cancelCallback">The function to be called when the user hits Cancel. Leave null if nothing should happen.</param>
+    public static UserDialogStringInput Show(string message, Action<string> submitCallback, Action cancelCallback)
+    {
+        if (submitCallback == null)
+            throw new ArgumentException("Submit callback can't be null!", nameof(submitCallback));
+
+        var dialog = CreateDialog<UserDialogStringInput>(message);
+        dialog.OnSubmit += submitCallback;
+
+        if (cancelCallback != null)
+            dialog.OnCancel += cancelCallback;
+
+        return dialog;
+    }
+
+    /// <summary>
+    /// Shows a prompt for the user to enter a string.
+    /// </summary>
+    /// <param name="cancelCallback">The function to be called when the user hits Cancel. Leave null if nothing should happen.</param>
+    public static UserDialogStringInput Show(string message, Action<string> submitCallback, Action cancelCallback, InputField.ContentType contentType)
+    {
+        if (!Enum.IsDefined(typeof(InputField.ContentType), contentType))
+            throw new ArgumentException("Contenty type argument has to be a valid InputField.ContentType!", nameof(contentType));
+
+        var dialog = Show(message, submitCallback, cancelCallback);
+        dialog.SetContentType(contentType);
+        return dialog;
+    }
+
+    #region ShowBlocking
+    /// <summary>
     /// Shows a dialog with the specified message.
     /// </summary>
-    public static UserDialog ShowBlocking(string message)
+    public static UserDialogBasic ShowBlocking(string message)
     {
         var dialog = Show(message);
         Block(dialog);
@@ -101,7 +163,7 @@ public class UserDialogController : MonoBehaviour
     /// <summary>
     /// Shows a dialog with the specified message and calls the callback when it is closed
     /// </summary>
-    public static UserDialog ShowBlocking(string message, Action callback)
+    public static UserDialogBasic ShowBlocking(string message, Action callback)
     {
         var dialog = Show(message, callback);
         Block(dialog);
@@ -115,12 +177,57 @@ public class UserDialogController : MonoBehaviour
     /// <param name="cancelCallback">The function to be called when the user hits Cancel.
     /// Leave null if nothing should happen.</param>
     /// <returns></returns>
-    public static UserDialog ShowBlocking(string message, Action acceptCallback, Action cancelCallback)
+    public static UserDialogCancellable ShowBlocking(string message, Action acceptCallback, Action cancelCallback)
     {
         var dialog = Show(message, acceptCallback, cancelCallback);
         Block(dialog);
         return dialog;
     }
+
+    /// <summary>
+    /// Shows a prompt for the user to enter a string with no option to cancel.
+    /// </summary>
+    public static UserDialogStringInput ShowBlocking(string message, Action<string> submitCallback)
+    {
+        var dialog = Show(message, submitCallback);
+        Block(dialog);
+        return dialog;
+    }
+
+    /// <summary>
+    /// Shows a prompt for the user to enter a string with no option to cancel.
+    /// </summary>
+    public static UserDialogStringInput ShowBlocking(string message, Action<string> submitCallback, InputField.ContentType contentType)
+    {
+        var dialog = Show(message, submitCallback, contentType);
+        Block(dialog);
+        return dialog;
+    }
+
+    /// <summary>
+    /// Shows a prompt for the user to enter a string with an option to cancel.
+    /// </summary>
+    /// <param name="cancelCallback">The function to be called when the user hits Cancel. Leave null if nothing should happen.</param>
+    public static UserDialogStringInput ShowBlocking(string message, Action<string> submitCallback, Action cancelCallback)
+    {
+        var dialog = Show(message, submitCallback, cancelCallback);
+        Block(dialog);
+        return dialog;
+    }
+
+    /// <summary>
+    /// Shows a prompt for the user to enter a string.
+    /// </summary>
+    /// <param name="cancelCallback">The function to be called when the user hits Cancel. Leave null if nothing should happen.</param>
+    public static UserDialogStringInput ShowBlocking(string message, Action<string> submitCallback, Action cancelCallback, InputField.ContentType contentType)
+    {
+        var dialog = Show(message, submitCallback, cancelCallback, contentType);
+        Block(dialog);
+        return dialog;
+    }
+    #endregion
+
+    #endregion
 
     /// <summary>
     /// Makes a dialog block input to other UI elements (excluding other dialogs)

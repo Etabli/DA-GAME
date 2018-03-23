@@ -14,9 +14,7 @@ public class UserDialogBasic : UserDialog
 
         if (OKButton == null)
             throw new UserDialogException("User dialog's reference to OK button is not set!");
-        else
-        {
-            OKButton.onClick.AddListener(Close);
-        }
+
+        OKButton.onClick.AddListener(Close);
     }
 }

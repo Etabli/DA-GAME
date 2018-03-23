@@ -10,7 +10,7 @@ public class UserDialogCancellable : UserDialogBasic
     public event Action OnCancel;
 
     [SerializeField]
-    Button CancelButton;
+    protected Button CancelButton;
 
     protected override void Awake()
     {

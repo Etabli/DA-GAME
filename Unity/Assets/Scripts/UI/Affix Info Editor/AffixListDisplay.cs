@@ -36,6 +36,11 @@ public class AffixListDisplay : MonoBehaviour
 
     public void TestDialog()
     {
-        UserDialogController.Show("hi", () => UserDialogController.ShowBlocking("bye"), () => UserDialogController.ShowBlocking("I didn't wanna talk to you anyway"));
+        UserDialogController.Show("hi",
+            () => UserDialogController.Show("What's your name?",
+                name => UserDialogController.Show($"Nice to meet you, {name}"),
+                () => UserDialogController.Show("I said, what's your name?",
+                    name => UserDialogController.Show($"See, was that so hard, {name}?"))),
+            () => UserDialogController.ShowBlocking("I didn't wanna talk to you anyway"));
     }
 }
