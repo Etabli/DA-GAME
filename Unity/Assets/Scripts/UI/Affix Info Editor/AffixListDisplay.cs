@@ -33,4 +33,9 @@ public class AffixListDisplay : MonoBehaviour
         selectedType = type;
         AffixInfoDisplay.SetType(selectedType);
     }
+
+    public void TestDialog()
+    {
+        UserDialogController.Show("hi", () => UserDialogController.Block(UserDialogController.Show("bye")));
+    }
 }

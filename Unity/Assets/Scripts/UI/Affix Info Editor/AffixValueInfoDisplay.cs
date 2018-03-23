@@ -95,6 +95,11 @@ public class AffixValueInfoDisplay : MonoBehaviour
             inputGO = Instantiate(RangeInputPrefab, InputContainer);
             UpdateHeights();
         }
+        else if (type == typeof(AffixValueMultiple))
+        {
+
+            Debug.LogWarning("AffixValueMultiple not implemented yet!");
+        }
 
         var newInput = inputGO.GetComponent<AffixValueInfoInput>();
         if (!ReferenceEquals(input, newInput))
