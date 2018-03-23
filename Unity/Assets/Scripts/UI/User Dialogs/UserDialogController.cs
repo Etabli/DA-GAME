@@ -6,11 +6,19 @@ using UnityEngine.UI;
 
 public class UserDialogController : MonoBehaviour
 {
-    [SerializeField]
-    List<GameObject> dialogPrefabs;
+    [Serializable]
+    public struct NamedPrefab
+    {
+        public string name;
+        public GameObject prefab;
+    }
+
     [SerializeField]
     Image inputBlocker;
+    [SerializeField]
+    NamedPrefab[] prefabs;
 
+    static Dictionary<string, GameObject> dialogPrefabs = new Dictionary<string, GameObject>();
     static List<UserDialog> activeDialogs = new List<UserDialog>();
     static HashSet<UserDialog> blockingDialogs = new HashSet<UserDialog>();
 
@@ -26,6 +34,11 @@ public class UserDialogController : MonoBehaviour
 
         Instance = this;
 
+        foreach (var prefab in prefabs)
+        {
+            dialogPrefabs.Add(prefab.name, prefab.prefab);
+        }
+
         // Should always be last so input blocking works
         transform.SetAsLastSibling();
 	}
@@ -35,16 +48,10 @@ public class UserDialogController : MonoBehaviour
     /// </summary>
     public static UserDialog Show(string message)
     {
-        var dialogGO = Instantiate(Instance.dialogPrefabs[0], Instance.transform);
-        var dialog = dialogGO.GetComponent<UserDialog>();
-        dialogGO.transform.Translate(new Vector3(10, -10, 0) * activeDialogs.Count);
-        (dialogGO.transform as RectTransform).ClampToScreen();
+        if (message == null)
+            message = "";
 
-        activeDialogs.Add(dialog);
-        dialog.OnClose += () => activeDialogs.Remove(dialog);
-
-        dialog.Message = message;
-        return dialog;
+        return CreateDialog<UserDialogBasic>(message);
     }
 
     /// <summary>
@@ -52,11 +59,38 @@ public class UserDialogController : MonoBehaviour
     /// </summary>
     public static UserDialog Show(string message, Action callback)
     {
-        var dialog = Show(message);
+        if (callback == null)
+            throw new ArgumentException("Close callback can't be null!", nameof(callback));
+
+        var dialog = CreateDialog<UserDialogBasic>(message);
         dialog.OnClose += callback;
         return dialog;
     }
 
+    /// <summary>
+    /// Shows a dialog with the specified message and sets up the appropriate callbacks
+    /// </summary>
+    /// <param name="acceptCallback">The function to be called when the user hits OK</param>
+    /// <param name="cancelCallback">The function to be called when the user hits Cancel.
+    /// Leave null if nothing should happen.</param>
+    /// <returns></returns>
+    public static UserDialog Show(string message, Action acceptCallback, Action cancelCallback)
+    {
+        if (acceptCallback == null)
+            throw new ArgumentException("Accept callback can't be null!", nameof(acceptCallback));
+
+        var dialog = CreateDialog<UserDialogCancellable>(message);
+        dialog.OnAccept += acceptCallback;
+
+        if (cancelCallback != null)
+            dialog.OnCancel += cancelCallback;
+
+        return dialog;
+    }
+
+    /// <summary>
+    /// Shows a dialog with the specified message.
+    /// </summary>
     public static UserDialog ShowBlocking(string message)
     {
         var dialog = Show(message);
@@ -64,9 +98,26 @@ public class UserDialogController : MonoBehaviour
         return dialog;
     }
 
+    /// <summary>
+    /// Shows a dialog with the specified message and calls the callback when it is closed
+    /// </summary>
     public static UserDialog ShowBlocking(string message, Action callback)
     {
         var dialog = Show(message, callback);
+        Block(dialog);
+        return dialog;
+    }
+
+    /// <summary>
+    /// Shows a dialog with the specified message and sets up the appropriate callbacks
+    /// </summary>
+    /// <param name="acceptCallback">The function to be called when the user hits OK</param>
+    /// <param name="cancelCallback">The function to be called when the user hits Cancel.
+    /// Leave null if nothing should happen.</param>
+    /// <returns></returns>
+    public static UserDialog ShowBlocking(string message, Action acceptCallback, Action cancelCallback)
+    {
+        var dialog = Show(message, acceptCallback, cancelCallback);
         Block(dialog);
         return dialog;
     }
@@ -79,6 +130,21 @@ public class UserDialogController : MonoBehaviour
         blockingDialogs.Add(dialog);
         Instance.inputBlocker.enabled = true;
         dialog.OnClose += () => UnBlock(dialog);
+    }
+
+    static T CreateDialog<T>(string message) where T : UserDialog
+    {
+        var dialogGO = Instantiate(dialogPrefabs[typeof(T).Name], Instance.transform).GetComponent<UserDialog>();
+        dialogGO.transform.Translate(new Vector3(10, -10, 0) * activeDialogs.Count);
+        (dialogGO.transform as RectTransform).ClampToScreen();
+
+        var dialog = dialogGO.GetComponent<UserDialog>() as T;
+        dialog.Message = message;
+
+        activeDialogs.Add(dialog);
+        dialog.OnClose += () => activeDialogs.Remove(dialog);
+
+        return dialog;
     }
 
     static void UnBlock(UserDialog dialog)

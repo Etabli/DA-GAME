@@ -23,7 +23,7 @@ public abstract class UserDialog : MonoBehaviour
     protected virtual void Awake()
     {
         if (messageText == null)
-            Debug.LogError("User Dialog's reference to text object not set!");
+            throw new UserDialogException("User Dialog's reference to text object not set!");
     }
 
     /// <summary>
@@ -33,5 +33,16 @@ public abstract class UserDialog : MonoBehaviour
     {
         OnClose?.Invoke();
         Destroy(gameObject);
+    }
+
+    public class UserDialogException : Exception
+    {
+        public UserDialogException(string message)
+            : base(message)
+        { }
+
+        public UserDialogException(string message, Exception innerException)
+            : base(message, innerException)
+        { }
     }
 }

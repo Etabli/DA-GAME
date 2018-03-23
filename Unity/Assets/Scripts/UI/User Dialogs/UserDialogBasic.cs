@@ -13,7 +13,7 @@ public class UserDialogBasic : UserDialog
         base.Awake();
 
         if (OKButton == null)
-            Debug.LogError("User dialog's reference to OK button is not set!");
+            throw new UserDialogException("User dialog's reference to OK button is not set!");
         else
         {
             OKButton.onClick.AddListener(Close);
