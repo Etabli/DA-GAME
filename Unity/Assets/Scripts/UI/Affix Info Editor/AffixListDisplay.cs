@@ -36,6 +36,6 @@ public class AffixListDisplay : MonoBehaviour
 
     public void TestDialog()
     {
-        UserDialogController.Show("hi", () => UserDialogController.Block(UserDialogController.Show("bye")));
+        UserDialogController.Show("hi", () => UserDialogController.ShowBlocking("bye"));
     }
 }

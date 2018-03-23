@@ -11,7 +11,8 @@ public class UserDialogController : MonoBehaviour
     [SerializeField]
     Image inputBlocker;
 
-    static int blockCounter = 0;
+    static List<UserDialog> activeDialogs = new List<UserDialog>();
+    static HashSet<UserDialog> blockingDialogs = new HashSet<UserDialog>();
 
     public static UserDialogController Instance { get; private set; }
 
@@ -36,6 +37,12 @@ public class UserDialogController : MonoBehaviour
     {
         var dialogGO = Instantiate(Instance.dialogPrefabs[0], Instance.transform);
         var dialog = dialogGO.GetComponent<UserDialog>();
+        dialogGO.transform.Translate(new Vector3(10, -10, 0) * activeDialogs.Count);
+        (dialogGO.transform as RectTransform).ClampToScreen();
+
+        activeDialogs.Add(dialog);
+        dialog.OnClose += () => activeDialogs.Remove(dialog);
+
         dialog.Message = message;
         return dialog;
     }
@@ -50,21 +57,35 @@ public class UserDialogController : MonoBehaviour
         return dialog;
     }
 
+    public static UserDialog ShowBlocking(string message)
+    {
+        var dialog = Show(message);
+        Block(dialog);
+        return dialog;
+    }
+
+    public static UserDialog ShowBlocking(string message, Action callback)
+    {
+        var dialog = Show(message, callback);
+        Block(dialog);
+        return dialog;
+    }
+
     /// <summary>
     /// Makes a dialog block input to other UI elements (excluding other dialogs)
     /// </summary>
     public static void Block(UserDialog dialog)
     {
-        blockCounter++;
+        blockingDialogs.Add(dialog);
         Instance.inputBlocker.enabled = true;
-        dialog.OnClose += UnBlock;
+        dialog.OnClose += () => UnBlock(dialog);
     }
 
-    static void UnBlock()
+    static void UnBlock(UserDialog dialog)
     {
-        if (--blockCounter <= 0)
+        blockingDialogs.Remove(dialog);
+        if (blockingDialogs.Count == 0)
         {
-            blockCounter = 0;
             Instance.inputBlocker.enabled = false;
         }
     }
