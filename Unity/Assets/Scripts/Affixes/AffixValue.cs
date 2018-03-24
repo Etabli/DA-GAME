@@ -87,7 +87,7 @@ public class AffixValueSingle : AffixValue
     [DataMember]
     public float Value { get; protected set; }
 
-    public AffixValueSingle()
+    public AffixValueSingle() : this(0f)
     {}
 
     public AffixValueSingle(float value)
@@ -117,6 +117,11 @@ public class AffixValueSingle : AffixValue
 
     public static bool operator ==(AffixValueSingle lhs, AffixValueSingle rhs)
     {
+        if (ReferenceEquals(lhs, null) && ReferenceEquals(rhs, null))
+            return true;
+        if (ReferenceEquals(lhs, null) || ReferenceEquals(rhs, null))
+            return false;
+
         return lhs.Value == rhs.Value;
     }
 
@@ -127,6 +132,9 @@ public class AffixValueSingle : AffixValue
 
     public static bool operator ==(AffixValueSingle lhs, float rhs)
     {
+        if (ReferenceEquals(lhs, null))
+            return false;
+
         return lhs.Value == rhs;
     }
 
@@ -137,6 +145,9 @@ public class AffixValueSingle : AffixValue
 
     public static bool operator ==(float lhs, AffixValueSingle rhs)
     {
+        if (ReferenceEquals(rhs, null))
+            return false;
+
         return rhs == lhs;
     }
 

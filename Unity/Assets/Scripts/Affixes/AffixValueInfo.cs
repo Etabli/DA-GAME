@@ -22,6 +22,9 @@ public class AffixValueInfo
     public AffixValueInfo(AffixValueInfo src) : this(src.BaseValueMin, src.BaseValueMax, src.Progression)
     {}
 
+    public AffixValueInfo() : this(new AffixValueSingle(), new AffixValueSingle())
+    { }
+
     public AffixValueInfo(AffixValue baseValueMin, AffixValue baseValueMax) : this(baseValueMin, baseValueMax, new AffixProgression("Linear", 0, 1))
     { }
 

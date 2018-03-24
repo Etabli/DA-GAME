@@ -30,6 +30,14 @@ public class AffixTypeDisplay : MonoBehaviour
         Button.Select();
     }
 
+    public void SetChanged(bool value)
+    {
+        if (value)
+            ButtonText.text = affixType.Name + "*";
+        else
+            ButtonText.text = affixType.Name;
+    }
+
     private void Click()
     {
         OnClick?.Invoke(affixType);

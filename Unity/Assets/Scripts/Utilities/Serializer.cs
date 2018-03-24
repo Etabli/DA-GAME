@@ -68,7 +68,7 @@ public abstract class Serializer
     /// </summary>
     public static void SaveAffixInfoToDisk(AffixInfo info)
     {
-        SaveAffixInfoToDisk(info, "Assets/Resources/" + GetPathFromAffixType(info.Type) + ".xml");
+        SaveAffixInfoToDisk(info, GetSystemPath(GetPathFromAffixType(info.Type)));
     }
 
     /// <summary>
@@ -129,6 +129,15 @@ public abstract class Serializer
         }
     }
 
+    /// <summary>
+    /// Deletes the info file for a specific type
+    /// </summary>
+    /// <param name="type"></param>
+    public static void DeleteAffixInfo(AffixType type)
+    {
+        File.Delete(GetSystemPath(GetPathFromAffixType(type)));
+    }
+
     private static string GetFileNameFromAffixType(AffixType type)
     {
         return type.ToString();
@@ -143,7 +152,7 @@ public abstract class Serializer
     #region AffixPool
     public static void SaveAffixPoolsToDisk(Dictionary<AffixPoolPreset, AffixPool> pools)
     {
-        FileStream file = new FileStream("Assets/Resources/" + AFFIX_POOL_FILE_PATH + ".xml", FileMode.Create);
+        FileStream file = new FileStream(GetSystemPath(AFFIX_POOL_FILE_PATH), FileMode.Create);
 
         DataContractSerializer serializer = new DataContractSerializer(typeof(Dictionary<AffixPoolPreset, AffixPool>));
         XmlWriterSettings settings = new XmlWriterSettings() { Indent = true };
@@ -233,7 +242,7 @@ public abstract class Serializer
 
         //Debug.Log(data);
 
-        FileStream file = new FileStream("Assets/Resources/" + GetBiomePathFromType(info.Type) + ".xml", FileMode.Create);
+        FileStream file = new FileStream(GetSystemPath(GetBiomePathFromType(info.Type)), FileMode.Create);
         StreamWriter writer = new StreamWriter(file);
         writer.Write(data);
         writer.Close();
@@ -291,5 +300,16 @@ public abstract class Serializer
         return BIOME_FOLDER_PATH + type;
     }
     #endregion
+
+    /// <summary>
+    /// Takes a path that could be used to load an xml file via Resources.Load and
+    /// turns it into a path usable by System.IO.
+    /// </summary>
+    /// <param name="resourcePath"></param>
+    /// <returns></returns>
+    private static string GetSystemPath(string resourcePath)
+    {
+        return "Assets/Resources/" + resourcePath + ".xml";
+    }
 }
 

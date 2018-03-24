@@ -1,10 +1,13 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class AffixDescriptionDisplay : MonoBehaviour
 {
+    public event Action<bool> OnChangedStatusUpdated;
+
     const string LABEL_TEXT = "Description";
 
     public InputField InputField;
@@ -27,13 +30,28 @@ public class AffixDescriptionDisplay : MonoBehaviour
                     Label.text = LABEL_TEXT + "*";
                 else
                     Label.text = LABEL_TEXT;
+
+                OnChangedStatusUpdated?.Invoke(_isChanged);
             }
         }
     }
 
     public string Text
     {
-        get { return InputField.text; }
+        get
+        {
+            if (IsValid)
+                return InputField.text;
+            return null;
+        }
+    }
+
+    public bool IsValid
+    {
+        get
+        {
+            return InputField.text.Contains("{0}");
+        }
     }
 
     string originalText;
@@ -52,5 +70,6 @@ public class AffixDescriptionDisplay : MonoBehaviour
     {
         originalText = text;
         InputField.text = text;
+        IsChanged = false;
     }
 }

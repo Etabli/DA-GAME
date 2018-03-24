@@ -65,6 +65,8 @@ public class AffixValueInfoRangeInput : AffixValueInfoInput
         MaximumInput.SetValueInfo(info.BaseValueMax as AffixValueRange);
 
         MinimumInput.Progression = info.Progression;
+
+        UpdateIsChanged();
     }
 
     public override void Initialize()

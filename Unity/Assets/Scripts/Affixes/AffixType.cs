@@ -59,15 +59,56 @@ public sealed class AffixType
             var oldType = idDict[id];
             idDict.Remove(oldType.ID);
             nameDict.Remove(oldType.Name);
+            Types.Remove(oldType);
         }
         if (nameDict.ContainsKey(name))
         {
             var oldType = nameDict[name];
             idDict.Remove(oldType.ID);
             nameDict.Remove(oldType.Name);
+            Types.Remove(oldType);
         }
 
         return new AffixType(id, name);
+    }
+
+    /// <summary>
+    /// Removes an existing type
+    /// </summary>
+    /// <param name="type"></param>
+    public static void Remove(AffixType type)
+    {
+        idDict.Remove(type.ID);
+        nameDict.Remove(type.Name);
+        Types.Remove(type);
+    }
+
+    /// <summary>
+    /// Check whether an affix type with a given ID exists
+    /// </summary>
+    public static bool Exists(int id)
+    {
+        return idDict.ContainsKey(id);
+    }
+
+    /// <summary>
+    /// Check whether an affix type with a given name exists
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    public static bool Exists(string name)
+    {
+        return nameDict.ContainsKey(name);
+    }
+
+    /// <summary>
+    /// Checks whether the name would be a valid affix name
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    public static bool IsValidName(string name)
+    {
+        return !string.IsNullOrWhiteSpace(name);
     }
 
     #region Operators

@@ -21,25 +21,39 @@ public class AffixInfo
     public int ID { get { return Type.ID; } }
     public string Name { get { return Type.Name; } }
 
+    /// <summary>
+    /// Copies from an existing affix info object. Note that this also recreates the affix type.
+    /// </summary>
     public AffixInfo(AffixInfo src) : this(src.ID, src.Name, src.ValueInfo, src.Description)
     { }
 
+    /// <summary>
+    /// Creates a new AffixInfo object and its associated type
+    /// </summary>
     public AffixInfo(string name, AffixValueInfo valueInfo) : this(name, valueInfo, "")
     { }
 
     /// <summary>
-    /// Creates a new AffixInfo object
+    /// Creates a new AffixInfo object and its associated type
     /// </summary>
     public AffixInfo(string name, AffixValueInfo valueInfo, string description)
-        : this(valueInfo, description)
-    {
-        Type = AffixType.CreateNew(name);
-    }
+        : this(AffixType.CreateNew(name), valueInfo, description)
+    { }
 
+    /// <summary>
+    /// Creates a new AffixInfo object and its associated type
+    /// </summary>
     public AffixInfo(int id, string name, AffixValueInfo valueInfo, string description)
+        : this(AffixType.Replace(id, name), valueInfo, description)
+    { }
+
+    /// <summary>
+    /// Creates a new AffixInfo object with a preexisting type
+    /// </summary>
+    public AffixInfo(AffixType type, AffixValueInfo valueInfo, string description)
         : this(valueInfo, description)
     {
-        Type = AffixType.Replace(id, name);
+        Type = type;
     }
 
     private AffixInfo(AffixValueInfo valueInfo, string description)
@@ -87,7 +101,8 @@ public class AffixInfo
     /// <param name="type"></param>
     public static void Deregister(AffixType type)
     {
-        affixInfoDictionary.Remove(type);
+        if (affixInfoDictionary.ContainsKey(type))
+            affixInfoDictionary.Remove(type);
     }
 
     /// <summary>

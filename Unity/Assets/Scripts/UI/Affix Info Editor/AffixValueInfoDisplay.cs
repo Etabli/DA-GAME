@@ -8,6 +8,8 @@ using UnityEngine.UI;
 
 public class AffixValueInfoDisplay : MonoBehaviour
 {
+    public event Action<bool> OnChangedStatusUpdated;
+
     const string LABEL_TEXT = "Values";
 
     public RectTransform InputContainer;
@@ -97,7 +99,6 @@ public class AffixValueInfoDisplay : MonoBehaviour
         }
         else if (type == typeof(AffixValueMultiple))
         {
-
             Debug.LogWarning("AffixValueMultiple not implemented yet!");
         }
 
@@ -107,6 +108,7 @@ public class AffixValueInfoDisplay : MonoBehaviour
             input = newInput;
             input.Initialize();
             input.OnChangedStatusUpdated += UpdateLabel;
+            input.OnChangedStatusUpdated += isChanged => OnChangedStatusUpdated?.Invoke(isChanged);
         }
     }
 
@@ -122,11 +124,13 @@ public class AffixValueInfoDisplay : MonoBehaviour
 
         if (type != currentInfo.BaseValueMin.GetType())
         {
+            OnChangedStatusUpdated?.Invoke(true);
             input.OnChangedStatusUpdated -= UpdateLabel;
             UpdateLabel(true);
         }
         else
         {
+            OnChangedStatusUpdated?.Invoke(false);
             input.SetValueInfo(currentInfo);
             UpdateLabel(false);
         }

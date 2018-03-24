@@ -14,9 +14,9 @@ public class AffixValueInfoSingleInput : AffixValueInfoInput
     public LayoutElement ProgressionSpaceFiller;
     public GameObject ProgressionParemeterInputPrefab;
 
-    private bool isMinimumValid;
-    private bool isMaximumValid;
-    private bool isProgressionValid;
+    private bool isMinimumValid = true;
+    private bool isMaximumValid = true;
+    private bool isProgressionValid = true;
 
     private AffixValueSingle originalMinimum;
     private AffixValueSingle originalMaximum;
@@ -150,24 +150,36 @@ public class AffixValueInfoSingleInput : AffixValueInfoInput
 
     private void UpdateIsMinimumChanged(string current)
     {
-        if (current == "")
+        if (string.IsNullOrWhiteSpace(current) || current == ".")
         {
             isMinimumValid = false;
             return;
         }
         isMaximumValid = true;
 
+        if (originalMinimum == null)
+        {
+            IsMinimumChanged = true;
+            return;
+        }
+
         IsMinimumChanged = float.Parse(current) != originalMinimum;
     }
 
     private void UpdateIsMaximumChanged(string current)
     {
-        if (current == "")
+        if (string.IsNullOrWhiteSpace(current) || current == ".")
         {
             isMaximumValid = false;
             return;
         }
         isMaximumValid = true;
+
+        if (originalMaximum == null)
+        {
+            IsMaximumChanged = true;
+            return;
+        }
 
         IsMaximumChanged = float.Parse(current) != originalMaximum;
     }
@@ -285,6 +297,10 @@ public class AffixValueInfoSingleInput : AffixValueInfoInput
         MaximumInput.text = originalMaximum.ToString();
 
         Progression = info.Progression;
+
+        UpdateIsMaximumChanged(MaximumInput.text);
+        UpdateIsMinimumChanged(MinimumInput.text);
+        UpdateIsProgressionChanged();
     }
 
     public void SetValueInfo(Range range)
@@ -294,5 +310,9 @@ public class AffixValueInfoSingleInput : AffixValueInfoInput
 
         MinimumInput.text = originalMinimum.ToString();
         MaximumInput.text = originalMaximum.ToString();
+
+        UpdateIsMaximumChanged(MaximumInput.text);
+        UpdateIsMinimumChanged(MinimumInput.text);
+        UpdateIsProgressionChanged();
     }
 }
