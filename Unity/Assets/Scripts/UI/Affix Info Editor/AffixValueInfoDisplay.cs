@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UserDialog;
 
 public class AffixValueInfoDisplay : MonoBehaviour
 {
@@ -21,6 +22,7 @@ public class AffixValueInfoDisplay : MonoBehaviour
     public GameObject SingleValueInputPrefab;
     public GameObject RangeInputPrefab;
 
+    #region Properties
     public bool IsChanged
     {
         get
@@ -50,10 +52,12 @@ public class AffixValueInfoDisplay : MonoBehaviour
             return null;
         }
     }
+    #endregion
 
     AffixValueInfo currentInfo;
     GameObject inputGO;
     AffixValueInfoInput input;
+    int previousType;
 
     private void Start()
     {
@@ -64,8 +68,28 @@ public class AffixValueInfoDisplay : MonoBehaviour
 
         TypeDropdown.AddOptions(types.ToList());
 
-        // TODO: Add confirmation dialog here
-        TypeDropdown.onValueChanged.AddListener(ChangeType);
+        TypeDropdown.onValueChanged.AddListener(
+            index =>
+            {
+                if (TypeDropdown.value == previousType)
+                    return;
+
+                if (IsChanged)
+                {
+                    DialogController.ShowBlocking("You have unsaved changes, are you sure you want to change the value type?"
+                    , () =>
+                    {
+                        ChangeType(index);
+                        previousType = TypeDropdown.value;
+                    }
+                    , () => TypeDropdown.value = previousType);
+                }
+                else
+                {
+                    ChangeType(index);
+                    previousType = TypeDropdown.value;
+                }
+            });
     }
 
     public void SetInfo(AffixValueInfo info)
@@ -79,6 +103,7 @@ public class AffixValueInfoDisplay : MonoBehaviour
         UpdateValueDisplay(type);
         input.SetValueInfo(info);
         TypeDropdown.value = TypeDropdown.options.FindIndex(option => option.text == type.Name.Remove(0, "AffixValue".Length));
+        previousType = TypeDropdown.value;
     }
 
     void UpdateValueDisplay(Type type)

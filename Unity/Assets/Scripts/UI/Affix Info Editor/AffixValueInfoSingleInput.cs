@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -280,6 +281,7 @@ public class AffixValueInfoSingleInput : AffixValueInfoInput
         ProgressionDropdown.AddOptions(progressionFunctions);
         ProgressionDropdown.onValueChanged.AddListener(i => UpdateProgression(progressionFunctions[i]));
         ProgressionDropdown.onValueChanged.AddListener(_ => UpdateIsProgressionChanged());
+        ProgressionDropdown.value = ProgressionDropdown.options.FindIndex(option => option.text == "Exponential");
 
         MinimumInput.onValueChanged.AddListener(UpdateIsMinimumChanged);
         MaximumInput.onValueChanged.AddListener(UpdateIsMaximumChanged);
