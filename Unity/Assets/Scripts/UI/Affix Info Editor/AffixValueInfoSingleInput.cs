@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UserDialog;
 
 public class AffixValueInfoSingleInput : AffixValueInfoInput
 {
@@ -25,6 +26,7 @@ public class AffixValueInfoSingleInput : AffixValueInfoInput
     private List<InputField> progressionParameterInputs;
     private List<float> originalParameters = new List<float>();
     private string originalProgressionName;
+    private int previousProgressionIndex;
 
     #region Properties
     public override AffixValueInfo Info
@@ -233,6 +235,8 @@ public class AffixValueInfoSingleInput : AffixValueInfoInput
         if (!AffixProgression.ParameterRequirements.ContainsKey(name))
             throw new ArgumentException("No parameter info for this progression function!");
 
+        previousProgressionIndex = progressionFunctions.FindIndex(progression => progression == name);
+
         int nParams = AffixProgression.ParameterRequirements[name];
         if (progressionParameterInputs == null)
         {
@@ -279,7 +283,24 @@ public class AffixValueInfoSingleInput : AffixValueInfoInput
         InitializeProgressionFunctions();
 
         ProgressionDropdown.AddOptions(progressionFunctions);
-        ProgressionDropdown.onValueChanged.AddListener(i => UpdateProgression(progressionFunctions[i]));
+        ProgressionDropdown.onValueChanged.AddListener(i =>
+        {
+            if (previousProgressionIndex == i)
+                return;
+
+            string name = progressionFunctions[i];
+
+            if (IsProgressionChanged)
+            {
+                DialogController.ShowBlocking("There are unsaved changes to the progression. Are you sure you want to change it?"
+                    , () =>
+                    {
+                        UpdateProgression(name);
+                    }, () => ProgressionDropdown.value = previousProgressionIndex);
+            }
+            else
+                UpdateProgression(name);
+        });
         ProgressionDropdown.onValueChanged.AddListener(_ => UpdateIsProgressionChanged());
         ProgressionDropdown.value = ProgressionDropdown.options.FindIndex(option => option.text == "Exponential");
 

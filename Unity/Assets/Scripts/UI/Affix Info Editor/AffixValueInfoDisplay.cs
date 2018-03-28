@@ -80,14 +80,12 @@ public class AffixValueInfoDisplay : MonoBehaviour
                     , () =>
                     {
                         ChangeType(index);
-                        previousType = TypeDropdown.value;
                     }
                     , () => TypeDropdown.value = previousType);
                 }
                 else
                 {
                     ChangeType(index);
-                    previousType = TypeDropdown.value;
                 }
             });
     }
@@ -145,6 +143,7 @@ public class AffixValueInfoDisplay : MonoBehaviour
         if (type == null)
             throw new InvalidOperationException("AffixValue type dropdown contained non-existant type!");
 
+        previousType = TypeDropdown.value;
         UpdateValueDisplay(type);
 
         if (type != currentInfo.BaseValueMin.GetType())
