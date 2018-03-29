@@ -86,6 +86,8 @@ public class AffixValueSingle : AffixValue
 {
     [DataMember]
     public float Value { get; protected set; }
+    [DataMember]
+    public AffixProgression Progression { get; protected set; }
 
     public AffixValueSingle() : this(0f)
     {}

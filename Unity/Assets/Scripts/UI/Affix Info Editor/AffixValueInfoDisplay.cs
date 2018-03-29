@@ -13,6 +13,8 @@ public class AffixValueInfoDisplay : MonoBehaviour
 
     const string LABEL_TEXT = "Values";
 
+    public float MaxHeight;
+
     public RectTransform InputContainer;
     public LayoutElement Layout;
     public LayoutElement ScrollViewLayout;
@@ -21,6 +23,7 @@ public class AffixValueInfoDisplay : MonoBehaviour
 
     public GameObject SingleValueInputPrefab;
     public GameObject RangeInputPrefab;
+    public GameObject MultipleInputPrefab;
 
     #region Properties
     public bool IsChanged
@@ -92,7 +95,7 @@ public class AffixValueInfoDisplay : MonoBehaviour
 
     public void SetInfo(AffixValueInfo info)
     {
-        if (info == currentInfo)
+        if (ReferenceEquals(info, currentInfo))
             return;
 
         currentInfo = info;
@@ -120,9 +123,14 @@ public class AffixValueInfoDisplay : MonoBehaviour
             inputGO = Instantiate(RangeInputPrefab, InputContainer);
             UpdateHeights();
         }
-        else if (type == typeof(AffixValueMultiple))
+        else if (type == typeof(AffixValueMultiple) && !(input is AffixValueInfoMultipleInput))
         {
-            Debug.LogWarning("AffixValueMultiple not implemented yet!");
+            Destroy(inputGO);
+
+            inputGO = Instantiate(MultipleInputPrefab, InputContainer);
+            var input = inputGO.GetComponent<AffixValueInfoMultipleInput>();
+            input.OnHeightChanged += x => UpdateHeights();
+            UpdateHeights();
         }
 
         var newInput = inputGO.GetComponent<AffixValueInfoInput>();
@@ -162,13 +170,15 @@ public class AffixValueInfoDisplay : MonoBehaviour
 
     void UpdateHeights()
     {
-        float content_height = inputGO.GetComponent<LayoutElement>().minHeight;
+        float contentHeight = inputGO.GetComponent<LayoutElement>().minHeight;
+        InputContainer.sizeDelta = new Vector2(InputContainer.sizeDelta.x, contentHeight);
+
         Layout.minHeight = Label.GetComponent<LayoutElement>().minHeight
             + TypeDropdown.GetComponent<LayoutElement>().minHeight
-            + content_height
+            + contentHeight
             + 10; // Spacing between elements
-        InputContainer.sizeDelta = new Vector2(InputContainer.sizeDelta.x, content_height);
-        ScrollViewLayout.minHeight = content_height;
+
+        Layout.minHeight = Mathf.Min(Layout.minHeight, MaxHeight); 
     }
 
     void UpdateLabel(bool isChanged)

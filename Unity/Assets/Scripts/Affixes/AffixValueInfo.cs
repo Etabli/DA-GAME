@@ -13,13 +13,17 @@ using System;
 public class AffixValueInfo
 {
     [DataMember]
-    public readonly AffixValue BaseValueMin;
+    private readonly AffixValue baseValueMin;
     [DataMember]
-    public readonly AffixValue BaseValueMax;
+    private readonly AffixValue baseValueMax;
     [DataMember]
-    public readonly AffixProgression Progression;
+    private readonly AffixProgression progression;
 
-    public AffixValueInfo(AffixValueInfo src) : this(src.BaseValueMin, src.BaseValueMax, src.Progression)
+    public AffixValue BaseValueMin { get { return baseValueMin; } }
+    public AffixValue BaseValueMax { get { return baseValueMax; } }
+    public AffixProgression Progression { get { return progression; } }
+
+    public AffixValueInfo(AffixValueInfo src) : this(src.baseValueMin, src.baseValueMax, src.progression)
     {}
 
     public AffixValueInfo() : this(new AffixValueSingle(), new AffixValueSingle())
@@ -33,9 +37,9 @@ public class AffixValueInfo
         if (!baseValueMin.IsSameType(baseValueMax))
             throw new ArgumentException($"Mininum and maximum value have to be of the same type!");
 
-        BaseValueMin = baseValueMin;
-        BaseValueMax = baseValueMax;
-        Progression = new AffixProgression(progression);
+        this.baseValueMin = baseValueMin;
+        this.baseValueMax = baseValueMax;
+        this.progression = new AffixProgression(progression);
     }
 
     #region Comparison
@@ -58,9 +62,9 @@ public class AffixValueInfo
         if (ReferenceEquals(lhs, null) || ReferenceEquals(rhs, null))
             return false;
 
-        if (lhs.BaseValueMin != rhs.BaseValueMin ||
-            lhs.BaseValueMax != rhs.BaseValueMax ||
-            lhs.Progression != rhs.Progression)
+        if (lhs.baseValueMin != rhs.baseValueMin ||
+            lhs.baseValueMax != rhs.baseValueMax ||
+            lhs.progression != rhs.progression)
         {
             return false;
         }
@@ -80,7 +84,7 @@ public class AffixValueInfo
     /// <returns></returns>
     public AffixValue GetValueForTier(int tier)
     {
-        return GetValueForTier(tier, Progression);
+        return GetValueForTier(tier, progression);
     }
 
     public AffixValue GetValueForTier(int tier, AffixProgression prog)
@@ -95,14 +99,14 @@ public class AffixValueInfo
         float frac = rng.Next(101) / 100.0f;
 
         // This will raise an exception if parameters are invalid
-        AffixValue progressedMin = prog.Apply(BaseValueMin, tier);
-        AffixValue progressedMax = prog.Apply(BaseValueMax, tier);
+        AffixValue progressedMin = prog.Apply(baseValueMin, tier);
+        AffixValue progressedMax = prog.Apply(baseValueMax, tier);
 
         return progressedMin + (progressedMax - progressedMin) * frac;
     }
 
     public override string ToString()
     {
-        return string.Format("{0} - {1}", BaseValueMin, BaseValueMax);
+        return string.Format("{0} - {1}", baseValueMin, baseValueMax);
     }
 }

@@ -9,6 +9,8 @@ using UnityEngine;
 /// Represents information on a single AffixType. Serializable via a DataContract.
 /// </summary>
 [DataContract]
+[KnownType(typeof(AffixValueInfo))]
+[KnownType(typeof(AffixValueInfoMultiple))]
 public class AffixInfo
 {
     [DataMember]

@@ -6,18 +6,26 @@
     <Name>Fire Rate</Name>
   </Type>
   <ValueInfo>
-    <BaseValueMax i:type="AffixValueSingle">
+    <baseValueMax i:type="AffixValueSingle">
+      <Progression>
+        <Name i:nil="true" />
+        <Parameters xmlns:d5p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" i:nil="true" />
+      </Progression>
       <Value>0.8</Value>
-    </BaseValueMax>
-    <BaseValueMin i:type="AffixValueSingle">
+    </baseValueMax>
+    <baseValueMin i:type="AffixValueSingle">
+      <Progression>
+        <Name i:nil="true" />
+        <Parameters xmlns:d5p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" i:nil="true" />
+      </Progression>
       <Value>0.5</Value>
-    </BaseValueMin>
-    <Progression>
+    </baseValueMin>
+    <progression>
       <Name>Linear</Name>
       <Parameters xmlns:d4p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
         <d4p1:float>0</d4p1:float>
         <d4p1:float>1</d4p1:float>
       </Parameters>
-    </Progression>
+    </progression>
   </ValueInfo>
 </AffixInfo>
