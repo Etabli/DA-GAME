@@ -58,6 +58,40 @@ public abstract class AffixValue
         return rhs.Multiply(lhs);
     }
 
+    public static bool operator==(AffixValue lhs, AffixValue rhs)
+    {
+        if (ReferenceEquals(lhs, null) || ReferenceEquals(rhs, null))
+            return false;
+
+        if (lhs.IsSameType(rhs))
+        {
+            if (lhs is AffixValueSingle)
+                return (lhs as AffixValueSingle) == (rhs as AffixValueSingle);
+            else if (lhs is AffixValueRange)
+                return (lhs as AffixValueRange) == (rhs as AffixValueRange);
+            else
+                return (lhs as AffixValueMultiple) == (rhs as AffixValueMultiple);
+        }
+        return false;
+    }
+
+    public static bool operator!=(AffixValue lhs, AffixValue rhs)
+    {
+        return !(lhs == rhs);
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is AffixValue)
+            return (obj as AffixValue) == this;
+        return base.Equals(obj);
+    }
+
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
+    }
+
     protected void ThrowIncompatipleArgumentTypeException(AffixValue val)
     {
         throw new ArgumentException(string.Format("Cannot add object of type {0} to object of type {1}", val.GetType(), this.GetType()), "val");
@@ -261,7 +295,7 @@ public class AffixValueRange : AffixValue
 
     public static bool operator ==(AffixValueRange lhs, AffixValueRange rhs)
     {
-        return lhs == rhs.Value;
+        return lhs.Value == rhs.Value;
     }
 
     public static bool operator !=(AffixValueRange lhs, AffixValueRange rhs)
@@ -276,17 +310,17 @@ public class AffixValueRange : AffixValue
 
     public static bool operator !=(AffixValueRange lhs, Range rhs)
     {
-        return lhs.Value != rhs;
+        return !(lhs == rhs);
     }
 
     public static bool operator ==(Range lhs, AffixValueRange rhs)
     {
-        return rhs == lhs;
+        return rhs.Value == lhs;
     }
 
     public static bool operator !=(Range lhs, AffixValueRange rhs)
     {
-        return rhs != lhs;
+        return !(rhs == lhs);
     }
     #endregion
 

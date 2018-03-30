@@ -160,7 +160,7 @@ public class AffixValueInfoSingleInput : AffixValueInfoInput
             isMinimumValid = false;
             return;
         }
-        isMaximumValid = true;
+        isMinimumValid = true;
 
         if (originalMinimum == null)
         {
@@ -308,6 +308,9 @@ public class AffixValueInfoSingleInput : AffixValueInfoInput
 
         MinimumInput.onValueChanged.AddListener(UpdateIsMinimumChanged);
         MaximumInput.onValueChanged.AddListener(UpdateIsMaximumChanged);
+
+        UpdateIsMinimumChanged(MinimumInput.text);
+        UpdateIsMaximumChanged(MaximumInput.text);
     }
 
     public override void SetValueInfo(AffixValueInfo info)

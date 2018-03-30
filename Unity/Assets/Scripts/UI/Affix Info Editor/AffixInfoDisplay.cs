@@ -13,7 +13,7 @@ public class AffixInfoDisplay : MonoBehaviour
     public AffixValueInfoDisplay ValueInfoDisplay;
 
     #region IsChanged Logic
-    bool _isChanged;
+    bool _isChanged = false;
     public bool IsChanged
     {
         get { return _isChanged; }

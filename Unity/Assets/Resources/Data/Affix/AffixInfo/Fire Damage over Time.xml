@@ -1,45 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AffixInfo xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.datacontract.org/2004/07/">
-  <Description>{0}</Description>
+  <Description>Deals {0} Fire Damage every x seconds for y seconds</Description>
   <Type>
     <ID>3</ID>
-    <Name>asdf</Name>
+    <Name>Fire Damage over Time</Name>
   </Type>
   <ValueInfo>
     <baseValueMax i:type="AffixValueMultiple">
       <Values>
-        <AffixValue i:type="AffixValueSingle">
-          <Progression>
-            <Name i:nil="true" />
-            <Parameters xmlns:d7p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" i:nil="true" />
-          </Progression>
-          <Value>3</Value>
+        <AffixValue i:type="AffixValueRange">
+          <Value>
+            <MaxValue>6</MaxValue>
+            <MinValue>5</MinValue>
+          </Value>
         </AffixValue>
         <AffixValue i:type="AffixValueSingle">
           <Progression>
             <Name i:nil="true" />
             <Parameters xmlns:d7p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" i:nil="true" />
           </Progression>
-          <Value>1</Value>
+          <Value>0.7</Value>
+        </AffixValue>
+        <AffixValue i:type="AffixValueSingle">
+          <Progression>
+            <Name i:nil="true" />
+            <Parameters xmlns:d7p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" i:nil="true" />
+          </Progression>
+          <Value>5</Value>
         </AffixValue>
       </Values>
       <valueNames xmlns:d4p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
     </baseValueMax>
     <baseValueMin i:type="AffixValueMultiple">
       <Values>
-        <AffixValue i:type="AffixValueSingle">
-          <Progression>
-            <Name i:nil="true" />
-            <Parameters xmlns:d7p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" i:nil="true" />
-          </Progression>
-          <Value>2</Value>
+        <AffixValue i:type="AffixValueRange">
+          <Value>
+            <MaxValue>5</MaxValue>
+            <MinValue>4</MinValue>
+          </Value>
         </AffixValue>
         <AffixValue i:type="AffixValueSingle">
           <Progression>
             <Name i:nil="true" />
             <Parameters xmlns:d7p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" i:nil="true" />
           </Progression>
-          <Value>1</Value>
+          <Value>0.6</Value>
+        </AffixValue>
+        <AffixValue i:type="AffixValueSingle">
+          <Progression>
+            <Name i:nil="true" />
+            <Parameters xmlns:d7p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" i:nil="true" />
+          </Progression>
+          <Value>4</Value>
         </AffixValue>
       </Values>
       <valueNames xmlns:d4p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
@@ -48,12 +60,19 @@
       <AffixProgression>
         <Name>Exponential</Name>
         <Parameters xmlns:d5p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+          <d5p1:float>1.1</d5p1:float>
+        </Parameters>
+      </AffixProgression>
+      <AffixProgression>
+        <Name>Constant</Name>
+        <Parameters xmlns:d5p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
           <d5p1:float>1</d5p1:float>
         </Parameters>
       </AffixProgression>
       <AffixProgression>
-        <Name>Exponential</Name>
+        <Name>Linear</Name>
         <Parameters xmlns:d5p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+          <d5p1:float>0</d5p1:float>
           <d5p1:float>1</d5p1:float>
         </Parameters>
       </AffixProgression>

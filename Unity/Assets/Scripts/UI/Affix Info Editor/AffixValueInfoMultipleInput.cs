@@ -45,6 +45,8 @@ public class AffixValueInfoMultipleInput : AffixValueInfoInput
     {
         get
         {
+            if (inputs.Count == 0)
+                return true;
             return inputs.All(i => i.IsValid);
         }
     }
@@ -175,6 +177,7 @@ public class AffixValueInfoMultipleInput : AffixValueInfoInput
 
         UpdateSiblingIndices(index);
         UpdateHeight();
+        UpdateIsChanged();
     }
 
     void AddInput(int index) => AddInput(index, singleInputPrefab);
@@ -194,6 +197,7 @@ public class AffixValueInfoMultipleInput : AffixValueInfoInput
 
         UpdateHeight();
         UpdateSiblingIndices();
+        UpdateIsChanged();
     }
 
     void MoveInputUp(int index) => SwitchInputs(index, index - 1);
@@ -271,14 +275,6 @@ public class AffixValueInfoMultipleInput : AffixValueInfoInput
         inputs[index] = newInput;
         Destroy(input.gameObject);
 
-        var originalMin = (originalInfo.BaseValueMin as AffixValueMultiple)[index];
-        if ((originalMin is AffixValueSingle && newInput is AffixValueInfoSingleInput)
-            || (originalMin is AffixValueRange && newInput is AffixValueInfoRangeInput))
-        {
-            var originalMax = (originalInfo.BaseValueMax as AffixValueMultiple)[index];
-            newInput.SetValueInfo(new AffixValueInfo(originalMin, originalMax, originalInfo.Progressions[index]));
-        }
-
         UpdateHeight();
         UpdateSiblingIndices();
         UpdateIsChanged();
@@ -286,13 +282,20 @@ public class AffixValueInfoMultipleInput : AffixValueInfoInput
 
     void UpdateIsChanged()
     {
-        if (originalInfo == null && !IsValid)
+        if (originalInfo == null || !IsValid)
         {
             IsChanged = true;
             return;
         }
 
         var min = originalInfo.BaseValueMin as AffixValueMultiple;
+
+        if (min.Count != inputs.Count)
+        {
+            IsChanged = true;
+            return;
+        }
+
         var max = originalInfo.BaseValueMax as AffixValueMultiple;
         for (int i = 0; i < inputs.Count; i++)
         {
@@ -305,7 +308,11 @@ public class AffixValueInfoMultipleInput : AffixValueInfoInput
             }
             else
             {
-                if (input.IsChanged)
+                var info = input.Info;
+                if (info == null
+                    || info.BaseValueMax != max[i]
+                    || info.BaseValueMin != min[i]
+                    || info.Progression != originalInfo.Progressions[i])
                 {
                     IsChanged = true;
                     return;
