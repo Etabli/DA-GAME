@@ -17,6 +17,7 @@ public class AffixValueInfoMultipleInput : AffixValueInfoInput
 
     List<AffixValueInfoInput> inputs;
     List<ListElementModifier> elementModifiers;
+    AffixValueInfo originalInfo;
 
     public override AffixValueInfo Info
     {
@@ -25,11 +26,18 @@ public class AffixValueInfoMultipleInput : AffixValueInfoInput
             if (!IsValid)
                 return null;
 
-            List<AffixValueInfo> values = new List<AffixValueInfo>();
+            List<AffixValue> minValues = new List<AffixValue>();
+            List<AffixValue> maxValues = new List<AffixValue>();
+            List<AffixProgression> progressions = new List<AffixProgression>();
             foreach (var input in inputs)
-                values.Add(input.Info);
+            {
+                var info = input.Info;
+                minValues.Add(info.BaseValueMin);
+                maxValues.Add(info.BaseValueMax);
+                progressions.Add(info.Progression);
+            }
 
-            return new AffixValueInfoMultiple(values);
+            return new AffixValueInfo(new AffixValueMultiple(minValues.ToArray()), new AffixValueMultiple(maxValues.ToArray()), progressions.ToArray());
         }
     }
 
@@ -52,7 +60,30 @@ public class AffixValueInfoMultipleInput : AffixValueInfoInput
 
     public override void SetValueInfo(AffixValueInfo info)
     {
-        throw new NotImplementedException();
+        if (!(info.BaseValueMin is AffixValueMultiple))
+            throw new ArgumentException($"Info needs to be of type AffixValueMultiple!");
+
+        originalInfo = info;
+
+        // First clear all exisiting inputs
+        while (inputs.Count > 0)
+            RemoveInput(inputs.Count - 1);
+
+        var min = info.BaseValueMin as AffixValueMultiple;
+        var max = info.BaseValueMax as AffixValueMultiple;
+
+        for (int i = 0; i < min.Count; i++)
+        {
+            if (!(min[i] is AffixValueSingle) && !(min[i] is AffixValueRange))
+                throw new ArgumentException($"Info contains affix values other than single or range!");
+
+            GameObject prefab = min[i] is AffixValueSingle ? singleInputPrefab : rangeInputPrefab;
+            AddInput(i, prefab);
+            var input = inputs.Last();
+            input.SetValueInfo(new AffixValueInfo(min[i], max[i], info.Progressions[i]));
+        }
+
+        UpdateIsChanged();
     }
 
     /// <summary>
@@ -134,6 +165,7 @@ public class AffixValueInfoMultipleInput : AffixValueInfoInput
         var inputGO = Instantiate(prefab, transform);
         var input = inputGO.GetComponent<AffixValueInfoInput>();
         input.Initialize();
+        input.OnChangedStatusUpdated += _ => UpdateIsChanged();
 
         inputs.Insert(index, input);
         CreateElementModifier();
@@ -156,10 +188,10 @@ public class AffixValueInfoMultipleInput : AffixValueInfoInput
         var input = inputs[index];
         inputs.RemoveAt(index);
         Destroy(input.gameObject);
+        RemoveElementModifier();
 
         UpdateElementModifierDropdown(index);
 
-        RemoveElementModifier();
         UpdateHeight();
         UpdateSiblingIndices();
     }
@@ -193,6 +225,9 @@ public class AffixValueInfoMultipleInput : AffixValueInfoInput
     /// <param name="index"></param>
     void UpdateElementModifierDropdown(int index)
     {
+        if (index >= inputs.Count)
+            return;
+
         var input = inputs[index];
         var elementModifier = elementModifiers[index];
 
@@ -206,7 +241,6 @@ public class AffixValueInfoMultipleInput : AffixValueInfoInput
     /// </summary>
     void ChangeInputType(int index, string type)
     {
-        Debug.Log("hi");
         var input = inputs[index];
 
         // First check if type changed at all
@@ -237,7 +271,48 @@ public class AffixValueInfoMultipleInput : AffixValueInfoInput
         inputs[index] = newInput;
         Destroy(input.gameObject);
 
+        var originalMin = (originalInfo.BaseValueMin as AffixValueMultiple)[index];
+        if ((originalMin is AffixValueSingle && newInput is AffixValueInfoSingleInput)
+            || (originalMin is AffixValueRange && newInput is AffixValueInfoRangeInput))
+        {
+            var originalMax = (originalInfo.BaseValueMax as AffixValueMultiple)[index];
+            newInput.SetValueInfo(new AffixValueInfo(originalMin, originalMax, originalInfo.Progressions[index]));
+        }
+
         UpdateHeight();
         UpdateSiblingIndices();
+        UpdateIsChanged();
+    }
+
+    void UpdateIsChanged()
+    {
+        if (originalInfo == null && !IsValid)
+        {
+            IsChanged = true;
+            return;
+        }
+
+        var min = originalInfo.BaseValueMin as AffixValueMultiple;
+        var max = originalInfo.BaseValueMax as AffixValueMultiple;
+        for (int i = 0; i < inputs.Count; i++)
+        {
+            var input = inputs[i];
+            if ((input is AffixValueInfoSingleInput && min[i] is AffixValueRange)
+                || (input is AffixValueInfoRangeInput && min[i] is AffixValueSingle))
+            {
+                IsChanged = true;
+                return;
+            }
+            else
+            {
+                if (input.IsChanged)
+                {
+                    IsChanged = true;
+                    return;
+                }
+            }
+        }
+
+        IsChanged = false;
     }
 }

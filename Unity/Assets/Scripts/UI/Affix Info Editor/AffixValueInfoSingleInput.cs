@@ -23,6 +23,7 @@ public class AffixValueInfoSingleInput : AffixValueInfoInput
     private AffixValueSingle originalMinimum;
     private AffixValueSingle originalMaximum;
 
+    private bool progressionEnabled;
     private List<InputField> progressionParameterInputs;
     private List<float> originalParameters = new List<float>();
     private string originalProgressionName;
@@ -69,6 +70,7 @@ public class AffixValueInfoSingleInput : AffixValueInfoInput
         }
         set
         {
+            progressionEnabled = true;
             ProgressionDropdown.value = ProgressionDropdown.options.FindIndex(option => option.text == value.Name);
             UpdateProgression(value.Name);
 
@@ -189,7 +191,7 @@ public class AffixValueInfoSingleInput : AffixValueInfoInput
 
     private void UpdateIsProgressionChanged()
     {
-        if (progressionParameterInputs == null)
+        if (!progressionEnabled)
         {
             isProgressionValid = true;
             return;
@@ -336,6 +338,6 @@ public class AffixValueInfoSingleInput : AffixValueInfoInput
 
         UpdateIsMaximumChanged(MaximumInput.text);
         UpdateIsMinimumChanged(MinimumInput.text);
-        UpdateIsProgressionChanged();
+        progressionEnabled = false;
     }
 }

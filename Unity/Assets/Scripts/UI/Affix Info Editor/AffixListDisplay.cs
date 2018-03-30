@@ -47,8 +47,19 @@ public class AffixListDisplay : MonoBehaviour
         if (type == selectedType && type.Name == selectedType.Name)
             return;
 
-        selectedType = type;
-        AffixInfoDisplay.SetType(selectedType);
+        if (AffixInfoDisplay.IsChanged)
+            DialogController.ShowBlocking("There are unsaved changes, are you sure you want to select a different type?"
+                , () =>
+                {
+                    displays[selectedType].SetChanged(false);
+                    selectedType = type;
+                    AffixInfoDisplay.SetType(selectedType);
+                }, null);
+        else
+        {
+            selectedType = type;
+            AffixInfoDisplay.SetType(selectedType);
+        }
     }
 
     void AddTypeToLIst(AffixType type)

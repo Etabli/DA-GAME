@@ -9,8 +9,6 @@ using UnityEngine;
 /// Represents information on a single AffixType. Serializable via a DataContract.
 /// </summary>
 [DataContract]
-[KnownType(typeof(AffixValueInfo))]
-[KnownType(typeof(AffixValueInfoMultiple))]
 public class AffixInfo
 {
     [DataMember]
@@ -70,14 +68,6 @@ public class AffixInfo
     public Affix GenerateAffix(int tier)
     {
         return new Affix(Type, ValueInfo.GetValueForTier(tier), tier);
-    }
-
-    /// <summary>
-    /// Generates an affix of this type with a non-default progression function.
-    /// </summary>
-    public Affix GenerateAffix(int tier, AffixProgression progression)
-    {
-        return new Affix(Type, ValueInfo.GetValueForTier(tier, progression), tier);
     }
 
     public override string ToString()

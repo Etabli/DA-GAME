@@ -17,14 +17,16 @@ public class AffixValueInfo
     [DataMember]
     private readonly AffixValue baseValueMax;
     [DataMember]
-    private readonly AffixProgression progression;
+    private readonly AffixProgression[] progressions;
 
     public AffixValue BaseValueMin { get { return baseValueMin; } }
     public AffixValue BaseValueMax { get { return baseValueMax; } }
-    public AffixProgression Progression { get { return progression; } }
+    public AffixProgression Progression { get { return progressions[0]; } }
+    public AffixProgression[] Progressions { get { return progressions; } }
 
-    public AffixValueInfo(AffixValueInfo src) : this(src.baseValueMin, src.baseValueMax, src.progression)
-    {}
+    public AffixValueInfo(AffixValueInfo src) : this(src.baseValueMin, src.baseValueMax, src.progressions)
+    {
+    }
 
     public AffixValueInfo() : this(new AffixValueSingle(), new AffixValueSingle())
     { }
@@ -33,13 +35,25 @@ public class AffixValueInfo
     { }
 
     public AffixValueInfo(AffixValue baseValueMin, AffixValue baseValueMax, AffixProgression progression)
+        : this (baseValueMin, baseValueMax, new AffixProgression[] { progression })
+    { }
+
+    public AffixValueInfo(AffixValue baseValueMin, AffixValue baseValueMax, AffixProgression[] progressions)
     {
         if (!baseValueMin.IsSameType(baseValueMax))
             throw new ArgumentException($"Mininum and maximum value have to be of the same type!");
 
+        if (BaseValueMin is AffixValueMultiple)
+            if ((BaseValueMin as AffixValueMultiple).Count != progressions.Length)
+                throw new ArgumentException($"Info AffixValueMultiple needs the same amount of progressions as affix values!", nameof(progressions));
+
         this.baseValueMin = baseValueMin;
         this.baseValueMax = baseValueMax;
-        this.progression = new AffixProgression(progression);
+        this.progressions = new AffixProgression[progressions.Length];
+        for (int i = 0; i < progressions.Length; i++)
+        {
+            this.progressions[i] = new AffixProgression(progressions[i]);
+        }
     }
 
     #region Comparison
@@ -64,7 +78,7 @@ public class AffixValueInfo
 
         if (lhs.baseValueMin != rhs.baseValueMin ||
             lhs.baseValueMax != rhs.baseValueMax ||
-            lhs.progression != rhs.progression)
+            lhs.progressions != rhs.progressions)
         {
             return false;
         }
@@ -84,10 +98,28 @@ public class AffixValueInfo
     /// <returns></returns>
     public AffixValue GetValueForTier(int tier)
     {
-        return GetValueForTier(tier, progression);
+        if (baseValueMin is AffixValueMultiple)
+        {
+            List<AffixValue> values = new List<AffixValue>();
+
+            var min = baseValueMin as AffixValueMultiple;
+            var max = baseValueMax as AffixValueMultiple;
+
+            for (int i = 0; i < min.Count; i++)
+            {
+                values.Add(GetValueForTier(min[i], max[i], tier, progressions[i]));
+            }
+
+            return new AffixValueMultiple(values.ToArray());
+        }
+        else
+            return GetValueForTier(baseValueMin, baseValueMax, tier, Progression);
     }
 
-    public AffixValue GetValueForTier(int tier, AffixProgression prog)
+    /// <summary>
+    /// Generates an affixValue based on min and max values, a tier, and a progression function
+    /// </summary>
+    protected AffixValue GetValueForTier(AffixValue min, AffixValue max, int tier, AffixProgression prog)
     {
         if (!prog.HasProgressionFunction())
         {
@@ -99,8 +131,8 @@ public class AffixValueInfo
         float frac = rng.Next(101) / 100.0f;
 
         // This will raise an exception if parameters are invalid
-        AffixValue progressedMin = prog.Apply(baseValueMin, tier);
-        AffixValue progressedMax = prog.Apply(baseValueMax, tier);
+        AffixValue progressedMin = prog.Apply(min, tier);
+        AffixValue progressedMax = prog.Apply(max, tier);
 
         return progressedMin + (progressedMax - progressedMin) * frac;
     }

@@ -357,6 +357,8 @@ public class AffixValueMultiple : AffixValue
     [DataMember]
     protected readonly Dictionary<string, int> valueNames = new Dictionary<string, int>();
 
+    public int Count { get { return Values.Length; } }
+
     public AffixValueMultiple()
     { }
 
