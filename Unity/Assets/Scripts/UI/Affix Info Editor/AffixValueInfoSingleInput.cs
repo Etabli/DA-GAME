@@ -8,6 +8,12 @@ using UserDialog;
 
 public class AffixValueInfoSingleInput : AffixValueInfoInput
 {
+    public Color DefaultColor;
+    public Color InvalidColor;
+
+    public Image MinimumBackground;
+    public Image MaximumBackground;
+
     public InputField MinimumInput;
     public InputField MaximumInput;
 
@@ -15,9 +21,7 @@ public class AffixValueInfoSingleInput : AffixValueInfoInput
     public Dropdown ProgressionDropdown;
     public LayoutElement ProgressionSpaceFiller;
     public GameObject ProgressionParemeterInputPrefab;
-
-    private bool isMinimumValid = true;
-    private bool isMaximumValid = true;
+        
     private bool isProgressionValid = true;
 
     private AffixValueSingle originalMinimum;
@@ -46,7 +50,34 @@ public class AffixValueInfoSingleInput : AffixValueInfoInput
     {
         get
         {
-            return isMinimumValid && isMaximumValid && isProgressionValid;
+            return IsMinimumValid && IsMaximumValid && isProgressionValid;
+        }
+    }
+
+    private bool _isMinimumValid = true;
+    private bool IsMinimumValid
+    {
+        get { return _isMinimumValid; }
+        set
+        {
+            _isMinimumValid = value;
+            if (_isMinimumValid)
+                MinimumBackground.color = DefaultColor;
+            else
+                MinimumBackground.color = InvalidColor;
+        }
+    }
+    private bool _isMaximumValid = true;
+    private bool IsMaximumValid
+    {
+        get { return _isMaximumValid; }
+        set
+        {
+            _isMaximumValid = value;
+            if (_isMaximumValid)
+                MaximumBackground.color = DefaultColor;
+            else
+                MaximumBackground.color = InvalidColor;
         }
     }
 
@@ -88,7 +119,7 @@ public class AffixValueInfoSingleInput : AffixValueInfoInput
     {
         get
         {
-            if (!isMinimumValid)
+            if (!IsMinimumValid)
                 return 0f;
             return float.Parse(MinimumInput.text);
         }
@@ -98,7 +129,7 @@ public class AffixValueInfoSingleInput : AffixValueInfoInput
     {
         get
         {
-            if (!isMaximumValid)
+            if (!IsMaximumValid)
                 return 0f;
             return float.Parse(MaximumInput.text);
         }
@@ -156,11 +187,11 @@ public class AffixValueInfoSingleInput : AffixValueInfoInput
     private void UpdateIsMinimumChanged(string current)
     {
         if (string.IsNullOrWhiteSpace(current) || current == ".")
-        {
-            isMinimumValid = false;
+        {            
+            IsMinimumValid = false;
             return;
         }
-        isMinimumValid = true;
+        IsMinimumValid = true;
 
         if (originalMinimum == null)
         {
@@ -175,10 +206,10 @@ public class AffixValueInfoSingleInput : AffixValueInfoInput
     {
         if (string.IsNullOrWhiteSpace(current) || current == ".")
         {
-            isMaximumValid = false;
+            IsMaximumValid = false;
             return;
         }
-        isMaximumValid = true;
+        IsMaximumValid = true;
 
         if (originalMaximum == null)
         {

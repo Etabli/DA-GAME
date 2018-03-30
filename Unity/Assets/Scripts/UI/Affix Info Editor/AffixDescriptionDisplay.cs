@@ -10,6 +10,9 @@ public class AffixDescriptionDisplay : MonoBehaviour
 
     const string LABEL_TEXT = "Description";
 
+    public Color DefaultColor;
+    public Color InvalidColor;
+    public Image InputBackground;
     public InputField InputField;
     public Text Label;
 
@@ -63,6 +66,11 @@ public class AffixDescriptionDisplay : MonoBehaviour
 
     void CheckChanged(string currentText)
     {
+        if (IsValid)
+            InputBackground.color = DefaultColor;
+        else
+            InputBackground.color = InvalidColor;
+
         IsChanged = originalText != currentText;
     }
 
