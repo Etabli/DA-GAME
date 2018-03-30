@@ -222,23 +222,28 @@ public class AffixValueInfoSingleInput : AffixValueInfoInput
 
     private void UpdateIsProgressionChanged()
     {
+        isProgressionValid = true;
+
         if (!progressionEnabled)
-        {
-            isProgressionValid = true;
             return;
-        }
 
         // First check if valid so we don't have to worry when parsing
         for (int i = 0; i < progressionParameterInputs.Count; i++)
         {
             var input = progressionParameterInputs[i];
 
-            if (input.text == "")
+            float num; // Just need this for checking validity
+            if (!float.TryParse(input.text, out num))
             {
                 isProgressionValid = false;
-                return;
+                progressionParameterInputs[i].GetComponent<Image>().color = InvalidColor;
             }
+            else
+                progressionParameterInputs[i].GetComponent<Image>().color = DefaultColor;
         }
+        if (!isProgressionValid)
+            return;
+
         isProgressionValid = true;
 
         // First check if we are still the same progression type
