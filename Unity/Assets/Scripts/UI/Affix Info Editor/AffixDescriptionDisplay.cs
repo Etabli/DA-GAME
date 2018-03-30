@@ -53,6 +53,7 @@ public class AffixDescriptionDisplay : MonoBehaviour
     {
         get
         {
+            // TODO: Update with proper logic for AffixValueMultiple
             return InputField.text.Contains("{0}");
         }
     }
