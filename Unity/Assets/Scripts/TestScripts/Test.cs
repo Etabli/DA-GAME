@@ -1,6 +1,9 @@
-﻿using System.Collections;
+﻿using System.Diagnostics;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
+using Debug = UnityEngine.Debug;
 
 public class Test : MonoBehaviour
 {
@@ -103,12 +106,36 @@ public class Test : MonoBehaviour
         print(AffixInfo.GenerateAffix(3, 5).ToString());
     }
 
+    void TestLotteryPerformance()
+    {
+        Stopwatch timer = new Stopwatch();
+
+        // setup
+        Lottery<int> lottery = new Lottery<int>(1000000);
+        HashSet<int> blacklist = new HashSet<int>();
+        for (int i = 0; i < 10000; i++)
+        {
+            lottery.Enter(i % 100, 100);
+            if (i != 69)
+                blacklist.Add(i);
+        }
+        lottery.StartBatchDraw();
+
+        timer.Start();
+
+        // actual test
+        lottery.Draw(100);
+
+        timer.Stop();
+        Debug.Log($"Test took {timer.Elapsed.ToString("fffffff").Insert(3, ".").TrimStart('0')} ms");
+    }
+
     // Update is called once per frame
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            TestAffixGeneration();
+            TestLotteryPerformance();
         }
     }
 }

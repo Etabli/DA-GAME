@@ -23,8 +23,10 @@ public class LotteryException : Exception
 }
 
 /// <summary>
-/// A lottery for randomly drawing from a pool of objects. Fast for adding
-/// entrants and drawing but slow for batch drawing and removing entrants
+/// A lottery for randomly drawing from a pool of objects. Very fast for drawing
+/// ,reasonably fast for adding entrants, and slow for removing and drawing with blacklist. For 
+/// large lotteries specifying a capacity (total number of expected tickets) vastly
+/// improves adding time.
 /// </summary>
 /// <typeparam name="T">The type of object the lottery is for</typeparam>
 [DataContract]
@@ -34,24 +36,47 @@ public class Lottery<T> : ILottery<T> where T : IEquatable<T>
     /// <summary>
     /// Stores starting index and size of a continuous block belonging to a single entrant
     /// </summary>
-    private class Block
+    private class Block : IComparable<Block>
     {
+        /// <summary>
+        /// Called when the block's size changes. Argument is the difference in size
+        /// </summary>
+        public event Action<int> OnSizeChanged;
+
+        public T Entrant;
         public int StartingIndex;
-        public int Size;
+
+        private int _size;
+        public int Size
+        {
+            get { return _size; }
+            set
+            {
+                if (_size != value)
+                {
+                    int diff = value - _size;
+                    _size = value;
+                    OnSizeChanged?.Invoke(diff);
+                }
+            }
+        }
 
         public int LastIndex { get { return StartingIndex + Size; } }
 
-        public Block(int startingIndex, int size)
+        public Block(T entrant, int startingIndex, int size)
         {
             if (size < 1)
                 throw new ArgumentException($"Cannot create block with size {size}!");
 
+            Entrant = entrant;
             StartingIndex = startingIndex;
             Size = size;
         }
+
+        public int CompareTo(Block block) => StartingIndex.CompareTo(block.StartingIndex);
     }
 
-    private class Blocks 
+    private class Blocks : IEnumerable<Block>
     {
         List<Block> blocks;
         public int TotalSize;
@@ -60,19 +85,37 @@ public class Lottery<T> : ILottery<T> where T : IEquatable<T>
         {
             blocks = new List<Block>(1) { block };
             TotalSize = block.Size;
+            block.OnSizeChanged += diff => TotalSize += diff;
         }
 
         public Blocks(List<Block> blocks)
         {
             this.blocks = blocks;
             TotalSize = blocks.Aggregate(0, (n, block) => n + block.Size);
+            foreach (var block in blocks)
+            {
+                block.OnSizeChanged += diff => TotalSize += diff;
+            }
         }
 
         public int Count { get { return blocks.Count; } }
+        public int StartingIndex
+        {
+            get
+            {
+                if (blocks.Count == 0)
+                    return -1;
+
+                return blocks[0].StartingIndex;
+            }
+        }
         public int LastIndex
         {
             get
             {
+                if (blocks.Count == 0)
+                    return -1;
+
                 var last = blocks.Last();
                 return last.StartingIndex + last.Size;
             }
@@ -90,7 +133,6 @@ public class Lottery<T> : ILottery<T> where T : IEquatable<T>
                 throw new ArgumentException("Can't add negative values to a block!", nameof(value));
 
             blocks.Last().Size += value;
-            TotalSize += value;
         }
 
         /// <summary>
@@ -106,30 +148,8 @@ public class Lottery<T> : ILottery<T> where T : IEquatable<T>
                 var block = blocks.Last();
                 if (block.LastIndex > index)
                 {
-                    TotalSize -= block.Size;
                     block.Size = index - block.StartingIndex + 1;
-                    TotalSize += block.Size;
                 }
-            }
-        }
-
-        /// <summary>
-        /// Decreases the total size by the given value
-        /// </summary>
-        /// <param name="value"></param>
-        public void CutBy(int value)
-        {
-            while (blocks.Count > 0 && blocks.Last().Size <= value)
-            {
-                value -= blocks.Last().Size;
-                RemoveAt(blocks.Count - 1);
-            }
-
-            if (value > 0 && blocks.Count > 0)
-            {
-                var block = blocks.Last();
-                block.Size -= value;
-                TotalSize -= value;
             }
         }
 
@@ -152,6 +172,19 @@ public class Lottery<T> : ILottery<T> where T : IEquatable<T>
             get { return blocks[index]; }
             set { blocks[index] = value; }
         }
+
+        public IEnumerator<Block> GetEnumerator()
+        {
+            foreach (var block in blocks)
+            {
+                yield return block;
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
     }
     #endregion
 
@@ -162,9 +195,13 @@ public class Lottery<T> : ILottery<T> where T : IEquatable<T>
     // Only used to store total number of tickets in each block of entries
     // Actual drawing only happens fromt he entrants list
     Dictionary<T, Blocks> entrantBlocks = new Dictionary<T, Blocks>();
+    List<Block> sortedBlocks = new List<Block>();
 
     // Our own random generator to make seeding possible
     Random rng;
+
+    // Used for batch drawing
+    Lottery<T> batchLottery;
 
     #region Constructors
     public Lottery() : this(2)
@@ -179,7 +216,7 @@ public class Lottery<T> : ILottery<T> where T : IEquatable<T>
         rng = new Random(seed);
     }
 
-    public Lottery(Lottery<T> src) : this()
+    public Lottery(Lottery<T> src) : this(src.entrants.Capacity)
     {
         src.CombineInto(this);
     }
@@ -207,12 +244,16 @@ public class Lottery<T> : ILottery<T> where T : IEquatable<T>
             }
             else
             {
-                entrantBlocks[entrant].Add(new Block(entrants.Count, tickets));
+                Block newBlock = new Block(entrant, entrants.Count, tickets);
+                entrantBlocks[entrant].Add(newBlock);
+                sortedBlocks.Add(newBlock);
             }
         }
         else
         {
-            entrantBlocks.Add(entrant, new Blocks(new Block(entrants.Count, tickets)));
+            Block newBlock = new Block(entrant, entrants.Count, tickets);
+            entrantBlocks.Add(entrant, new Blocks(newBlock));
+            sortedBlocks.Add(newBlock);
         }
 
         // Add entries themselves
@@ -233,7 +274,13 @@ public class Lottery<T> : ILottery<T> where T : IEquatable<T>
     /// <summary>
     /// Removes an entrant from the lottery
     /// </summary>
-    public void Remove(T entrant) => Remove(entrant, entrantBlocks[entrant].TotalSize);
+    public void Remove(T entrant)
+    {
+        if (!entrantBlocks.ContainsKey(entrant))
+            return;
+
+        Remove(entrant, entrantBlocks[entrant].TotalSize);
+    }
 
     /// <summary>
     /// Removes a given amount of tickets from an entrant
@@ -256,18 +303,18 @@ public class Lottery<T> : ILottery<T> where T : IEquatable<T>
                 lastIndex = block.StartingIndex;
                 entrants.RemoveRange(block.StartingIndex, block.Size);
                 remaining -= block.Size;
+                blocks.RemoveAt(i);
+                sortedBlocks.RemoveAt(sortedBlocks.BinarySearch(block));
             }
             else
             {
-                int diff = block.Size - remaining;
-                int start = block.StartingIndex + diff;
-                lastIndex = start;
-                entrants.RemoveRange(start, block.Size - diff);
+                block.Size -= remaining;
+                lastIndex = block.LastIndex;
+                entrants.RemoveRange(block.StartingIndex, remaining);
                 break;
             }
         }
 
-        blocks.CutBy(tickets);
         if (blocks.TotalSize == 0)
             entrantBlocks.Remove(entrant);
 
@@ -276,36 +323,103 @@ public class Lottery<T> : ILottery<T> where T : IEquatable<T>
     #endregion
 
     #region Draw
+    /// <summary>
+    /// Draws a random entrant from this lottery
+    /// </summary>
+    /// <returns></returns>
     public T Draw()
     {
-        throw new NotImplementedException();
+        if (entrants.Count == 0)
+            throw new LotteryException("Can't draw from empty lottery!");
+
+        if (batchLottery == null)
+            return entrants[rng.Next(entrants.Count)];
+
+        // else draw from the batch lottery
+        try
+        {
+            T result = batchLottery.Draw();
+            batchLottery.Remove(result);
+            return result;
+        }
+        catch (LotteryException)
+        {
+            return default(T);
+        }
     }
 
+    /// <summary>
+    /// Draws n random entrants from this lottery
+    /// </summary>
+    /// <param name="n"></param>
+    /// <returns></returns>
     public List<T> Draw(int n)
     {
-        throw new NotImplementedException();
+        List<T> winners = new List<T>(n);
+        for (int i = 0; i < n; i++)
+        {
+            winners.Add(Draw());
+        }
+        return winners;
     }
 
+    /// <summary>
+    /// Draws a random entrant from this lottery that is not on the blacklist
+    /// </summary>
     public T Draw(HashSet<T> blacklist)
     {
-        throw new NotImplementedException();
+        if (entrants.Count == 0)
+            throw new LotteryException("Can't draw from empty lottery!");
+
+        // First get a sorted list of all blocks that aren't on the blacklist
+        List<Block> blocks = entrantBlocks.Keys
+            .Where(key => !blacklist.Contains(key))
+            .Select(key => entrantBlocks[key])
+            .SelectMany(list => list)
+            .ToList();
+        blocks.Sort((lhs, rhs) => lhs.StartingIndex.CompareTo(rhs.StartingIndex));
+
+        // Then create filtered list of entrants based on those blocks
+        List<T> filtered = new List<T>(blocks.Aggregate(0, (sum, block) => sum + block.Size));
+        foreach (var block in blocks)
+        {
+            for (int i = 0; i < block.Size; i++)
+            {
+                filtered.Add(block.Entrant);
+            }
+        }
+
+        if (filtered.Count == 0)
+            return default(T);
+        return filtered[rng.Next(filtered.Count)];
     }
     #endregion
 
     #region Batch Draw
+    /// <summary>
+    /// Puts this lottery into batch drawing mode. This means each entrant can only be drawn once
+    /// </summary>
     public void StartBatchDraw()
     {
-        throw new NotImplementedException();
+        batchLottery = new Lottery<T>(this);
     }
 
+    /// <summary>
+    /// Puts this lottery into batch drawing mode with a preexisting blacklist.
+    /// </summary>
     public void StartBatchDraw(HashSet<T> blacklist)
     {
-        throw new NotImplementedException();
+        batchLottery = new Lottery<T>(entrants.Count);
+
+        foreach (var e in entrantBlocks.Keys.Where(key => !blacklist.Contains(key)))
+        {
+            batchLottery.Enter(e, entrantBlocks[e].TotalSize);
+        }
     }
 
     public void EndBatchDraw()
     {
-        throw new NotImplementedException();
+        batchLottery = null;
     }
     #endregion
 
@@ -341,9 +455,9 @@ public class Lottery<T> : ILottery<T> where T : IEquatable<T>
     /// </summary>
     public void CombineInto(ILottery<T> lottery)
     {
-        foreach (var entrant in entrantBlocks.Keys)
+        foreach (var e in entrantBlocks.Keys)
         {
-            lottery.Enter(entrant, entrantBlocks[entrant].TotalSize);
+            lottery.Enter(e, entrantBlocks[e].TotalSize);
         }
     }
 
@@ -376,31 +490,14 @@ public class Lottery<T> : ILottery<T> where T : IEquatable<T>
         if (startingIndex >= entrants.Count)
             return;
 
-        // First cut off all blocks that are after the starting index
-        foreach (var blocks in entrantBlocks.Values)
-            blocks.CutAfter(startingIndex);
+        int index = sortedBlocks.BinarySearch(new Block(default(T), startingIndex, 1));
+        if (index < 0)
+            index = ~index;
 
-        // Check if we're starting in the middle of a block
-        if (startingIndex > 0 && ReferenceEquals(entrants[startingIndex - 1], entrants[startingIndex]))
+        for (int i = index; i < sortedBlocks.Count; i++)
         {
-            T entrant = entrants[startingIndex];
-
-            int start = startingIndex;
-            int end = FindEndOfBlock(start);
-            entrantBlocks[entrant].AddToLast(end - start);
-            startingIndex = end;
-        }
-
-        // Finally scan over all remaining entrants and add new blocks as needed
-        for (int i = startingIndex; i < entrants.Count;)
-        {
-            T entrant = entrants[i];
-
-            // Scan until end of block
-            int start = i;
-            i = FindEndOfBlock(start);
-
-            entrantBlocks[entrant].Add(new Block(start, i - start));
+            int newStart = i > 0 ? sortedBlocks[i - 1].LastIndex : 0;
+            sortedBlocks[i].StartingIndex = newStart;
         }
     }
 
