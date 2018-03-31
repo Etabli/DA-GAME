@@ -86,7 +86,7 @@ public abstract class ItemBase
         // Guaranteed affixes don't care about possible pool
         foreach (AffixType affixType in GuaranteedAffixes)
         {
-            int tier = tierLottery.GetWinner();
+            int tier = tierLottery.Draw();
             tier = tier > quality ? quality : tier;
             item.Affixes.Add(AffixInfo.GetAffixInfo(affixType).GenerateAffix(tier));
             quality -= tier;

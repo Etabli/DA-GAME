@@ -100,7 +100,7 @@ public class Test : MonoBehaviour
 
     void TestAffixGeneration()
     {
-        print(AffixInfo.GenerateAffix(3, 1).ToString());
+        print(AffixInfo.GenerateAffix(3, 5).ToString());
     }
 
     // Update is called once per frame
@@ -108,7 +108,7 @@ public class Test : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            //TestAffixGeneration();
+            TestAffixGeneration();
         }
     }
 }

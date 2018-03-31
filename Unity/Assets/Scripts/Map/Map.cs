@@ -141,7 +141,7 @@ public class Map
             nextPossibleAreaCenters.Remove(AreaBegin);
             List<HexCell> possibleCellsForArea = new List<HexCell>(GetNeighborsWithoutArea(AreaBegin));
 
-            Area newArea = new Area(lottery.GetWinner());
+            Area newArea = new Area(lottery.Draw());
             Areas.Add(newArea.AreaID, newArea);
             newArea.TryEstablishRelationWithCell(AreaBegin);
             //Debug.Log("Map::GenerateAreas - Chose Cell: " + AreaBegin.ToString());

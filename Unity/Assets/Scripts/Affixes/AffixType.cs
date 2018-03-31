@@ -10,7 +10,7 @@ using System.Runtime.Serialization;
 /// Represents a single affix type, encoded by a string
 /// </summary>
 [DataContract]
-public sealed class AffixType
+public sealed class AffixType : IEquatable<AffixType>
 {
     #region Static
     private static int nextID = 0;
@@ -180,6 +180,11 @@ public sealed class AffixType
         if (obj is AffixType)
             return (obj as AffixType) == this;
         return base.Equals(obj);
+    }
+
+    public bool Equals(AffixType type)
+    {
+        return this == type;
     }
 
     public override int GetHashCode()

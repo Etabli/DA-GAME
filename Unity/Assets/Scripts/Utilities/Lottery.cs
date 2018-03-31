@@ -5,28 +5,15 @@ using UnityEngine;
 using System.Runtime.Serialization;
 using System.Linq;
 
-
-/// <summary>
-/// Options for how to handle duplicates when entering a Lottery
-/// </summary>
-public enum EntryOptions
-{
-    NoChecks,       // Don't perform any checks
-    Aggregate,      // Aggregate duplicate entries into a single entry
-    Overwrite,      // Overwrite old entries with the new one
-    Discard         // Discard entry if one of the same type is already in the lottery
-}
+using Random = System.Random;
 
 /// <summary>
 /// A general Exception from mishandling a Lottery
 /// </summary>
 public class LotteryException : Exception
 {
-    // Only throw this if it's something seriously dumb, otherwise just log error
     public LotteryException()
-    {
-
-    }
+    { }
 
     public LotteryException(string message) : base(message)
     { }
@@ -36,122 +23,303 @@ public class LotteryException : Exception
 }
 
 /// <summary>
-/// A lottery for randomly drawing from a pool of objects.
+/// A lottery for randomly drawing from a pool of objects. Fast for adding
+/// entrants and drawing but slow for batch drawing and removing entrants
 /// </summary>
 /// <typeparam name="T">The type of object the lottery is for</typeparam>
 [DataContract]
-public class Lottery<T>
+public class Lottery<T> : ILottery<T> where T : IEquatable<T>
 {
-    [DataMember]
-    List<Tuple<T, int>> entrants;
-
-    // Our own random generator to make seeding possible
-    System.Random rng;
-    int maxRoll = 0;
-
-    List<Tuple<T, int>> batchDrawEntrants;
-    int batchDrawMaxRoll = 0;
-
-    public Lottery() : this((int)DateTime.Now.Ticks)
-    { }
-
-    public Lottery(int seed)
-    {
-        rng = new System.Random(seed);
-        entrants = new List<Tuple<T, int>>();
-    }
-
-    public Lottery(Lottery<T> src)
-    {
-        rng = new System.Random((int)DateTime.Now.Ticks);
-        src.CombineInto(this);
-    }
-
-    #region BatchDraw
+    #region Block
     /// <summary>
-    /// Initializes a batch draw with a preexisting blacklist
+    /// Stores starting index and size of a continuous block belonging to a single entrant
     /// </summary>
-    /// <param name="blacklist"></param>
-    public void StartBatchDraw(HashSet<T> blacklist)
+    private class Block
     {
-        batchDrawEntrants = new List<Tuple<T, int>>(from Tuple<T, int> e in entrants where !blacklist.Contains(e.Item1) select e);
-        batchDrawMaxRoll = batchDrawEntrants.Aggregate(0, (sum, e) => sum + e.Item2);
-    }
+        public int StartingIndex;
+        public int Size;
 
-    /// <summary>
-    /// Initializes a batch draw
-    /// </summary>
-    public void StartBatchDraw()
-    {
-        batchDrawEntrants = new List<Tuple<T, int>>(entrants);
-        batchDrawMaxRoll = maxRoll;
-    }
+        public int LastIndex { get { return StartingIndex + Size; } }
 
-    /// <summary>
-    /// Draws a batch of winners.
-    /// </summary>
-    /// <param name="n">The number of winners to draw</param>
-    /// <returns>The list of winners. Null if there were no entrants left.</returns>
-    public T[] DrawBatch(int n)
-    {
-        if (batchDrawEntrants == null)
+        public Block(int startingIndex, int size)
         {
-            throw new LotteryException("Trying to BatchDraw without initializing!");
+            if (size < 1)
+                throw new ArgumentException($"Cannot create block with size {size}!");
+
+            StartingIndex = startingIndex;
+            Size = size;
+        }
+    }
+
+    private class Blocks 
+    {
+        List<Block> blocks;
+        public int TotalSize;
+
+        public Blocks(Block block)
+        {
+            blocks = new List<Block>(1) { block };
+            TotalSize = block.Size;
         }
 
-        List<T> batch = new List<T>();
-        // Draw n times
-        for (; n > 0; n--)
+        public Blocks(List<Block> blocks)
         {
-            // Break if we've exhausted all entrants
-            if (batchDrawEntrants.Count == 0)
-            {
-                break;
-            }
+            this.blocks = blocks;
+            TotalSize = blocks.Aggregate(0, (n, block) => n + block.Size);
+        }
 
-            int roll = rng.Next(batchDrawMaxRoll);
-            foreach (Tuple<T, int> e in batchDrawEntrants)
+        public int Count { get { return blocks.Count; } }
+        public int LastIndex
+        {
+            get
             {
-                if (roll < e.Item2)
+                var last = blocks.Last();
+                return last.StartingIndex + last.Size;
+            }
+        }
+
+        public void Add(Block block)
+        {
+            blocks.Add(block);
+            TotalSize += block.Size;
+        }
+
+        public void AddToLast(int value)
+        {
+            if (value < 0)
+                throw new ArgumentException("Can't add negative values to a block!", nameof(value));
+
+            blocks.Last().Size += value;
+            TotalSize += value;
+        }
+
+        /// <summary>
+        /// Cuts off all contents after a given index (exclusive)
+        /// </summary>
+        public void CutAfter(int index)
+        {
+            while (blocks.Count > 0 && blocks.Last().StartingIndex > index)
+                RemoveAt(Count - 1);
+
+            if (blocks.Count > 0)
+            {
+                var block = blocks.Last();
+                if (block.LastIndex > index)
                 {
-                    batch.Add(e.Item1);
-                    batchDrawEntrants.Remove(e);
-                    batchDrawMaxRoll -= e.Item2;
-                    break;
+                    TotalSize -= block.Size;
+                    block.Size = index - block.StartingIndex + 1;
+                    TotalSize += block.Size;
                 }
-                roll -= e.Item2;
             }
         }
 
-        if (batch.Count > 0)
+        /// <summary>
+        /// Decreases the total size by the given value
+        /// </summary>
+        /// <param name="value"></param>
+        public void CutBy(int value)
         {
-            return batch.ToArray();
+            while (blocks.Count > 0 && blocks.Last().Size <= value)
+            {
+                value -= blocks.Last().Size;
+                RemoveAt(blocks.Count - 1);
+            }
+
+            if (value > 0 && blocks.Count > 0)
+            {
+                var block = blocks.Last();
+                block.Size -= value;
+                TotalSize -= value;
+            }
         }
-        return null;
-    }
 
-    /// <summary>
-    /// Draws a single winner from the batch-drawing list.
-    /// </summary>
-    /// <returns></returns>
-    public T DrawBatch()
-    {
-        T[] batch = DrawBatch(1);
-        if (batch == null)
-            return default(T);
-        return batch[0];
-    }
+        public void Remove(Block block)
+        {
+            TotalSize -= block.Size;
+            blocks.Remove(block);
+        }
 
-    /// <summary>
-    /// Ends a batch draw, so that accidental draws without restarting throw an error
-    /// </summary>
-    public void EndBatchDraw()
-    {
-        batchDrawEntrants = null;
-        batchDrawMaxRoll = 0;
+        public void RemoveAt(int index)
+        {
+            TotalSize -= blocks[index].Size;
+            blocks.RemoveAt(index);
+        }
+
+        public Block Last() => blocks.Last();
+
+        public Block this[int index]
+        {
+            get { return blocks[index]; }
+            set { blocks[index] = value; }
+        }
     }
     #endregion
 
+    // List which contains one entry for each ticket
+    [DataMember]
+    List<T> entrants;
+
+    // Only used to store total number of tickets in each block of entries
+    // Actual drawing only happens fromt he entrants list
+    Dictionary<T, Blocks> entrantBlocks = new Dictionary<T, Blocks>();
+
+    // Our own random generator to make seeding possible
+    Random rng;
+
+    #region Constructors
+    public Lottery() : this(2)
+    { }
+
+    public Lottery(int capacity) : this(capacity, (int)DateTime.Now.Ticks)
+    { }
+
+    public Lottery(int capacity, int seed)
+    {
+        entrants = new List<T>(capacity);
+        rng = new Random(seed);
+    }
+
+    public Lottery(Lottery<T> src) : this()
+    {
+        src.CombineInto(this);
+    }
+    #endregion
+
+    #region Enter
+    /// <summary>
+    /// Enters an object into the lottery
+    /// </summary>
+    public void Enter(T entrant, int tickets)
+    {
+        if (tickets < 1)
+            throw new LotteryException($"Cannot enter with {tickets} ticktes!");
+
+        // Adjust capacity if necessary
+        if (entrants.Capacity < entrants.Count + tickets)
+            entrants.Capacity = entrants.Count + tickets;
+        
+        // Update blocks
+        if (entrantBlocks.ContainsKey(entrant))
+        {
+            if (entrants.Last().Equals(entrant))
+            {
+                entrantBlocks[entrant].AddToLast(tickets);
+            }
+            else
+            {
+                entrantBlocks[entrant].Add(new Block(entrants.Count, tickets));
+            }
+        }
+        else
+        {
+            entrantBlocks.Add(entrant, new Blocks(new Block(entrants.Count, tickets)));
+        }
+
+        // Add entries themselves
+        for (int i = 0; i < tickets; i++)
+        {
+            entrants.Add(entrant);
+        }
+    }
+
+    /// <summary>
+    /// Enters an object into the lottery
+    /// </summary>
+    /// <param name="entrant"></param>
+    public void Enter(T entrant) => Enter(entrant, 1);
+    #endregion
+
+    #region Remove
+    /// <summary>
+    /// Removes an entrant from the lottery
+    /// </summary>
+    public void Remove(T entrant) => Remove(entrant, entrantBlocks[entrant].TotalSize);
+
+    /// <summary>
+    /// Removes a given amount of tickets from an entrant
+    /// </summary>
+    public void Remove(T entrant, int tickets)
+    {
+        if (!entrantBlocks.ContainsKey(entrant))
+            return;
+        if (tickets < 1)
+            return;
+
+        int lastIndex = entrants.Count;
+        int remaining = tickets;
+        var blocks = entrantBlocks[entrant];
+        for (int i = blocks.Count - 1; i >= 0; i--)
+        {
+            var block = blocks[i];
+            if (block.Size <= remaining)
+            {
+                lastIndex = block.StartingIndex;
+                entrants.RemoveRange(block.StartingIndex, block.Size);
+                remaining -= block.Size;
+            }
+            else
+            {
+                int diff = block.Size - remaining;
+                int start = block.StartingIndex + diff;
+                lastIndex = start;
+                entrants.RemoveRange(start, block.Size - diff);
+                break;
+            }
+        }
+
+        blocks.CutBy(tickets);
+        if (blocks.TotalSize == 0)
+            entrantBlocks.Remove(entrant);
+
+        RebuildBlocks(lastIndex);
+    }
+    #endregion
+
+    #region Draw
+    public T Draw()
+    {
+        throw new NotImplementedException();
+    }
+
+    public List<T> Draw(int n)
+    {
+        throw new NotImplementedException();
+    }
+
+    public T Draw(HashSet<T> blacklist)
+    {
+        throw new NotImplementedException();
+    }
+    #endregion
+
+    #region Batch Draw
+    public void StartBatchDraw()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void StartBatchDraw(HashSet<T> blacklist)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void EndBatchDraw()
+    {
+        throw new NotImplementedException();
+    }
+    #endregion
+
+    #region GetTickets
+    public int GetTickets(T entrant)
+    {
+        if (!entrantBlocks.ContainsKey(entrant))
+            return 0;
+
+        return entrantBlocks[entrant].TotalSize;
+    }
+    #endregion
+
+    #region ChangeSeed
     /// <summary>
     /// Changes the current seed of the lottery
     /// </summary>
@@ -165,206 +333,89 @@ public class Lottery<T>
     {
         ChangeSeed((int)DateTime.Now.Ticks);
     }
+    #endregion
 
+    #region Combining
     /// <summary>
-    /// Enters all entrants of this lottery into another lottery
+    /// Enters all entrants of this lottery into the given lottery
     /// </summary>
-    /// <param name="lottery">The lottery to be entered into</param>
-    /// <param name="options">Strategy to use for duplicate entries</param>
-    public void CombineInto(Lottery<T> lottery, EntryOptions options)
+    public void CombineInto(ILottery<T> lottery)
     {
-        foreach (Tuple<T, int> e in entrants)
+        foreach (var entrant in entrantBlocks.Keys)
         {
-            lottery.Enter(e.Item1, e.Item2, options);
+            lottery.Enter(entrant, entrantBlocks[entrant].TotalSize);
         }
     }
 
     /// <summary>
-    /// Enters all entrants of this lottery into another lottery. Uses Aggregate option
+    /// Returns a combined lottery between this lottery and the given lottery
     /// </summary>
     /// <param name="lottery"></param>
-    public void CombineInto(Lottery<T> lottery)
-    {
-        CombineInto(lottery, EntryOptions.Aggregate);
-    }
-
-    /// <summary>
-    /// Combines this lottery with another one and returns the result
-    /// </summary>
-    /// <param name="lottery">The lottery to combine this one with</param>
-    /// <returns>The combined lottery</returns>
-    public Lottery<T> CombineWith(Lottery<T> lottery, EntryOptions options)
+    /// <returns></returns>
+    public ILottery<T> CombineWith(ILottery<T> lottery)
     {
         Lottery<T> result = new Lottery<T>();
-        CombineInto(result, options);
-        lottery.CombineInto(result, options);
+        lottery.CombineInto(result);
+        this.CombineInto(result);
         return result;
-    }
-
-    public Lottery<T> CombineWith(Lottery<T> lottery)
-    {
-        return CombineWith(lottery, EntryOptions.Aggregate);
-    }
-
-    public static Lottery<T> Combine(Lottery<T> lottery1, Lottery<T> lottery2, EntryOptions options)
-    {
-        return lottery1.CombineWith(lottery2, options);
     }
 
     public static Lottery<T> Combine(Lottery<T> lottery1, Lottery<T> lottery2)
     {
-        return Combine(lottery1, lottery2, EntryOptions.Aggregate);
+        return lottery1.CombineWith(lottery2) as Lottery<T>;
+    }
+    #endregion
+
+    #region Private Helper Functions
+    /// <summary>
+    /// Rebuilds the blocks of all entrants starting from a given index
+    /// </summary>
+    /// <param name="startingIndex"></param>
+    private void RebuildBlocks(int startingIndex)
+    {
+        if (startingIndex >= entrants.Count)
+            return;
+
+        // First cut off all blocks that are after the starting index
+        foreach (var blocks in entrantBlocks.Values)
+            blocks.CutAfter(startingIndex);
+
+        // Check if we're starting in the middle of a block
+        if (startingIndex > 0 && ReferenceEquals(entrants[startingIndex - 1], entrants[startingIndex]))
+        {
+            T entrant = entrants[startingIndex];
+
+            int start = startingIndex;
+            int end = FindEndOfBlock(start);
+            entrantBlocks[entrant].AddToLast(end - start);
+            startingIndex = end;
+        }
+
+        // Finally scan over all remaining entrants and add new blocks as needed
+        for (int i = startingIndex; i < entrants.Count;)
+        {
+            T entrant = entrants[i];
+
+            // Scan until end of block
+            int start = i;
+            i = FindEndOfBlock(start);
+
+            entrantBlocks[entrant].Add(new Block(start, i - start));
+        }
     }
 
     /// <summary>
-    /// Enters an object into the lottery
+    /// Scans through the entrants to find the end of a block
     /// </summary>
-    /// <param name="entrant">The object to be entered into the lottery</param>
-    /// <param name="nTickets">The number of tickets to assign to the object</param>
-    /// <param name="options">Options regarding what to do when a duplicate is found</param>
-    public void Enter(T entrant, int nTickets, EntryOptions options)
+    /// <returns>The first index after the block.</returns>
+    private int FindEndOfBlock(int start)
     {
-        // Check for duplicates if we care about them
-        if (options != EntryOptions.NoChecks)
-        {
-            Tuple<T, int> duplicate = GetEntrant(entrant);
+        T entrant = entrants[start];
 
-            // We found a duplicate
-            if (duplicate != null)
-            {
-                if (options == EntryOptions.Discard)
-                {
-                    // Do nothing
-                    return;
-                }
-                else if (options == EntryOptions.Aggregate)
-                {
-                    // Remove duplicate and update ticket amount
-                    nTickets += duplicate.Item2;
-                    Remove(entrant);
-                }
-                else if (options == EntryOptions.Overwrite)
-                {
-                    // Simply remove duplicate
-                    Remove(entrant);
-                }
-            }
-        }             
+        int end = start;
+        for (; end < entrants.Count && entrants[end].Equals(entrant); end++) ;
 
-        maxRoll += nTickets;
-        entrants.Add(new Tuple<T, int>(entrant, nTickets));
+        return end;
     }
-
-    public void Enter(T entrant, int nTickets)
-    {
-        Enter(entrant, nTickets, EntryOptions.Aggregate);
-    }
-
-    public void Enter(T entrant)
-    {
-        Enter(entrant, 1, EntryOptions.Aggregate);
-    }
-
-    public T GetWinner(HashSet<T> blacklist)
-    {
-        Tuple<T, int>[] entrants_copy = new Tuple<T, int>[entrants.Count];
-        entrants.CopyTo(entrants_copy);
-
-        var filtered_entrants = entrants.ToArray();
-        int max = maxRoll;
-
-        // Only filter if we actually have a blacklist
-        if (blacklist.Count > 0)
-        {
-            filtered_entrants = (from Tuple<T, int> e in entrants where !blacklist.Contains(e.Item1) select e).ToArray();
-            max = filtered_entrants.Aggregate(0, (sum, e) => sum + e.Item2);
-        }    
-
-        T winner = default(T);
-        int roll = rng.Next(max);
-        foreach (Tuple<T, int> entrant in filtered_entrants)
-        {
-            if (roll < entrant.Item2)
-            {
-                winner = entrant.Item1;
-                break;
-            }
-            roll -= entrant.Item2;
-        }
-        return winner;
-    }
-
-    public T GetWinner()
-    {
-        return GetWinner(new HashSet<T>());
-    }
-
-    public T Draw()
-    {
-        return GetWinner();
-    }
-
-    public T Draw(HashSet<T> blacklist)
-    {
-        return GetWinner(blacklist);
-    }
-
-    public void Remove(T entrant)
-    {
-        entrants.RemoveAll(t => {
-            if (t.Item1.Equals(entrant))
-            {
-                maxRoll -= t.Item2;
-                return true;
-            }
-            return false;
-        });
-    }
-
-    public override string ToString()
-    {
-        string result = string.Format("Lottery of type '{0}' with {1} entrants:\n", typeof(T), entrants.Count);
-        foreach(Tuple<T, int> e in entrants)
-        {
-            result += string.Format("{0}: {1}\n", e.Item1, e.Item2);
-        }
-        return result;
-    }
-
-    /// <summary>
-    /// Returns a proper entrant for a given object, if there is one
-    /// </summary>
-    private Tuple<T, int> GetEntrant(T value)
-    {
-        Tuple<T, int> result = null;
-        foreach(Tuple<T, int> e in entrants)
-        {
-            if (e.Item1.Equals(value))
-            {
-                result = e;
-                break;
-            }
-        }
-        return result;
-    }
-
-    /// <summary>
-    /// Returns all entrants for a given object, if there are any
-    /// </summary>
-    /// <param name="value"></param>
-    /// <returns></returns>
-    private Tuple<T, int>[] GetEntrants(T value)
-    {
-        List<Tuple<T, int>> result = new List<Tuple<T, int>>();
-
-        foreach (Tuple<T, int> e in entrants)
-        {
-            if (e.Item1.Equals(value))
-            {
-                result.Add(e);
-            }
-        }
-
-        return result.ToArray();
-    }
+    #endregion
 }

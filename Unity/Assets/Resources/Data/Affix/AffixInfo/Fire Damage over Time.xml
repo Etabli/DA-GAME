@@ -64,16 +64,17 @@
         </Parameters>
       </AffixProgression>
       <AffixProgression>
-        <Name>Constant</Name>
+        <Name>Linear</Name>
         <Parameters xmlns:d5p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
           <d5p1:float>1</d5p1:float>
+          <d5p1:float>0</d5p1:float>
         </Parameters>
       </AffixProgression>
       <AffixProgression>
         <Name>Linear</Name>
         <Parameters xmlns:d5p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
-          <d5p1:float>0</d5p1:float>
           <d5p1:float>1</d5p1:float>
+          <d5p1:float>0.1</d5p1:float>
         </Parameters>
       </AffixProgression>
     </progressions>

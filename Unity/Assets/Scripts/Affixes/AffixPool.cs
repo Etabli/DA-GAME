@@ -53,7 +53,7 @@ public class AffixPool
 
     public void CombineInto(AffixPool pool)
     {
-        lottery.CombineInto(pool.lottery, EntryOptions.Discard);
+        lottery.CombineInto(pool.lottery);
     }
 
     /// <summary>
@@ -62,7 +62,7 @@ public class AffixPool
     /// <returns></returns>
     public AffixType GetRandomType()
     {
-        return lottery.GetWinner();
+        return lottery.Draw();
     }
 
     /// <summary>
@@ -89,7 +89,7 @@ public class AffixPool
     public AffixType[] GetUniqueRandomTypes(int n)
     {
         lottery.StartBatchDraw();
-        AffixType[] types = lottery.DrawBatch(n);
+        AffixType[] types = lottery.Draw(n).ToArray();
         lottery.EndBatchDraw();
         return types;
     }
@@ -155,7 +155,7 @@ public class AffixPool
             int tier = tierDistribution.Draw();
             tier = tier > totalTiers ? totalTiers : tier;
 
-            AffixType type = lottery.DrawBatch();
+            AffixType type = lottery.Draw();
             if (type == AffixType.None)
             {
                 // We've run out of AffixTypes to draw from
