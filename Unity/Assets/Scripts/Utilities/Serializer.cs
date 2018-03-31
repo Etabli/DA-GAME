@@ -193,7 +193,7 @@ public abstract class Serializer
             // Create new random objects
             foreach (var pool in pools)
             {
-                pool.Value.ChangeSeed();
+                pool.Value.Initialize();
             }
 
             return pools;

@@ -114,6 +114,11 @@ public sealed class AffixType : IEquatable<AffixType>
     #region Operators
     public static bool operator ==(AffixType lhs, AffixType rhs)
     {
+        if (ReferenceEquals(lhs, rhs))
+            return true;
+        if (ReferenceEquals(lhs, null) || ReferenceEquals(rhs, null))
+            return false;
+
         return lhs.ID == rhs.ID;
     }
 

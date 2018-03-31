@@ -81,6 +81,12 @@ public class Lottery<T> : ILottery<T> where T : IEquatable<T>
         List<Block> blocks;
         public int TotalSize;
 
+        public Blocks()
+        {
+            blocks = new List<Block>();
+            TotalSize = 0;
+        }
+
         public Blocks(Block block)
         {
             blocks = new List<Block>(1) { block };
@@ -318,7 +324,7 @@ public class Lottery<T> : ILottery<T> where T : IEquatable<T>
         if (blocks.TotalSize == 0)
             entrantBlocks.Remove(entrant);
 
-        RebuildBlocks(lastIndex);
+        UpdateBlockStarts(lastIndex);
     }
     #endregion
 
@@ -409,6 +415,9 @@ public class Lottery<T> : ILottery<T> where T : IEquatable<T>
     /// </summary>
     public void StartBatchDraw(HashSet<T> blacklist)
     {
+        if (blacklist == null)
+            StartBatchDraw();
+
         batchLottery = new Lottery<T>(entrants.Count);
 
         foreach (var e in entrantBlocks.Keys.Where(key => !blacklist.Contains(key)))
@@ -485,7 +494,7 @@ public class Lottery<T> : ILottery<T> where T : IEquatable<T>
     /// Rebuilds the blocks of all entrants starting from a given index
     /// </summary>
     /// <param name="startingIndex"></param>
-    private void RebuildBlocks(int startingIndex)
+    private void UpdateBlockStarts(int startingIndex)
     {
         if (startingIndex >= entrants.Count)
             return;
@@ -498,6 +507,26 @@ public class Lottery<T> : ILottery<T> where T : IEquatable<T>
         {
             int newStart = i > 0 ? sortedBlocks[i - 1].LastIndex : 0;
             sortedBlocks[i].StartingIndex = newStart;
+        }
+    }
+
+    public void RebuildBlocks()
+    {
+        entrantBlocks = new Dictionary<T, Blocks>();
+        sortedBlocks = new List<Block>();
+
+        for (int i = 0; i < entrants.Count; i++)
+        {
+            T entrant = entrants[i];
+            if (!entrantBlocks.ContainsKey(entrant))
+                entrantBlocks.Add(entrant, new Blocks());
+
+            int start = i;
+            i = FindEndOfBlock(start);
+
+            var newBlock = new Block(entrant, start, i - start);
+            entrantBlocks[entrant].Add(newBlock);
+            sortedBlocks.Add(newBlock);
         }
     }
 

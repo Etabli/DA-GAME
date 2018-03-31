@@ -5,12 +5,10 @@
     <Value xmlns:d3p1="http://schemas.datacontract.org/2004/07/">
       <d3p1:lottery>
         <d3p1:entrants>
-          <d3p1:TupleOfAffixTypeintQMN0Fzzj>
-            <d3p1:item1>
-              <d3p1:type>PhysDmgFlat</d3p1:type>
-            </d3p1:item1>
-            <d3p1:item2>1</d3p1:item2>
-          </d3p1:TupleOfAffixTypeintQMN0Fzzj>
+          <d3p1:AffixType>
+            <d3p1:ID>1</d3p1:ID>
+            <d3p1:Name>Flat Physical Damage</d3p1:Name>
+          </d3p1:AffixType>
         </d3p1:entrants>
       </d3p1:lottery>
     </Value>
@@ -20,18 +18,14 @@
     <Value xmlns:d3p1="http://schemas.datacontract.org/2004/07/">
       <d3p1:lottery>
         <d3p1:entrants>
-          <d3p1:TupleOfAffixTypeintQMN0Fzzj>
-            <d3p1:item1>
-              <d3p1:type>Health</d3p1:type>
-            </d3p1:item1>
-            <d3p1:item2>1</d3p1:item2>
-          </d3p1:TupleOfAffixTypeintQMN0Fzzj>
-          <d3p1:TupleOfAffixTypeintQMN0Fzzj>
-            <d3p1:item1>
-              <d3p1:type>PhysDmgFlat</d3p1:type>
-            </d3p1:item1>
-            <d3p1:item2>1</d3p1:item2>
-          </d3p1:TupleOfAffixTypeintQMN0Fzzj>
+          <d3p1:AffixType>
+            <d3p1:ID>0</d3p1:ID>
+            <d3p1:Name>Health</d3p1:Name>
+          </d3p1:AffixType>
+          <d3p1:AffixType>
+            <d3p1:ID>1</d3p1:ID>
+            <d3p1:Name>Flat Physical Damage</d3p1:Name>
+          </d3p1:AffixType>
         </d3p1:entrants>
       </d3p1:lottery>
     </Value>
@@ -41,24 +35,18 @@
     <Value xmlns:d3p1="http://schemas.datacontract.org/2004/07/">
       <d3p1:lottery>
         <d3p1:entrants>
-          <d3p1:TupleOfAffixTypeintQMN0Fzzj>
-            <d3p1:item1>
-              <d3p1:type>FireRate</d3p1:type>
-            </d3p1:item1>
-            <d3p1:item2>1</d3p1:item2>
-          </d3p1:TupleOfAffixTypeintQMN0Fzzj>
-          <d3p1:TupleOfAffixTypeintQMN0Fzzj>
-            <d3p1:item1>
-              <d3p1:type>PhysDmgFlat</d3p1:type>
-            </d3p1:item1>
-            <d3p1:item2>1</d3p1:item2>
-          </d3p1:TupleOfAffixTypeintQMN0Fzzj>
-          <d3p1:TupleOfAffixTypeintQMN0Fzzj>
-            <d3p1:item1>
-              <d3p1:type>Health</d3p1:type>
-            </d3p1:item1>
-            <d3p1:item2>1</d3p1:item2>
-          </d3p1:TupleOfAffixTypeintQMN0Fzzj>
+          <d3p1:AffixType>
+            <d3p1:ID>2</d3p1:ID>
+            <d3p1:Name>Fire Rate</d3p1:Name>
+          </d3p1:AffixType>
+          <d3p1:AffixType>
+            <d3p1:ID>1</d3p1:ID>
+            <d3p1:Name>Flat Physical Damage</d3p1:Name>
+          </d3p1:AffixType>
+          <d3p1:AffixType>
+            <d3p1:ID>0</d3p1:ID>
+            <d3p1:Name>Health</d3p1:Name>
+          </d3p1:AffixType>
         </d3p1:entrants>
       </d3p1:lottery>
     </Value>
