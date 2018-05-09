@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Runtime.Serialization;
 using System;
 
 /// <summary>
@@ -22,18 +21,12 @@ public enum ItemBaseType
     FireCrystals
 }
 
-[DataContract]
 public abstract class ItemBase
 {
-    [DataMember]
     public readonly ItemClass Class;
-    [DataMember]
     public readonly ItemBaseType BaseType;
-    [DataMember]
     public readonly AffixType[] BaseAffixes;
-    [DataMember]
     public readonly AffixType[] GuaranteedAffixes;
-    [DataMember]
     public readonly AffixPool PossibleAffixes;
 
     public ItemBase(ItemBaseType baseType, ItemClass itemClass, AffixType[] baseAffixs, AffixType[] guaranteedAffixes, AffixPool affixPool)
@@ -101,10 +94,8 @@ public abstract class ItemBase
     }
 }
 
-[DataContract]
 public class WeaponBase : ItemBase
 {
-    [DataMember]
     public readonly AmmoClass[] AllowedAmmoTypes;
 
     public WeaponBase(ItemBaseType baseType, AffixType[] baseAffixes, AffixType[] guaranteedAffixes, AmmoClass[] allowedAmmoTypes, AffixPool affixPool)
@@ -125,10 +116,8 @@ public class WeaponBase : ItemBase
     }
 }
 
-[DataContract]
 public class ArmorBase : ItemBase
 {
-    [DataMember]
     public readonly Slot[] Slots;
 
     public ArmorBase(ItemBaseType baseType, AffixType[] baseAffixes, AffixType[] guaranteedAffixes, Slot[] slots, AffixPool affixPool)
@@ -151,7 +140,6 @@ public class ArmorBase : ItemBase
 
 public class AmmoBase : ItemBase
 {
-    [DataMember]
     public readonly AmmoClass AmmoClass;
 
     public AmmoBase(ItemBaseType baseType, AffixType[] baseAffixes, AffixType[] guaranteedAffixes, AmmoClass ammoClass, AffixPool affixPool)

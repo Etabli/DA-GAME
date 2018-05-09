@@ -1,24 +1,21 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 using System;
 using System.Linq;
-using UnityEngine;
+using Newtonsoft.Json;
 
 /// <summary>
 /// Represents information on a single AffixType. Serializable via a DataContract.
 /// </summary>
-[DataContract]
 public class AffixInfo
 {
-    [DataMember]
     public readonly AffixType Type;
-    [DataMember]
     public readonly string Description;
-    [DataMember]
     public readonly AffixValueInfo ValueInfo;
 
+    [JsonIgnore]
     public int ID { get { return Type.ID; } }
+    [JsonIgnore]
     public string Name { get { return Type.Name; } }
 
     /// <summary>
@@ -50,6 +47,7 @@ public class AffixInfo
     /// <summary>
     /// Creates a new AffixInfo object with a preexisting type
     /// </summary>
+    [JsonConstructor]
     public AffixInfo(AffixType type, AffixValueInfo valueInfo, string description)
         : this(valueInfo, description)
     {

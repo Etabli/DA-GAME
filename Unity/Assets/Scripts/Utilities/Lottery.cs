@@ -2,8 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Runtime.Serialization;
 using System.Linq;
+using Newtonsoft.Json;
 
 using Random = System.Random;
 
@@ -29,7 +29,6 @@ public class LotteryException : Exception
 /// improves adding time.
 /// </summary>
 /// <typeparam name="T">The type of object the lottery is for</typeparam>
-[DataContract]
 public class Lottery<T> : ILottery<T> where T : IEquatable<T>
 {
     #region Block
@@ -195,8 +194,11 @@ public class Lottery<T> : ILottery<T> where T : IEquatable<T>
     #endregion
 
     // List which contains one entry for each ticket
-    [DataMember]
+    [JsonProperty]
     List<T> entrants;
+
+    public int EntrantCount { get { return entrantBlocks.Count; } }
+    public List<T> Entrants { get { return entrantBlocks.Keys.ToList(); } }
 
     // Only used to store total number of tickets in each block of entries
     // Actual drawing only happens fromt he entrants list
@@ -225,6 +227,13 @@ public class Lottery<T> : ILottery<T> where T : IEquatable<T>
     public Lottery(Lottery<T> src) : this(src.entrants.Capacity)
     {
         src.CombineInto(this);
+    }
+
+    [JsonConstructor]
+    private Lottery(List<T> entrants)
+    {
+        this.entrants = entrants;
+        RebuildBlocks();
     }
     #endregion
 

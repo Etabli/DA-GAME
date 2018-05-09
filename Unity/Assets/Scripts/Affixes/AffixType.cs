@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
-using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
 /// <summary>
 /// Represents a single affix type, encoded by a string
 /// </summary>
-[DataContract]
 public sealed class AffixType : IEquatable<AffixType>
 {
     #region Static
@@ -43,7 +42,7 @@ public sealed class AffixType : IEquatable<AffixType>
     /// <returns>A reference to the new affix type</returns>
     public static AffixType CreateNew(string name)
     {
-        return new AffixType(name);
+        return new AffixType(nextID++, name);
     }
 
     /// <summary>
@@ -146,10 +145,9 @@ public sealed class AffixType : IEquatable<AffixType>
     #endregion
 
     #endregion
-    [DataMember]
-    public int ID { get; private set; }
 
-    [DataMember]
+    [JsonIgnore]
+    public int ID { get; private set; }
     public string Name { get; private set; }
 
     private AffixType(int id, string name)
@@ -172,8 +170,19 @@ public sealed class AffixType : IEquatable<AffixType>
             Types.Add(this);
     }
 
-    private AffixType(string name) : this(nextID++, name)
-    { }
+    /// <summary>
+    /// Initializes this affix type to an existing type with the same name or creates a new one if it doesn't exist yet
+    /// </summary>  
+    [JsonConstructor]
+    private AffixType(string name)
+    {
+        if (!nameDict.ContainsKey(name))
+            ID = CreateNew(name).ID;
+        else
+            ID = nameDict[name].ID;
+
+        Name = name;
+    }
 
     public override string ToString()
     {

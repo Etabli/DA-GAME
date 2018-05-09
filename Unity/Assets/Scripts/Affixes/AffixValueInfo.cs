@@ -1,30 +1,21 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 using System;
+using Newtonsoft.Json;
 
 /// <summary>
 /// Represents information on an Affix's value or values. Serialiazable via a DataContract.
 /// </summary>
-[DataContract]
-[KnownType(typeof(AffixValueSingle))]
-[KnownType(typeof(AffixValueRange))]
-[KnownType(typeof(AffixValueMultiple))]
 public class AffixValueInfo
 {
-    [DataMember]
-    private readonly AffixValue baseValueMin;
-    [DataMember]
-    private readonly AffixValue baseValueMax;
-    [DataMember]
-    private readonly AffixProgression[] progressions;
+    public AffixValue BaseValueMin { get; }
+    public AffixValue BaseValueMax { get; }
+    public AffixProgression[] Progressions { get; }
 
-    public AffixValue BaseValueMin { get { return baseValueMin; } }
-    public AffixValue BaseValueMax { get { return baseValueMax; } }
-    public AffixProgression Progression { get { return progressions[0]; } }
-    public AffixProgression[] Progressions { get { return progressions; } }
+    [JsonIgnore]
+    public AffixProgression Progression { get { return Progressions[0]; } }
 
-    public AffixValueInfo(AffixValueInfo src) : this(src.baseValueMin, src.baseValueMax, src.progressions)
+    public AffixValueInfo(AffixValueInfo src) : this(src.BaseValueMin, src.BaseValueMax, src.Progressions)
     {
     }
 
@@ -38,6 +29,7 @@ public class AffixValueInfo
         : this (baseValueMin, baseValueMax, new AffixProgression[] { progression })
     { }
 
+    [JsonConstructor]
     public AffixValueInfo(AffixValue baseValueMin, AffixValue baseValueMax, AffixProgression[] progressions)
     {
         if (!baseValueMin.IsSameType(baseValueMax))
@@ -47,12 +39,12 @@ public class AffixValueInfo
             if ((BaseValueMin as AffixValueMultiple).Count != progressions.Length)
                 throw new ArgumentException($"Info AffixValueMultiple needs the same amount of progressions as affix values!", nameof(progressions));
 
-        this.baseValueMin = baseValueMin;
-        this.baseValueMax = baseValueMax;
-        this.progressions = new AffixProgression[progressions.Length];
+        BaseValueMin = baseValueMin;
+        BaseValueMax = baseValueMax;
+        Progressions = new AffixProgression[progressions.Length];
         for (int i = 0; i < progressions.Length; i++)
         {
-            this.progressions[i] = new AffixProgression(progressions[i]);
+            Progressions[i] = new AffixProgression(progressions[i]);
         }
     }
 
@@ -76,9 +68,9 @@ public class AffixValueInfo
         if (ReferenceEquals(lhs, null) || ReferenceEquals(rhs, null))
             return false;
 
-        if (lhs.baseValueMin != rhs.baseValueMin ||
-            lhs.baseValueMax != rhs.baseValueMax ||
-            lhs.progressions != rhs.progressions)
+        if (lhs.BaseValueMin != rhs.BaseValueMin ||
+            lhs.BaseValueMax != rhs.BaseValueMax ||
+            lhs.Progressions != rhs.Progressions)
         {
             return false;
         }
@@ -98,22 +90,22 @@ public class AffixValueInfo
     /// <returns></returns>
     public AffixValue GetValueForTier(int tier)
     {
-        if (baseValueMin is AffixValueMultiple)
+        if (BaseValueMin is AffixValueMultiple)
         {
             List<AffixValue> values = new List<AffixValue>();
 
-            var min = baseValueMin as AffixValueMultiple;
-            var max = baseValueMax as AffixValueMultiple;
+            var min = BaseValueMin as AffixValueMultiple;
+            var max = BaseValueMax as AffixValueMultiple;
 
             for (int i = 0; i < min.Count; i++)
             {
-                values.Add(GetValueForTier(min[i], max[i], tier, progressions[i]));
+                values.Add(GetValueForTier(min[i], max[i], tier, Progressions[i]));
             }
 
             return new AffixValueMultiple(values.ToArray());
         }
         else
-            return GetValueForTier(baseValueMin, baseValueMax, tier, Progression);
+            return GetValueForTier(BaseValueMin, BaseValueMax, tier, Progression);
     }
 
     /// <summary>
@@ -139,6 +131,6 @@ public class AffixValueInfo
 
     public override string ToString()
     {
-        return string.Format("{0} - {1}", baseValueMin, baseValueMax);
+        return string.Format("{0} - {1}", BaseValueMin, BaseValueMax);
     }
 }

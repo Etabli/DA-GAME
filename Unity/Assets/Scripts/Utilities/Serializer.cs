@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
-using System.Xml;
-using System.Runtime.Serialization;
 using UnityEngine;
+using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
 // TODO: Change saving
 public abstract class Serializer
@@ -17,6 +17,18 @@ public abstract class Serializer
     const string AFFIX_TYPE_FILE_PATH = AFFIX_FOLDER_PATH + "AffixTypes";
     const string BIOME_FOLDER_PATH = DATA_FOLDER_PATH + "Biome/";
 
+    public static void Initialize()
+    {
+        JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+        {
+            NullValueHandling = NullValueHandling.Ignore,
+            Formatting = Formatting.Indented,
+            TypeNameHandling = TypeNameHandling.Auto,
+            ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+            Converters = new List<JsonConverter> { new AffixPoolJsonConverter() }
+        };
+    }
+
     #region AffixInfo
     /// <summary>
     /// Takes an AffixInfo object and returns a string containing formatted XML describing it.
@@ -25,18 +37,7 @@ public abstract class Serializer
     /// <returns>A strong containing formatted XML</returns>
     public static string SerializeAffixInfo(AffixInfo info)
     {
-        MemoryStream stream = new MemoryStream();
-        DataContractSerializer serializer = new DataContractSerializer(typeof(AffixInfo));
-        XmlWriterSettings settings = new XmlWriterSettings() { Indent = true };
-
-        using (XmlWriter writer = XmlWriter.Create(stream, settings))
-            serializer.WriteObject(writer, info);
-        stream.Position = 0;
-        StreamReader reader = new StreamReader(stream);
-        string data = reader.ReadToEnd();
-        reader.Close();
-        stream.Close();
-        return data;
+        return JsonConvert.SerializeObject(info);
     }
 
     /// <summary>
@@ -46,21 +47,7 @@ public abstract class Serializer
     /// <returns>The usable AffixInfo object</returns>
     public static AffixInfo DeserializeAffixInfo(string data)
     {
-        return DeserializeAffixInfo(Encoding.UTF8.GetBytes(data));
-    }
-
-    /// <summary>
-    /// Deserializes an Affix Info object from a string. Automatically calls its constructor to perform setup work.
-    /// </summary>
-    /// <param name="data">A byte array containing the xml data describing the AffixInfo object</param>
-    /// <returns>The loaded AffixInfo object</returns>
-    public static AffixInfo DeserializeAffixInfo(byte[] data)
-    {
-        MemoryStream stream = new MemoryStream(data);
-        DataContractSerializer serializer = new DataContractSerializer(typeof(AffixInfo));
-        AffixInfo info = serializer.ReadObject(stream) as AffixInfo;
-        stream.Close();
-        return new AffixInfo(info);
+        return JsonConvert.DeserializeObject<AffixInfo>(data);
     }
 
     /// <summary>
@@ -105,7 +92,7 @@ public abstract class Serializer
         if (text == null)
             throw new ArgumentException($"'{path}' is not a valid text asset!");
 
-        return DeserializeAffixInfo(text.bytes);
+        return DeserializeAffixInfo(text.text);
     }
 
     /// <summary>
@@ -125,7 +112,7 @@ public abstract class Serializer
         var texts = Resources.LoadAll<TextAsset>(folder);
         foreach (var text in texts)
         {
-            AffixInfo.Register(DeserializeAffixInfo(text.bytes));
+            AffixInfo.Register(DeserializeAffixInfo(text.text));
         }
     }
 
@@ -152,14 +139,9 @@ public abstract class Serializer
     #region AffixPool
     public static void SaveAffixPoolsToDisk(Dictionary<AffixPoolPreset, AffixPool> pools)
     {
-        FileStream file = new FileStream(GetSystemPath(AFFIX_POOL_FILE_PATH), FileMode.Create);
-
-        DataContractSerializer serializer = new DataContractSerializer(typeof(Dictionary<AffixPoolPreset, AffixPool>));
-        XmlWriterSettings settings = new XmlWriterSettings() { Indent = true };
-
-        using (XmlWriter writer = XmlWriter.Create(file, settings))
-            serializer.WriteObject(writer, pools);
-        file.Close();
+        using (FileStream file = new FileStream(GetSystemPath(AFFIX_POOL_FILE_PATH), FileMode.Create))
+        using (StreamWriter sw = new StreamWriter(file))
+            sw.Write(JsonConvert.SerializeObject(pools));
     }
 
     public static Dictionary<AffixPoolPreset, AffixPool> LoadAffixPoolsFromDisk()
@@ -168,55 +150,14 @@ public abstract class Serializer
         if (text == null)
             throw new ArgumentException($"{AFFIX_POOL_FILE_PATH} is not a valid text asset!");
 
-        string data;
-        using (MemoryStream stream = new MemoryStream(text.bytes))
-            using (StreamReader reader = new StreamReader(stream))
-                data = reader.ReadToEnd();
-
-        // Remove all newlines and spaces between individual tags because apparently this serializer doesn't like them
-        int index;
-        while ((index = data.IndexOf(Environment.NewLine)) != -1)
-        {
-            data = data.Remove(index, 2);
-        }
-        while ((index = data.IndexOf("> ")) != -1)
-        {
-            data = data.Remove(index + 1, 1);
-        }
-
-        using (MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(data)))
-        {
-            Dictionary<AffixPoolPreset, AffixPool> pools = new Dictionary<AffixPoolPreset, AffixPool>();
-            DataContractSerializer serializer = new DataContractSerializer(pools.GetType());
-            pools = serializer.ReadObject(stream) as Dictionary<AffixPoolPreset, AffixPool>;
-
-            // Create new random objects
-            foreach (var pool in pools)
-            {
-                pool.Value.Initialize();
-            }
-
-            return pools;
-        }
+        return JsonConvert.DeserializeObject<Dictionary<AffixPoolPreset, AffixPool>>(text.text);
     }
     #endregion
 
     #region BiomeInfo
     public static string SerializeBiomeInfo(BiomeInfo info)
     {
-        MemoryStream stream = new MemoryStream();
-        DataContractSerializer serializer = new DataContractSerializer(typeof(BiomeInfo));
-        XmlWriterSettings settings = new XmlWriterSettings() { Indent = true };
-
-        using (XmlWriter writer = XmlWriter.Create(stream, settings))
-            serializer.WriteObject(writer, info);
-
-        stream.Position = 0;
-        StreamReader reader = new StreamReader(stream);
-        string data = reader.ReadToEnd();
-        reader.Close();
-        stream.Close();
-        return data;
+        return JsonConvert.SerializeObject(info);
     }
 
     /// <summary>
@@ -310,6 +251,35 @@ public abstract class Serializer
     private static string GetSystemPath(string resourcePath)
     {
         return "Assets/Resources/" + resourcePath + ".xml";
+    }
+}
+
+public class AffixPoolJsonConverter : JsonConverter<AffixPool>
+{
+    public override void WriteJson(JsonWriter writer, AffixPool value, JsonSerializer serializer)
+    {
+        AffixPool pool = value as AffixPool;
+
+        List<string> names = new List<string>(pool.AffixTypes.Count);
+        foreach (var type in pool.AffixTypes)
+        {
+            names.Add(type.Name);
+        }
+        
+        serializer.Serialize(writer, names);
+    }
+
+    public override AffixPool ReadJson(JsonReader reader, Type objectType, AffixPool existingValue, bool hasExistingValue, JsonSerializer serializer)
+    {
+        List<string> names = serializer.Deserialize<List<string>>(reader);
+
+        AffixType[] types = new AffixType[names.Count];
+        for (int i = 0; i < names.Count; i++)
+        {
+            types[i] = AffixType.GetByName(names[i]);
+        }
+
+        return new AffixPool(types);
     }
 }
 

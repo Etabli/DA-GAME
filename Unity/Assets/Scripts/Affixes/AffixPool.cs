@@ -1,10 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 using System.IO;
 using System;
 using System.Xml;
 using System.Text;
+using Newtonsoft.Json;
 
 public enum AffixPoolPreset
 {
@@ -18,12 +18,11 @@ public enum AffixPoolPreset
 /// to immediately generate the Affixes. In that case either a fixed tier or tier
 /// lottery can be used.
 /// </summary>
-[DataContract]
-[KnownType(typeof(Lottery<AffixType>))]
 public class AffixPool
 {
-    [DataMember]
     protected Lottery<AffixType> lottery;
+
+    public List<AffixType> AffixTypes { get { return lottery.Entrants; } }
 
     public AffixPool(params AffixType[] types)
     {
@@ -32,6 +31,12 @@ public class AffixPool
         {
             lottery.Enter(t, 1);
         }
+    }
+
+    [JsonConstructor]
+    public AffixPool(Lottery<AffixType> lottery)
+    {
+        this.lottery = new Lottery<AffixType>(lottery);
     }
 
     /// <summary>

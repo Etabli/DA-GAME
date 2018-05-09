@@ -1,54 +1,14 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<ArrayOfKeyValueOfAffixPoolPresetAffixPoolaI91Yjnm xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
-  <KeyValueOfAffixPoolPresetAffixPoolaI91Yjnm>
-    <Key>Ammo</Key>
-    <Value xmlns:d3p1="http://schemas.datacontract.org/2004/07/">
-      <d3p1:lottery>
-        <d3p1:entrants>
-          <d3p1:AffixType>
-            <d3p1:ID>1</d3p1:ID>
-            <d3p1:Name>Flat Physical Damage</d3p1:Name>
-          </d3p1:AffixType>
-        </d3p1:entrants>
-      </d3p1:lottery>
-    </Value>
-  </KeyValueOfAffixPoolPresetAffixPoolaI91Yjnm>
-  <KeyValueOfAffixPoolPresetAffixPoolaI91Yjnm>
-    <Key>Armor</Key>
-    <Value xmlns:d3p1="http://schemas.datacontract.org/2004/07/">
-      <d3p1:lottery>
-        <d3p1:entrants>
-          <d3p1:AffixType>
-            <d3p1:ID>0</d3p1:ID>
-            <d3p1:Name>Health</d3p1:Name>
-          </d3p1:AffixType>
-          <d3p1:AffixType>
-            <d3p1:ID>1</d3p1:ID>
-            <d3p1:Name>Flat Physical Damage</d3p1:Name>
-          </d3p1:AffixType>
-        </d3p1:entrants>
-      </d3p1:lottery>
-    </Value>
-  </KeyValueOfAffixPoolPresetAffixPoolaI91Yjnm>
-  <KeyValueOfAffixPoolPresetAffixPoolaI91Yjnm>
-    <Key>Weapon</Key>
-    <Value xmlns:d3p1="http://schemas.datacontract.org/2004/07/">
-      <d3p1:lottery>
-        <d3p1:entrants>
-          <d3p1:AffixType>
-            <d3p1:ID>2</d3p1:ID>
-            <d3p1:Name>Fire Rate</d3p1:Name>
-          </d3p1:AffixType>
-          <d3p1:AffixType>
-            <d3p1:ID>1</d3p1:ID>
-            <d3p1:Name>Flat Physical Damage</d3p1:Name>
-          </d3p1:AffixType>
-          <d3p1:AffixType>
-            <d3p1:ID>0</d3p1:ID>
-            <d3p1:Name>Health</d3p1:Name>
-          </d3p1:AffixType>
-        </d3p1:entrants>
-      </d3p1:lottery>
-    </Value>
-  </KeyValueOfAffixPoolPresetAffixPoolaI91Yjnm>
-</ArrayOfKeyValueOfAffixPoolPresetAffixPoolaI91Yjnm>
+{
+  "Ammo": [
+    "Flat Physical Damage"
+  ],
+  "Armor": [
+    "Fire Rate",
+    "Flat Physical Damage"
+  ],
+  "Weapon": [
+    "Health",
+    "Flat Physical Damage",
+    "Fire Rate"
+  ]
+}

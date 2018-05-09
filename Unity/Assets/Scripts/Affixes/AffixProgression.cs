@@ -1,22 +1,20 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 using System.Reflection;
 using System.Linq;
 using System;
 using UnityEngine;
+using Newtonsoft.Json;
 
 /// <summary>
 /// Represents a progression function that can be applied to an AffixValue
 /// </summary>
-[DataContract]
 public struct AffixProgression
 {
-    [DataMember]
     public readonly float[] Parameters;
-    [DataMember]
     public readonly string Name;
 
+    [JsonIgnore]
     private MethodInfo progressionFunction;
 
     public AffixProgression(AffixProgression src) : this(src.Name, src.Parameters)
@@ -168,9 +166,6 @@ public struct AffixProgression
         public InvalidProgressionFunctionException() { }
         public InvalidProgressionFunctionException(string message) : base(message) { }
         public InvalidProgressionFunctionException(string message, Exception inner) : base(message, inner) { }
-        protected InvalidProgressionFunctionException(
-          SerializationInfo info,
-          StreamingContext context) : base(info, context) { }
     }
     #endregion
 }

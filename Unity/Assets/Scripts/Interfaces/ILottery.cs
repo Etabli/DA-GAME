@@ -2,6 +2,9 @@
 
 public interface ILottery<T>
 {
+    int EntrantCount { get; }
+    List<T> Entrants { get; }
+
     void Enter(T entrant);
     void Enter(T entrant, int tickets);
     void Remove(T entrant);

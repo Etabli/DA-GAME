@@ -2,13 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
 #region AffixValue
 /// <summary>
 /// Represents a general AffixValue and the operations it should support.
 /// </summary>
-[DataContract]
 public abstract class AffixValue
 {
     // Not an interface because interfaces can't contain operators
@@ -115,13 +114,9 @@ public abstract class AffixValue
 /// <summary>
 /// An AffixValue that represents a single float.
 /// </summary>
-[DataContract]
 public class AffixValueSingle : AffixValue
 {
-    [DataMember]
     public float Value { get; protected set; }
-    [DataMember]
-    public AffixProgression Progression { get; protected set; }
 
     public AffixValueSingle() : this(0f)
     {}
@@ -243,10 +238,9 @@ public class AffixValueSingle : AffixValue
 /// <summary>
 /// An AffixValue that represents a Range.
 /// </summary>
-[DataContract]
 public class AffixValueRange : AffixValue
 {
-    [DataMember]
+    [JsonProperty]
     public Range Value;
 
     public float MinValue
@@ -282,7 +276,7 @@ public class AffixValueRange : AffixValue
     public override bool Equals(object obj)
     {
         if (obj is AffixValueRange)
-            return this == (AffixValueRange)obj;
+            return this == obj as AffixValueRange;
         if (obj is Range)
             return this == (Range)obj;
         return base.Equals(obj);
@@ -383,12 +377,9 @@ public class AffixValueRange : AffixValue
 /// <summary>
 /// An AffixValue that represents an array of floats.
 /// </summary>
-[DataContract]
 public class AffixValueMultiple : AffixValue
 {
-    [DataMember]
     public AffixValue[] Values { get; protected set; }
-    [DataMember]
     protected readonly Dictionary<string, int> valueNames = new Dictionary<string, int>();
 
     public int Count { get { return Values.Length; } }

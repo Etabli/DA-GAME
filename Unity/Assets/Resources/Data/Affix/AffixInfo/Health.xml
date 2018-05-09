@@ -1,33 +1,25 @@
-<?xml version="1.0" encoding="utf-8"?>
-<AffixInfo xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.datacontract.org/2004/07/">
-  <Description>Increases your health by {0}</Description>
-  <Type>
-    <ID>0</ID>
-    <Name>Health</Name>
-  </Type>
-  <ValueInfo>
-    <baseValueMax i:type="AffixValueSingle">
-      <Progression>
-        <Name i:nil="true" />
-        <Parameters xmlns:d5p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" i:nil="true" />
-      </Progression>
-      <Value>5</Value>
-    </baseValueMax>
-    <baseValueMin i:type="AffixValueSingle">
-      <Progression>
-        <Name i:nil="true" />
-        <Parameters xmlns:d5p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" i:nil="true" />
-      </Progression>
-      <Value>3</Value>
-    </baseValueMin>
-    <progressions>
-      <AffixProgression>
-        <Name>Linear</Name>
-        <Parameters xmlns:d5p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
-          <d5p1:float>0</d5p1:float>
-          <d5p1:float>1</d5p1:float>
-        </Parameters>
-      </AffixProgression>
-    </progressions>
-  </ValueInfo>
-</AffixInfo>
+{
+  "Type": {
+    "Name": "Health"
+  },
+  "Description": "Increases your health by {0}",
+  "ValueInfo": {
+    "BaseValueMin": {
+      "$type": "AffixValueSingle, Assembly-CSharp",
+      "Value": 3.0
+    },
+    "BaseValueMax": {
+      "$type": "AffixValueSingle, Assembly-CSharp",
+      "Value": 5.0
+    },
+    "Progressions": [
+      {
+        "Parameters": [
+          0.0,
+          1.0
+        ],
+        "Name": "Linear"
+      }
+    ]
+  }
+}
