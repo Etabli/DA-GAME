@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Runtime.Serialization;
 using System.Linq;
 using System;
+using Newtonsoft.Json;
 
 /// <summary>
 /// The possible bioms
@@ -37,6 +38,7 @@ public class BiomeInfo{
     #endregion
 
     #region ctor
+    [JsonConstructor]
     public BiomeInfo(BiomeType type, List<EnemyType>enemyList, List<ItemBaseType> itemList, List<ResourceType> resourceList,Range minMaxTier)
     {
         Type = type;

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using UserDialog;
@@ -14,6 +15,15 @@ public class AffixListDisplay : MonoBehaviour
 
     AffixType selectedType = AffixType.None;
     Dictionary<AffixType, AffixTypeDisplay> displays = new Dictionary<AffixType, AffixTypeDisplay>();
+
+    [SerializeField]
+    Button NewButton;
+    [SerializeField]
+    Button DeleteButton;
+    [SerializeField]
+    Button RenameButton;
+    [SerializeField]
+    Button SaveButton;
 
     private void Start()
     {
@@ -31,13 +41,19 @@ public class AffixListDisplay : MonoBehaviour
 
             displays[selectedType].SetChanged(changed);
         };
+
+        // async await to silence warnings
+        NewButton.onClick.AddListener(async () => await CreateNew());
+        DeleteButton.onClick.AddListener(async () => await DeleteSelectedType());
+        RenameButton.onClick.AddListener(async () => await RenameSelectedType());
+        SaveButton.onClick.AddListener(async () => await SaveSelectedType());
     }
 
-    private void Update()
+    private async void Update()
     {
         if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.S))
         {
-            SaveSelectedType();
+            await SaveSelectedType();
         }
     }
 
@@ -86,32 +102,36 @@ public class AffixListDisplay : MonoBehaviour
     }
 
     /// <summary>
-    /// Shows a prompt for the user to enter a new name
+    /// Shows a prompt for the user to enter a new name.
     /// </summary>
-    public void CreateNew()
+    public async Task CreateNew()
     {
-        DialogController.ShowBlocking("Enter a name:", 
-            name =>
-            {
-                AffixInfo info = new AffixInfo(name, new AffixValueInfo());
-                AffixInfo.Register(info);
-                AddTypeToLIst(info.Type);
-                UpdateHeight();
-                SelectType(info.Type);
-            }
-            , null, name => !AffixType.Exists(name) && AffixType.IsValidName(name)
-            , ShowInvalidNameMessage);
+        var result = await DialogStringInput.ShowBlocking("Enter a name:", name => !AffixType.Exists(name) && AffixType.IsValidName(name), ShowInvalidNameMessage).result;
+        if (result.IsOK)
+        {
+            string name = result.Value;
+
+            AffixInfo info = new AffixInfo(name, new AffixValueInfo());
+            AffixInfo.Register(info);
+            AddTypeToLIst(info.Type);
+            UpdateHeight();
+            SelectType(info.Type);
+        }
     }
 
-    public void SaveSelectedType()
+    /// <summary>
+    /// Saves the selected affix type to disk and updates the entry in the AffixInfo dictionary.
+    /// </summary>
+    /// <returns>Whether or not there were any problems saving. Also true if there were no changes.</returns>
+    public async Task<bool> SaveSelectedType()
     {
         if (selectedType == AffixType.None)
-            return;
+            return false;
 
         if (!AffixInfoDisplay.IsValid)
         {
-            DialogController.Show("Some inputs are invalid! Make sure no fields are empty.");
-            return;
+            await DialogBasic.Show("Some inputs are invalid! Make sure no fields are empty.").result;
+            return false;
         }
 
         if (AffixInfoDisplay.IsChanged)
@@ -122,51 +142,78 @@ public class AffixListDisplay : MonoBehaviour
             Serializer.SaveAffixInfoToDisk(newInfo);
 
             // Updates all the changed variables
-            AffixInfoDisplay.SetType(newInfo.Type);  
+            AffixInfoDisplay.SetType(newInfo.Type);
         }
+        return true;
     }
 
-    public void DeleteSelectedType()
+    /// <summary>
+    /// Delets the selected affix type.
+    /// </summary>
+    /// <returns>A task that returns whether or not the affix type was deleted.</returns>
+    public async Task<bool> DeleteSelectedType()
+    {
+        if (selectedType == AffixType.None)
+            return false;
+
+        if (await DialogCancellable.ShowBlocking($"Are you sure you want to delete {selectedType.Name}?").result == DialogResult.OK)
+        {
+            AffixInfo.Deregister(selectedType);
+            AffixType.Remove(selectedType);
+            Destroy(displays[selectedType].gameObject);
+            displays.Remove(selectedType);
+            Serializer.DeleteAffixInfo(selectedType);
+            selectedType = AffixType.None;
+            UpdateHeight();
+            return true;
+        }
+        return false;
+    }
+
+    public async Task RenameSelectedType()
     {
         if (selectedType == AffixType.None)
             return;
 
-        DialogController.ShowBlocking($"Are you sure you want to delete {selectedType.Name}?",
-            () =>
-            {
-                AffixInfo.Deregister(selectedType);
-                AffixType.Remove(selectedType);
-                Destroy(displays[selectedType].gameObject);
-                displays.Remove(selectedType);
-                Serializer.DeleteAffixInfo(selectedType);
-                selectedType = AffixType.None;
-                UpdateHeight();
-            }, null);        
-    }
-
-    public void RenameSelectedType()
-    {
-        if (selectedType == AffixType.None)
+        if (!AffixInfoDisplay.IsValid)
+        {
+            DialogBasic.Show("Renaming requires that all changes are saved first, but there are invalid entries. Please fix all errors before trying again.");
             return;
+        }
 
-        DialogController.ShowBlocking($"Enter a new name for '{selectedType.Name}'",
-            name =>
+        if (AffixInfoDisplay.IsChanged)
+        {
+            if ((await DialogCancellable.Show("Renaming requires that all changes be saved first. Save now?").result).IsCancelled)
+                return;
+
+            if (await SaveSelectedType() == false)
             {
-                var oldInfo = AffixInfo.GetAffixInfo(selectedType);
-                AffixInfo.Deregister(selectedType);
-                Serializer.DeleteAffixInfo(oldInfo.Type);
+                DialogBasic.Show("There was a problem saving. Please recheck the values and try again.");
+                return;
+            }
+        }
 
-                var newType = AffixType.Replace(selectedType.ID, name);
-                var newInfo = new AffixInfo(newType, oldInfo.ValueInfo, oldInfo.Description);
-                AffixInfo.Register(newInfo);
-                Serializer.SaveAffixInfoToDisk(newInfo);
+        var result = await DialogStringInput.ShowBlocking($"Enter a new name for '{selectedType.Name}'",
+            name => !AffixType.Exists(name) && AffixType.IsValidName(name), ShowInvalidNameMessage).result;
 
-                var display = displays[selectedType];
-                displays.Remove(selectedType);
-                displays.Add(newType, display);
-                display.SetAffixType(newType);
-                SelectType(newType);
+        if (result.IsOK)
+        {
+            string name = result.Value;
 
-            }, null, name => !AffixType.Exists(name) && AffixType.IsValidName(name), ShowInvalidNameMessage);
+            var oldInfo = AffixInfo.GetAffixInfo(selectedType);
+            AffixInfo.Deregister(selectedType);
+            Serializer.DeleteAffixInfo(oldInfo.Type);
+
+            var newType = AffixType.Replace(selectedType.ID, name);
+            var newInfo = new AffixInfo(newType, oldInfo.ValueInfo, oldInfo.Description);
+            AffixInfo.Register(newInfo);
+            Serializer.SaveAffixInfoToDisk(newInfo);
+
+            var display = displays[selectedType];
+            displays.Remove(selectedType);
+            displays.Add(newType, display);
+            display.SetAffixType(newType);
+            SelectType(newType);
+        }
     }
 }

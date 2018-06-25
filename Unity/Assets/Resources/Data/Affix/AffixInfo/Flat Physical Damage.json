@@ -1,0 +1,26 @@
+{
+  "Type": {
+    "Name": "Flat Physical Damage"
+  },
+  "Description": "Increases your physical damage by {0}",
+  "ValueInfo": {
+    "BaseValueMin": {
+      "$type": "AffixValueRange, Assembly-CSharp",
+      "MinValue": 1.0,
+      "MaxValue": 1.3
+    },
+    "BaseValueMax": {
+      "$type": "AffixValueRange, Assembly-CSharp",
+      "MinValue": 1.5,
+      "MaxValue": 2.0
+    },
+    "Progressions": [
+      {
+        "Parameters": [
+          1.1
+        ],
+        "Name": "Exponential"
+      }
+    ]
+  }
+}

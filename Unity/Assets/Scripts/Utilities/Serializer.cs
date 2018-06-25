@@ -66,11 +66,9 @@ public abstract class Serializer
     {
         string data = SerializeAffixInfo(info);
 
-        FileStream file = new FileStream(path, FileMode.Create);
-        StreamWriter writer = new StreamWriter(file);
-        writer.Write(data);
-        writer.Close();
-        file.Close();
+        using (FileStream file = new FileStream(path, FileMode.Create))
+        using (StreamWriter writer = new StreamWriter(file))
+            writer.Write(data);
     }
 
     /// <summary>
@@ -167,11 +165,7 @@ public abstract class Serializer
     /// <returns></returns>
     public static BiomeInfo DeserializeBiomeInfo(string data)
     {
-        MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(data));
-        DataContractSerializer serializer = new DataContractSerializer(typeof(BiomeInfo));
-        BiomeInfo info = serializer.ReadObject(stream) as BiomeInfo;
-        stream.Close();
-        return info;
+        return JsonConvert.DeserializeObject<BiomeInfo>(data);
     }
 
     /// <summary>
@@ -183,11 +177,9 @@ public abstract class Serializer
 
         //Debug.Log(data);
 
-        FileStream file = new FileStream(GetSystemPath(GetBiomePathFromType(info.Type)), FileMode.Create);
-        StreamWriter writer = new StreamWriter(file);
-        writer.Write(data);
-        writer.Close();
-        file.Close();
+        using (FileStream file = new FileStream(GetSystemPath(GetBiomePathFromType(info.Type)), FileMode.Create))
+        using (StreamWriter writer = new StreamWriter(file))
+            writer.Write(data);
     }
 
     /// <summary>
@@ -203,8 +195,8 @@ public abstract class Serializer
 
         string data;
         using (MemoryStream stream = new MemoryStream(text.bytes))
-            using (StreamReader reader = new StreamReader(stream))
-                data = reader.ReadToEnd();
+        using (StreamReader reader = new StreamReader(stream))
+            data = reader.ReadToEnd();
 
         return new BiomeInfo(DeserializeBiomeInfo(data));
     }
@@ -250,7 +242,7 @@ public abstract class Serializer
     /// <returns></returns>
     private static string GetSystemPath(string resourcePath)
     {
-        return "Assets/Resources/" + resourcePath + ".xml";
+        return "Assets/Resources/" + resourcePath + ".json";
     }
 }
 

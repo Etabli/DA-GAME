@@ -121,6 +121,7 @@ public class AffixValueSingle : AffixValue
     public AffixValueSingle() : this(0f)
     {}
 
+    [JsonConstructor]
     public AffixValueSingle(float value)
     {
         Value = value;
@@ -240,7 +241,7 @@ public class AffixValueSingle : AffixValue
 /// </summary>
 public class AffixValueRange : AffixValue
 {
-    [JsonProperty]
+    [JsonIgnore]
     public Range Value;
 
     public float MinValue
@@ -259,6 +260,7 @@ public class AffixValueRange : AffixValue
     public AffixValueRange()
     {}
 
+    [JsonConstructor]
     public AffixValueRange(float min, float max) : this(new Range(min, max))
     { }
 
@@ -380,6 +382,7 @@ public class AffixValueRange : AffixValue
 public class AffixValueMultiple : AffixValue
 {
     public AffixValue[] Values { get; protected set; }
+    [JsonIgnore]
     protected readonly Dictionary<string, int> valueNames = new Dictionary<string, int>();
 
     public int Count { get { return Values.Length; } }
@@ -387,6 +390,7 @@ public class AffixValueMultiple : AffixValue
     public AffixValueMultiple()
     { }
 
+    [JsonConstructor]
     public AffixValueMultiple(params AffixValue[] values)
     {
         Values = new AffixValue[values.Length];

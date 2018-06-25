@@ -1,0 +1,21 @@
+{
+  "MinMaxTier": {
+    "MinValue": 1.0,
+    "MaxValue": 4.0
+  },
+  "Type": 1,
+  "PossibleEnemiesToSpawn": [
+    2,
+    0,
+    3,
+    1
+  ],
+  "PossibleItemsToSpawn": [
+    4,
+    3
+  ],
+  "PossibleResourceToSpawn": [
+    2,
+    1
+  ]
+}

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -47,5 +48,31 @@ namespace UserDialog
                 : base(message, innerException)
             { }
         }
+    }
+
+    public class DialogResult
+    {
+        protected uint ID;
+
+        protected DialogResult(uint id) => ID = id;
+        protected DialogResult(DialogResult src) => ID = src.ID;
+
+        public bool IsOK => this == OK;
+        public bool IsCancelled => this == Cancelled;
+
+        public static bool operator ==(DialogResult lhs, DialogResult rhs) => lhs.ID == rhs.ID;
+        public static bool operator !=(DialogResult lhs, DialogResult rhs) => !(lhs == rhs);
+
+        public override bool Equals(object obj)
+        {
+            if (obj is DialogResult dialogResult)
+                return this == dialogResult;
+            return base.Equals(obj);
+        }
+
+        public override int GetHashCode() => ID.GetHashCode();
+
+        public static readonly DialogResult OK = new DialogResult(0);
+        public static readonly DialogResult Cancelled = new DialogResult(1);
     }
 }

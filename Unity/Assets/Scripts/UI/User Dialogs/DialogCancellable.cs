@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -28,5 +29,19 @@ namespace UserDialog
 
         void Accept() => OnAccept?.Invoke();
         void Cancel() => OnCancel?.Invoke();
+
+        public static new (DialogCancellable dialog, Task<DialogResult> result) Show(string message)
+        {
+            var t = new TaskCompletionSource<DialogResult>();
+
+            return (DialogController.Show(message, () => t.TrySetResult(DialogResult.OK), () => t.TrySetResult(DialogResult.OK)), t.Task);
+        }
+
+        public static new (DialogCancellable dialog, Task<DialogResult> result) ShowBlocking(string message)
+        {
+            var dialogResult = Show(message);
+            DialogController.Block(dialogResult.dialog);
+            return dialogResult;
+        }
     }
 }

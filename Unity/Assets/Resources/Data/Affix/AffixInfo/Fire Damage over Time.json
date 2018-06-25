@@ -1,0 +1,67 @@
+{
+  "Type": {
+    "Name": "Fire Damage over Time"
+  },
+  "Description": "Deals {0} Fire Damage every {1} seconds for {2} seconds",
+  "ValueInfo": {
+    "BaseValueMin": {
+      "$type": "AffixValueMultiple, Assembly-CSharp",
+      "Values": [
+        {
+          "$type": "AffixValueRange, Assembly-CSharp",
+          "MinValue": 3.0,
+          "MaxValue": 4.0
+        },
+        {
+          "$type": "AffixValueSingle, Assembly-CSharp",
+          "Value": 0.8
+        },
+        {
+          "$type": "AffixValueSingle, Assembly-CSharp",
+          "Value": 3.0
+        }
+      ],
+      "Count": 3
+    },
+    "BaseValueMax": {
+      "$type": "AffixValueMultiple, Assembly-CSharp",
+      "Values": [
+        {
+          "$type": "AffixValueRange, Assembly-CSharp",
+          "MinValue": 4.0,
+          "MaxValue": 6.0
+        },
+        {
+          "$type": "AffixValueSingle, Assembly-CSharp",
+          "Value": 1.0
+        },
+        {
+          "$type": "AffixValueSingle, Assembly-CSharp",
+          "Value": 4.0
+        }
+      ],
+      "Count": 3
+    },
+    "Progressions": [
+      {
+        "Parameters": [
+          1.1
+        ],
+        "Name": "Exponential"
+      },
+      {
+        "Parameters": [
+          1.0
+        ],
+        "Name": "Constant"
+      },
+      {
+        "Parameters": [
+          0.0,
+          1.0
+        ],
+        "Name": "Linear"
+      }
+    ]
+  }
+}

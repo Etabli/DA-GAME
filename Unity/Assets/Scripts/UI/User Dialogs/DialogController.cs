@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -58,7 +59,9 @@ namespace UserDialog
             if (message == null)
                 message = "";
 
-            return CreateDialog<DialogBasic>(message);
+            var dialog = CreateDialog<DialogBasic>(message);
+            ShowDialog(dialog);
+            return dialog;
         }
 
         /// <summary>
@@ -71,9 +74,10 @@ namespace UserDialog
 
             var dialog = CreateDialog<DialogBasic>(message);
             dialog.OnClose += callback;
+            ShowDialog(dialog);
             return dialog;
         }
-        #endregion
+        #endregion // Show | Basic | Normal
 
         #region Blocking
         /// <summary>
@@ -95,9 +99,9 @@ namespace UserDialog
             Block(dialog);
             return dialog;
         }
-        #endregion
+        #endregion // Show | Basic | Blocking
 
-        #endregion
+        #endregion // Show | Basic
 
         #region Cancellable
 
@@ -120,9 +124,10 @@ namespace UserDialog
             if (cancelCallback != null)
                 dialog.OnCancel += cancelCallback;
 
+            ShowDialog(dialog);
             return dialog;
         }
-        #endregion
+        #endregion // Show | Cancellabel | Normal
 
         #region Blocking
         /// <summary>
@@ -138,9 +143,9 @@ namespace UserDialog
             Block(dialog);
             return dialog;
         }
-        #endregion
+        #endregion // Show | Cancellabel | Blocking
 
-        #endregion
+        #endregion // Show | Cancellable
 
         #region String Input
 
@@ -159,6 +164,7 @@ namespace UserDialog
             dialog.OnSubmit += submitCallback;
             dialog.DisableCancelling();
 
+            ShowDialog(dialog);
             return dialog;
         }
 
@@ -238,7 +244,7 @@ namespace UserDialog
             dialog.SetValidator(contentValidator, invalidCallback);
             return dialog;
         }
-        #endregion
+        #endregion // Show | String  Input | No Cancel | Normal
 
         #region Blocking
         /// <summary>
@@ -309,9 +315,9 @@ namespace UserDialog
             Block(dialog);
             return dialog;
         }
-        #endregion
+        #endregion // Show | String  Input | No Cancel | Blocking
 
-        #endregion
+        #endregion // Show | String  Input | No Cancel
 
         #region With Cancel
 
@@ -331,6 +337,7 @@ namespace UserDialog
             if (cancelCallback != null)
                 dialog.OnCancel += cancelCallback;
 
+            ShowDialog(dialog);
             return dialog;
         }
 
@@ -414,7 +421,7 @@ namespace UserDialog
             dialog.SetValidator(contentValidator, invalidCallback);
             return dialog;
         }
-        #endregion
+        #endregion // Show | String Input | With Cancel | Normal
 
         #region Blocking
         /// <summary>
@@ -488,13 +495,13 @@ namespace UserDialog
             Block(dialog);
             return dialog;
         }
-        #endregion
+        #endregion // Show | String Input | With Cancel | Blocking
 
-        #endregion
+        #endregion // Show | String Input | With Cancel
 
-        #endregion
+        #endregion // Show | String Input
 
-        #endregion
+        #endregion // Show
 
         /// <summary>
         /// Makes a dialog block input to other UI elements (excluding other dialogs)
@@ -506,19 +513,31 @@ namespace UserDialog
             dialog.OnClose += () => UnBlock(dialog);
         }
 
-        static T CreateDialog<T>(string message) where T : Dialog
+        /// <summary>
+        /// Instantiates a Dialog Gameobject of the corresponding type (but doesn't enable it)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public static T CreateDialog<T>(string message) where T : Dialog
         {
-            var dialogGO = Instantiate(dialogPrefabs[typeof(T).Name], Instance.transform).GetComponent<Dialog>();
-            dialogGO.transform.Translate(new Vector3(10, -10, 0) * activeDialogs.Count);
-            (dialogGO.transform as RectTransform).ClampToScreen();
+            var dialogGO = Instantiate(dialogPrefabs[typeof(T).Name], Instance.transform);
+            dialogGO.SetActive(false);
 
             var dialog = dialogGO.GetComponent<Dialog>() as T;
             dialog.Message = message;
 
+            return dialog;
+        }
+
+        public static void ShowDialog(Dialog dialog)
+        {
+            dialog.gameObject.transform.Translate(new Vector3(10, -10, 0) * activeDialogs.Count);
+            (dialog.gameObject.transform as RectTransform).ClampToScreen();
+            dialog.gameObject.SetActive(true);
+
             activeDialogs.Add(dialog);
             dialog.OnClose += () => activeDialogs.Remove(dialog);
-
-            return dialog;
         }
 
         static void UnBlock(Dialog dialog)

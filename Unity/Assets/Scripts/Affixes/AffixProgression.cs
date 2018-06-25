@@ -20,11 +20,13 @@ public struct AffixProgression
     public AffixProgression(AffixProgression src) : this(src.Name, src.Parameters)
     { }
 
+    [JsonConstructor]
     public AffixProgression(string name, params float[] parameters)
-    { 
+    {
         Parameters = new float[parameters.Length];
         parameters.CopyTo(Parameters, 0);
-        Name = name;
+
+        Name = name ?? "Linear";
         progressionFunction = null;
 
         AttachProgressionFunction();
@@ -67,13 +69,7 @@ public struct AffixProgression
     public void AttachProgressionFunction()
     {
         MethodInfo method = GetType().GetMethod(Name);
-
-        if (method == null)
-        {
-            throw new InvalidProgressionFunctionException($"Could not find progression function with name {Name}!");
-        }
-
-        progressionFunction = method;
+        progressionFunction = method ?? throw new InvalidProgressionFunctionException($"Could not find progression function with name {Name}!");
     }
 
     public bool HasProgressionFunction()
